@@ -20,6 +20,11 @@
 
   <!-- Hoja de Estilos Principal -->
   <link rel="stylesheet" href="style.css">
+
+  <!-- Vercel Web Analytics (Inicialización) -->
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
 </head>
 <body>
 
@@ -205,6 +210,14 @@
           <input type="file" id="item-image" name="foto_producto" accept="image/*" required>
         </div>
 
+        <!-- Confirmación de Políticas de Publicación -->
+        <div class="form-group checkbox-group" style="margin-top: 15px;">
+          <input type="checkbox" id="accept-policy" name="acepta_politicas" value="Sí" required>
+          <label for="accept-policy">
+            Declaro que esta publicación cumple con las Políticas de Publicación y Términos del Servicio.
+          </label>
+        </div>
+
         <button type="submit" class="submit-btn publish-submit-btn">🚀 Publicar Ahora</button>
       </form>
     </div>
@@ -225,5 +238,8 @@
 
   <!-- Lógica JavaScript en archivo externo -->
   <script src="script.js"></script>
+
+  <!-- Script de Rastreo de Vercel Analytics -->
+  <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
