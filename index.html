@@ -1,60 +1,50 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- SEO -->
-  <title>Mi Marketplace de Ofertas | Promociones Exclusivas</title>
-  <meta name="description" content="Descubre ofertas seleccionadas en moda, tecnología y hogar de Amazon, Shein, AliExpress y Alibaba.">
-  <meta name="robots" content="index, follow">
-
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-  <!-- Header -->
-  <header>
-    <div class="container header-content">
+<!-- Encabezado Publicitario / Hero Section -->
+  <header class="hero-banner">
+    <div class="container hero-content">
+      <div class="promo-badge">
+        <span class="pulse-dot"></span> 🔥 OFERTAS DEL DÍA & TOP VENTAS 2026
+      </div>
+      
       <h1 class="logo">Mi Marketplace <span>de Ofertas</span></h1>
+      
+      <p class="hero-subtitle">
+        Encuentra las mejores promociones y los productos más vendidos en 
+        <strong>Amazon</strong>, <strong>Shein</strong>, <strong>AliExpress</strong> y <strong>Alibaba</strong> en un solo lugar.
+      </p>
+
+      <!-- Accesos Directos a las Mejores Ofertas por Tienda -->
+      <div class="hero-pills">
+        <a href="https://amzn.to/4bJJq22" target="_blank" rel="nofollow noopener sponsored" class="pill-btn amazon">
+          <span class="store-icon">🛒</span>
+          <div>
+            <span class="pill-title">Top Amazon</span>
+            <small class="pill-sub">Lo + vendido</small>
+          </div>
+        </a>
+
+        <a href="https://onelink.shein.com/44/5wyleaujbj2iI" target="_blank" rel="nofollow noopener sponsored" class="pill-btn shein">
+          <span class="store-icon">👗</span>
+          <div>
+            <span class="pill-title">Tendencias Shein</span>
+            <small class="pill-sub">Moda & Descuentos</small>
+          </div>
+        </a>
+
+        <a href="https://s.click.aliexpress.com/e/_c33p0iwF" target="_blank" rel="nofollow noopener sponsored" class="pill-btn aliexpress">
+          <span class="store-icon">⚡</span>
+          <div>
+            <span class="pill-title">SuperOfertas AliExpress</span>
+            <small class="pill-sub">Envíos rápidos</small>
+          </div>
+        </a>
+
+        <a href="https://offer.alibaba.com/cps/t9vapivb?bm=cps&src=saf" target="_blank" rel="nofollow noopener sponsored" class="pill-btn alibaba">
+          <span class="store-icon">🏭</span>
+          <div>
+            <span class="pill-title">Mayoreo Alibaba</span>
+            <small class="pill-sub">Precios de fábrica</small>
+          </div>
+        </a>
+      </div>
     </div>
   </header>
-
-  <main class="container">
-    <!-- Buscador y Filtros -->
-    <section class="controls">
-      <input 
-        type="search" 
-        id="search-input" 
-        class="search-bar" 
-        placeholder="🔍 Buscar ofertas por producto o categoría..."
-      >
-      <div class="filters">
-        <button class="store-filter active" data-store="all">Todos</button>
-        <button class="store-filter" data-store="Amazon">Amazon</button>
-        <button class="store-filter" data-store="Shein">Shein</button>
-        <button class="store-filter" data-store="AliExpress">AliExpress</button>
-        <button class="store-filter" data-store="Alibaba">Alibaba</button>
-      </div>
-    </section>
-
-    <!-- Grid de Productos -->
-    <section id="products-grid" class="products-grid"></section>
-  </main>
-
-  <!-- Botón Flotante de WhatsApp -->
-  <a href="https://wa.me/18722371015" target="_blank" rel="noopener noreferrer" class="whatsapp-float">
-    💬 Soporte WhatsApp
-  </a>
-
-  <!-- Footer Legal -->
-  <footer>
-    <div class="container">
-      <p><strong>Aviso de afiliados:</strong> Este sitio participa en programas de afiliados (como Amazon Associates, AliExpress Affiliate, Shein Affiliate, entre otros). Al comprar a través de nuestros enlaces, podemos recibir una comisión sin costo extra para ti.</p>
-      <p>&copy; 2026 Mi Marketplace de Ofertas. Todos los derechos reservados.</p>
-    </div>
-  </footer>
-
-  <script src="script.js"></script>
-</body>
-</html>
