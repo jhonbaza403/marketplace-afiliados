@@ -1,0 +1,46 @@
+[
+  {
+    "id": "prod-001",
+    "title": "Audífonos Inalámbricos Bluetooth con Cancelación de Ruido",
+    "price": 29.99,
+    "currency": "USD",
+    "image": "https://via.placeholder.com/300x300?text=Audifonos+Bluetooth",
+    "category": "Electrónica",
+    "store": "Amazon",
+    "affiliateUrl": "https://www.amazon.com/dp/EXAMPLE?tag=TU_TAG_AFILIADO-20",
+    "rating": 4.5
+  },
+  {
+    "id": "prod-002",
+    "title": "Chaqueta Casual de Moda Urbana",
+    "price": 18.50,
+    "currency": "USD",
+    "image": "https://via.placeholder.com/300x300?text=Chaqueta+Shein",
+    "category": "Ropa",
+    "store": "Shein",
+    "affiliateUrl": "https://www.shein.com/EXAMPLE?aff_id=TU_ID_AFILIADO",
+    "rating": 4.2
+  },
+  {
+    "id": "prod-003",
+    "title": "Smartwatch Deportivo con Monitor de Ritmo Cardíaco",
+    "price": 15.99,
+    "currency": "USD",
+    "image": "https://via.placeholder.com/300x300?text=Smartwatch+AliExpress",
+    "category": "Electrónica",
+    "store": "AliExpress",
+    "affiliateUrl": "https://s.click.aliexpress.com/e/EXAMPLE_ID",
+    "rating": 4.7
+  },
+  {
+    "id": "prod-004",
+    "title": "Lote de Luces LED para Decoración de Interiores",
+    "price": 8.00,
+    "currency": "USD",
+    "image": "https://via.placeholder.com/300x300?text=Luces+LED+Alibaba",
+    "category": "Hogar",
+    "store": "Alibaba",
+    "affiliateUrl": "https://spanish.alibaba.com/p-detail/EXAMPLE.html?aff_id=TU_ID",
+    "rating": 4.0
+  }
+]
