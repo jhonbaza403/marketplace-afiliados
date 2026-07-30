@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#2563eb">
 
+  <!-- Manifest PWA -->
+  <link rel="manifest" href="manifest.json">
+
   <!-- SEO Básico -->
   <title>Mi Marketplace Multivendedor | Ofertas, Mayor, Detal & Servicios</title>
   <meta name="description" content="Encuentra ofertas al mayor, detal, servicios profesionales y promociones de Amazon, Shein, AliExpress y Alibaba.">
@@ -243,6 +246,17 @@
 
   <!-- Lógica JavaScript en archivo externo -->
   <script src="script.js"></script>
+
+  <!-- Script de Registro del Service Worker PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('Service Worker registrado con éxito:', reg))
+          .catch(err => console.error('Error al registrar Service Worker:', err));
+      });
+    }
+  </script>
 
   <!-- Script de Rastreo de Vercel Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
