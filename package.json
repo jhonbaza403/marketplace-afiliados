@@ -1,0 +1,23 @@
+{
+  "name": "primary",
+  "version": "1.0.0",
+  "description": "Plataforma web de agregación de ofertas y productos populares de **Amazon**, **Shein**, **AliExpress** y **Alibaba**, integrada con un módulo de **Registro y Verificación de Identidad (KYC)** para la evaluación y solicitud de financiamiento / crédito (estilo Cashea).",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jhonbaza403/marketplace-afiliados.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jhonbaza403/marketplace-afiliados/issues"
+  },
+  "homepage": "https://github.com/jhonbaza403/marketplace-afiliados#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
