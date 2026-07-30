@@ -24,7 +24,9 @@ body {
   padding: 0 1.5rem;
 }
 
-/* Header & Banner Principal */
+/* ==========================================
+   HEADER & BANNER PRINCIPAL
+   ========================================== */
 .hero-banner {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   color: white;
@@ -50,11 +52,12 @@ body {
   font-weight: 700;
   font-size: 0.85rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.2s;
 }
 
 .auth-btn:hover {
   background: #1d4ed8;
+  transform: translateY(-2px);
 }
 
 .promo-badge {
@@ -144,7 +147,9 @@ body {
 .pill-btn.aliexpress { background: #ff4747; color: #fff; }
 .pill-btn.alibaba { background: #ff6a00; color: #fff; }
 
-/* Buscador y Controles */
+/* ==========================================
+   BUSCADOR Y CONTROLES
+   ========================================== */
 .controls {
   margin: -1.8rem auto 2.5rem auto;
   background: white;
@@ -165,6 +170,12 @@ body {
   font-size: 0.95rem;
   outline: none;
   box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-bar:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 .filters {
@@ -191,7 +202,9 @@ body {
   border-color: var(--primary-color);
 }
 
-/* Grid de Productos */
+/* ==========================================
+   GRID DE PRODUCTOS Y TARJETAS
+   ========================================== */
 .products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -199,7 +212,6 @@ body {
   padding-bottom: 3rem;
 }
 
-/* Tarjeta de Producto */
 .product-card {
   background: var(--card-bg);
   border-radius: 16px;
@@ -231,6 +243,11 @@ body {
   max-width: 90%;
   max-height: 90%;
   object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .card-image img {
+  transform: scale(1.05);
 }
 
 .store-badge {
@@ -307,6 +324,12 @@ body {
   margin-top: 1rem;
   font-weight: 600;
   font-size: 0.9rem;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.buy-btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
 }
 
 /* ==========================================
@@ -354,6 +377,11 @@ body {
   font-size: 1.5rem;
   cursor: pointer;
   color: #64748b;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #0f172a;
 }
 
 .modal-card h2 {
@@ -390,6 +418,14 @@ body {
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="email"]:focus,
+.form-group input[type="tel"]:focus {
+  border-color: var(--primary-color);
 }
 
 .checkbox-group {
@@ -409,14 +445,17 @@ body {
   font-weight: 800;
   cursor: pointer;
   margin-top: 1rem;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.1s;
 }
 
 .submit-btn:hover {
   background: #15803d;
+  transform: translateY(-1px);
 }
 
-/* WhatsApp Flotante & Footer */
+/* ==========================================
+   WHATSAPP FLOTANTE Y FOOTER
+   ========================================== */
 .whatsapp-float {
   position: fixed;
   bottom: 20px;
@@ -430,6 +469,12 @@ body {
   text-decoration: none;
   box-shadow: 0 8px 20px rgba(37, 211, 102, 0.35);
   z-index: 1000;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.whatsapp-float:hover {
+  transform: scale(1.05);
+  background-color: #20ba5a;
 }
 
 footer {
@@ -438,4 +483,26 @@ footer {
   padding: 2rem 0;
   text-align: center;
   font-size: 0.85rem;
+}
+
+/* ==========================================
+   DISEÑO RESPONSIVO (MÓVILES)
+   ========================================== */
+@media (max-width: 600px) {
+  .hero-banner {
+    padding: 4rem 1rem 2.5rem 1rem;
+  }
+  .user-access {
+    position: static;
+    margin-bottom: 1rem;
+  }
+  .logo {
+    font-size: 1.8rem;
+  }
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+  }
+  .modal-card {
+    padding: 1.5rem;
+  }
 }
