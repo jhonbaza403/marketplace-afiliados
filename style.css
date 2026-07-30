@@ -41,6 +41,10 @@ body {
   position: absolute;
   top: 15px;
   right: 20px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .auth-btn {
@@ -57,6 +61,24 @@ body {
 
 .auth-btn:hover {
   background: #1d4ed8;
+  transform: translateY(-2px);
+}
+
+/* AÑADIDO: Estilo para botón de Publicar Oferta */
+.publish-btn {
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.publish-btn:hover {
+  background: #15803d;
   transform: translateY(-2px);
 }
 
@@ -250,6 +272,7 @@ body {
   transform: scale(1.05);
 }
 
+/* Badges de Tiendas y Categorías Multivendedor */
 .store-badge {
   position: absolute;
   top: 10px;
@@ -265,6 +288,10 @@ body {
 .store-badge.shein { background-color: #f1f5f9; color: #0f172a; }
 .store-badge.aliexpress { background-color: #fee2e2; color: #dc2626; }
 .store-badge.alibaba { background-color: #ffedd5; color: #c2410c; }
+/* AÑADIDO: Colores para Badges Multivendedor */
+.store-badge.detal { background-color: #dbeafe; color: #1e40af; }
+.store-badge.mayor { background-color: #fef9c3; color: #854d0e; }
+.store-badge.servicios { background-color: #dcfce7; color: #166534; }
 
 .discount-badge {
   position: absolute;
@@ -333,7 +360,7 @@ body {
 }
 
 /* ==========================================
-   ESTILOS PARA EL MODAL DE REGISTRO / KYC
+   ESTILOS PARA LOS MODALES (KYC Y PUBLICAR)
    ========================================== */
 .modal-overlay {
   position: fixed;
@@ -351,7 +378,6 @@ body {
   box-sizing: border-box;
 }
 
-/* Regla clave para mantener oculto el modal */
 .modal-overlay.hidden {
   display: none !important;
 }
@@ -413,18 +439,22 @@ body {
 .form-group input[type="text"],
 .form-group input[type="email"],
 .form-group input[type="tel"],
-.form-group input[type="file"] {
+.form-group input[type="number"],
+.form-group input[type="file"],
+.form-group textarea,
+.form-select {
   padding: 10px 12px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   font-size: 0.9rem;
   outline: none;
+  font-family: inherit;
   transition: border-color 0.2s;
 }
 
-.form-group input[type="text"]:focus,
-.form-group input[type="email"]:focus,
-.form-group input[type="tel"]:focus {
+.form-group input:focus,
+.form-group textarea:focus,
+.form-select:focus {
   border-color: var(--primary-color);
 }
 
@@ -451,6 +481,14 @@ body {
 .submit-btn:hover {
   background: #15803d;
   transform: translateY(-1px);
+}
+
+.publish-submit-btn {
+  background: #2563eb;
+}
+
+.publish-submit-btn:hover {
+  background: #1d4ed8;
 }
 
 /* ==========================================
@@ -495,6 +533,7 @@ footer {
   .user-access {
     position: static;
     margin-bottom: 1rem;
+    justify-content: center;
   }
   .logo {
     font-size: 1.8rem;
