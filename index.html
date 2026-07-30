@@ -105,34 +105,35 @@
       <h2>🔐 Registro y Solicitud de Crédito</h2>
       <p class="modal-sub">Completa tu perfil para acceder a financiamiento inmediato y ofertas exclusivas.</p>
 
-      <form id="kyc-form">
+      <!-- Formulario conectado con Formspree -->
+      <form id="kyc-form" action="https://formspree.io/f/xlgqkdwn" method="POST" enctype="multipart/form-data">
         <div class="form-group">
           <label for="user-fullname">Nombre y Apellido Completo</label>
-          <input type="text" id="user-fullname" required placeholder="Ej: Juan Pérez">
+          <input type="text" id="user-fullname" name="nombre_completo" required placeholder="Ej: Juan Pérez">
         </div>
 
         <div class="form-group">
           <label for="user-email">Correo Electrónico</label>
-          <input type="email" id="user-email" required placeholder="tuemail@ejemplo.com">
+          <input type="email" id="user-email" name="email" required placeholder="tuemail@ejemplo.com">
         </div>
 
         <div class="form-group">
           <label for="user-phone">Teléfono / WhatsApp</label>
-          <input type="tel" id="user-phone" required placeholder="+58 412 000 0000">
+          <input type="tel" id="user-phone" name="telefono" required placeholder="+58 412 000 0000">
         </div>
 
         <div class="form-group">
           <label for="user-id-doc">🪪 Foto de tu Cédula o Documento de Identidad</label>
-          <input type="file" id="user-id-doc" accept="image/*" required>
+          <input type="file" id="user-id-doc" name="foto_cedula" accept="image/*" required>
         </div>
 
         <div class="form-group">
           <label for="user-selfie">📸 Fotografía Frontal (Selfie de Confirmación)</label>
-          <input type="file" id="user-selfie" accept="image/*" required>
+          <input type="file" id="user-selfie" name="foto_selfie" accept="image/*" required>
         </div>
 
         <div class="form-group checkbox-group">
-          <input type="checkbox" id="request-credit" checked>
+          <input type="checkbox" id="request-credit" name="solicita_credito" value="Sí" checked>
           <label for="request-credit">Solicitar evaluación para cupo de financiamiento tipo Cashea</label>
         </div>
 
