@@ -1,4 +1,12 @@
-/* Badge con punto verde parpadeante */
+/* Banner Publicitario Principal */
+.hero-banner {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: white;
+  padding: 3rem 1rem;
+  text-align: center;
+  border-bottom: 4px solid #2563eb;
+}
+
 .promo-badge {
   display: inline-flex;
   align-items: center;
@@ -28,7 +36,14 @@
   100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
-/* Botones / Píldoras promocionales */
+.hero-subtitle {
+  color: #94a3b8;
+  font-size: 1.05rem;
+  max-width: 650px;
+  margin: 0.8rem auto 1.8rem auto;
+}
+
+/* Grilla de Botones */
 .hero-pills {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -54,25 +69,11 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
 }
 
-.store-icon {
-  font-size: 1.4rem;
-}
+.store-icon { font-size: 1.4rem; }
+.pill-title { display: block; font-weight: 800; font-size: 0.9rem; line-height: 1.1; }
+.pill-sub { display: block; font-size: 0.75rem; opacity: 0.85; margin-top: 2px; }
 
-.pill-title {
-  display: block;
-  font-weight: 800;
-  font-size: 0.9rem;
-  line-height: 1.1;
-}
-
-.pill-sub {
-  display: block;
-  font-size: 0.75rem;
-  opacity: 0.85;
-  margin-top: 2px;
-}
-
-/* Colores de las Marcas */
+/* Colores de Marcas */
 .pill-btn.amazon { background: #ff9900; color: #111; }
 .pill-btn.shein { background: #ffffff; color: #000; }
 .pill-btn.aliexpress { background: #ff4747; color: #fff; }
