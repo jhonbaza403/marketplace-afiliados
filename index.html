@@ -1,4 +1,19 @@
-<!-- Encabezado Publicitario / Hero Section -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO -->
+  <title>Mi Marketplace de Ofertas | Promociones Exclusivas</title>
+  <meta name="description" content="Descubre ofertas seleccionadas en moda, tecnología y hogar de Amazon, Shein, AliExpress y Alibaba.">
+  <meta name="robots" content="index, follow">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Encabezado Publicitario / Hero Section -->
   <header class="hero-banner">
     <div class="container hero-content">
       <div class="promo-badge">
@@ -12,7 +27,7 @@
         <strong>Amazon</strong>, <strong>Shein</strong>, <strong>AliExpress</strong> y <strong>Alibaba</strong> en un solo lugar.
       </p>
 
-      <!-- Accesos Directos con tus Links de Afiliado Reales -->
+      <!-- Accesos Directos con TUS LINKS REALES DE AFILIADO -->
       <div class="hero-pills">
         <a href="https://amzn.to/4bJJq22" target="_blank" rel="nofollow noopener sponsored" class="pill-btn amazon">
           <span class="store-icon">🛒</span>
@@ -48,3 +63,42 @@
       </div>
     </div>
   </header>
+
+  <main class="container">
+    <!-- Buscador y Filtros -->
+    <section class="controls">
+      <input 
+        type="search" 
+        id="search-input" 
+        class="search-bar" 
+        placeholder="🔍 Buscar ofertas por producto o categoría..."
+      >
+      <div class="filters">
+        <button class="store-filter active" data-store="all">Todos</button>
+        <button class="store-filter" data-store="Amazon">Amazon</button>
+        <button class="store-filter" data-store="Shein">Shein</button>
+        <button class="store-filter" data-store="AliExpress">AliExpress</button>
+        <button class="store-filter" data-store="Alibaba">Alibaba</button>
+      </div>
+    </section>
+
+    <!-- Grid de Productos -->
+    <section id="products-grid" class="products-grid"></section>
+  </main>
+
+  <!-- Botón Flotante de WhatsApp -->
+  <a href="https://wa.me/18722371015" target="_blank" rel="noopener noreferrer" class="whatsapp-float">
+    💬 Soporte WhatsApp
+  </a>
+
+  <!-- Footer Legal -->
+  <footer>
+    <div class="container">
+      <p><strong>Aviso de afiliados:</strong> Este sitio participa en programas de afiliados (como Amazon Associates, AliExpress Affiliate, Shein Affiliate, entre otros). Al comprar a través de nuestros enlaces, podemos recibir una comisión sin costo extra para ti.</p>
+      <p>&copy; 2026 Mi Marketplace de Ofertas. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
