@@ -1,28 +1,28 @@
-document.addEventListener('DOMContentLoaded', () => {
-  let allProducts = [];
+// Manejo del Modal de Usuario y Registro
+const authModal = document.getElementById('auth-modal');
+const openAuthBtn = document.getElementById('open-auth-btn');
+const closeModalBtn = document.getElementById('close-modal-btn');
+const kycForm = document.getElementById('kyc-form');
 
-  const productsContainer = document.getElementById('products-grid');
-  const searchInput = document.getElementById('search-input');
-  const storeButtons = document.querySelectorAll('.store-filter');
+if (openAuthBtn) {
+  openAuthBtn.addEventListener('click', () => {
+    authModal.classList.remove('hidden');
+  });
+}
 
-  async function loadProducts() {
-    try {
-      const response = await fetch('./products.json');
-      if (!response.ok) throw new Error('Error al cargar el archivo JSON');
-      allProducts = await response.json();
-      renderProducts(allProducts);
-    } catch (error) {
-      console.error(error);
-      if (productsContainer) {
-        productsContainer.innerHTML = '<p class="error">Error al cargar los productos.</p>';
-      }
-    }
-  }
+if (closeModalBtn) {
+  closeModalBtn.addEventListener('click', () => {
+    authModal.classList.add('hidden');
+  });
+}
 
-  function renderProducts(products) {
-    if (!productsContainer) return;
-    productsContainer.innerHTML = '';
-
+if (kycForm) {
+  kycForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    alert('¡Solicitud enviada con éxito! Tu cuenta está en proceso de verificación para otorgar tu cupo de financiamiento.');
+    authModal.classList.add('hidden');
+  });
+}
     if (products.length === 0) {
       productsContainer.innerHTML = '<p class="no-results" style="grid-column: 1/-1; text-align: center; padding: 2rem;">No se encontraron productos que coincidan con la búsqueda.</p>';
       return;
