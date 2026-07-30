@@ -142,5 +142,77 @@
     "affiliateUrl": "https://offer.alibaba.com/cps/t9vapivb?bm=cps&src=saf",
     "rating": 4.7,
     "discount": "Mayoreo"
+  },
+  {
+    "id": "13",
+    "title": "Lote x12 Franelas Unisex 100% Algodón (Colores Surtidos)",
+    "price": 3.50,
+    "currency": "USD",
+    "store": "Mayor",
+    "category": "Moda / Al Mayor",
+    "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&q=80",
+    "affiliateUrl": "https://wa.me/18722371015?text=Hola,%20busco%20información%20sobre%20el%20Lote%20de%20Franelas%20al%20Mayor",
+    "rating": 5.0,
+    "discount": "Fábrica"
+  },
+  {
+    "id": "14",
+    "title": "Servicio de Mantenimiento y Reparación de Aire Acondicionado",
+    "price": 25.00,
+    "currency": "USD",
+    "store": "Servicios",
+    "category": "Servicios Técnicos",
+    "image": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=500&q=80",
+    "affiliateUrl": "https://wa.me/18722371015?text=Hola,%20quiero%20cotizar%20un%20servicio%20de%20mantenimiento%20de%20aire%20acondicionado",
+    "rating": 4.9,
+    "discount": "Garantizado"
+  },
+  {
+    "id": "15",
+    "title": "Perfume Floral para Dama 100ml (Tienda Local)",
+    "price": 15.00,
+    "currency": "USD",
+    "store": "Detal",
+    "category": "Belleza",
+    "image": "https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&q=80",
+    "affiliateUrl": "https://wa.me/18722371015?text=Hola,%20deseo%20comprar%20el%20Perfume%20Floral%20al%20Detal",
+    "rating": 4.7,
+    "discount": "Entrega Inmediata"
+  },
+  {
+    "id": "16",
+    "title": "Diseño Web Profesional y Tienda Online para Negocios",
+    "price": 150.00,
+    "currency": "USD",
+    "store": "Servicios",
+    "category": "Servicios Digitales",
+    "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&q=80",
+    "affiliateUrl": "https://wa.me/18722371015?text=Hola,%20me%20interesa%20contratar%20el%20servicio%20de%20diseño%20web",
+    "rating": 5.0,
+    "discount": "Asesoría Gratis"
+  },
+  {
+    "id": "17",
+    "title": "Lote x50 Cables Carga Rápida Tipo C en Caja",
+    "price": 1.20,
+    "currency": "USD",
+    "store": "Mayor",
+    "category": "Tecnología / Al Mayor",
+    "image": "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=500&q=80",
+    "affiliateUrl": "https://wa.me/18722371015?text=Hola,%20quiero%20información%20del%20Lote%20de%20Cables%20Tipo%20C",
+    "rating": 4.8,
+    "discount": "Mayoreo"
+  },
+  {
+    "id": "18",
+    "title": "Combo Combo Calzado Deportivo Urbano (Venta al Detal)",
+    "price": 28.00,
+    "currency": "USD",
+    "store": "Detal",
+    "category": "Calzado",
+    "image": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=500&q=80",
+    "affiliateUrl": "https://wa.me/18722371015?text=Hola,%20consulto%20disponibilidad%20del%20Calzado%20Deportivo",
+    "rating": 4.6,
+    "discount": "Oferta Detal"
   }
 ]
