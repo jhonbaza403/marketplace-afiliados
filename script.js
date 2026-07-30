@@ -5,40 +5,43 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('search-input');
   const storeButtons = document.querySelectorAll('.store-filter');
 
-  // Cargar productos desde products.json
   async function loadProducts() {
     try {
       const response = await fetch('./products.json');
-      if (!response.ok) throw new Error('Error al cargar productos');
+      if (!response.ok) throw new Error('Error al cargar el archivo JSON');
       allProducts = await response.json();
       renderProducts(allProducts);
     } catch (error) {
       console.error(error);
       if (productsContainer) {
-        productsContainer.innerHTML = '<p class="error">Error al cargar productos.</p>';
+        productsContainer.innerHTML = '<p class="error">Error al cargar los productos.</p>';
       }
     }
   }
 
-  // Renderizar tarjetas
   function renderProducts(products) {
     if (!productsContainer) return;
     productsContainer.innerHTML = '';
 
     if (products.length === 0) {
-      productsContainer.innerHTML = '<p class="no-results">No se encontraron productos.</p>';
+      productsContainer.innerHTML = '<p class="no-results" style="grid-column: 1/-1; text-align: center; padding: 2rem;">No se encontraron productos que coincidan con la búsqueda.</p>';
       return;
     }
 
     products.forEach(product => {
       const card = document.createElement('article');
       card.className = 'product-card';
+      
       const storeClass = product.store.toLowerCase().replace(/\s+/g, '');
+      const discountBadge = product.discount 
+        ? `<span class="discount-badge">${product.discount}</span>` 
+        : '';
 
       card.innerHTML = `
         <div class="card-image">
           <img src="${product.image}" alt="${product.title}" loading="lazy">
           <span class="store-badge ${storeClass}">${product.store}</span>
+          ${discountBadge}
         </div>
         <div class="card-content">
           <span class="category">${product.category}</span>
@@ -59,9 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Filtrar por tienda y buscador
   function filterProducts() {
-    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
     const activeStoreBtn = document.querySelector('.store-filter.active');
     const selectedStore = activeStoreBtn ? activeStoreBtn.dataset.store : 'all';
 
