@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2563eb">
 
   <!-- SEO Básico -->
   <title>Mi Marketplace Multivendedor | Ofertas, Mayor, Detal & Servicios</title>
@@ -17,6 +18,10 @@
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="logo.png">
+
+  <!-- Optimización de Carga Previa -->
+  <link rel="preconnect" href="https://formspree.io">
+  <link rel="dns-prefetch" href="https://images.unsplash.com">
 
   <!-- Hoja de Estilos Principal -->
   <link rel="stylesheet" href="style.css">
@@ -214,7 +219,7 @@
         <div class="form-group checkbox-group" style="margin-top: 15px;">
           <input type="checkbox" id="accept-policy" name="acepta_politicas" value="Sí" required>
           <label for="accept-policy">
-            Declaro que esta publicación cumple con las Políticas de Publicación y Términos del Servicio.
+            Declaro que esta publicación cumple con las <a href="#" onclick="alert('Políticas: No publicar contenido ilegal, productos prohibidos o información falsa.'); return false;" style="color: #2563eb; text-decoration: underline;">Políticas de Publicación</a> y Términos del Servicio.
           </label>
         </div>
 
