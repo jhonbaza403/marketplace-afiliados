@@ -1,74 +1,74 @@
 [
   {
-    "id": "prod-001",
+    "id": "1",
     "title": "Audífonos Inalámbricos Bluetooth con Cancelación de Ruido",
     "price": 29.99,
-    "discount": "20% OFF",
     "currency": "USD",
-    "image": "https://via.placeholder.com/300x300?text=Audifonos+Bluetooth",
-    "category": "Electrónica",
     "store": "Amazon",
+    "category": "Tecnología",
+    "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80",
     "affiliateUrl": "https://amzn.to/4bJJq22",
-    "rating": 4.5
+    "rating": 4.8,
+    "discount": "-20%"
   },
   {
-    "id": "prod-002",
-    "title": "Chaqueta Casual de Moda Urbana",
+    "id": "2",
+    "title": "Vestido Casual de Verano Floral y Estampado Modesto",
     "price": 18.50,
-    "discount": "15% OFF",
     "currency": "USD",
-    "image": "https://via.placeholder.com/300x300?text=Chaqueta+Shein",
-    "category": "Ropa",
     "store": "Shein",
+    "category": "Moda",
+    "image": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500&q=80",
     "affiliateUrl": "https://onelink.shein.com/44/5wyleaujbj2iI",
-    "rating": 4.2
+    "rating": 4.6,
+    "discount": "-15%"
   },
   {
-    "id": "prod-003",
-    "title": "Smartwatch Deportivo con Monitor de Ritmo Cardíaco",
-    "price": 15.99,
-    "discount": "30% OFF",
+    "id": "3",
+    "title": "Reloj Inteligente Smartwatch Deportivo IP68",
+    "price": 22.40,
     "currency": "USD",
-    "image": "https://via.placeholder.com/300x300?text=Smartwatch+AliExpress",
-    "category": "Electrónica",
     "store": "AliExpress",
+    "category": "Tecnología",
+    "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80",
     "affiliateUrl": "https://s.click.aliexpress.com/e/_c33p0iwF",
-    "rating": 4.7
+    "rating": 4.7,
+    "discount": "-35%"
   },
   {
-    "id": "prod-004",
-    "title": "Lote de Luces LED para Decoración de Interiores",
-    "price": 8.00,
-    "discount": "OFERTA",
+    "id": "4",
+    "title": "Lote por Mayor: Lámparas LED de Escritorio Recargables",
+    "price": 5.20,
     "currency": "USD",
-    "image": "https://via.placeholder.com/300x300?text=Luces+LED+Alibaba",
-    "category": "Hogar",
     "store": "Alibaba",
+    "category": "Hogar",
+    "image": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=500&q=80",
     "affiliateUrl": "https://offer.alibaba.com/cps/t9vapivb?bm=cps&src=saf",
-    "rating": 4.0
+    "rating": 4.9,
+    "discount": "Mayoreo"
   },
   {
-    "id": "prod-005",
-    "title": "Teclado Mecánico RGB Gamer Inalámbrico",
-    "price": 45.00,
-    "discount": "25% OFF",
+    "id": "5",
+    "title": "Zapatillas Deportivas Running Antideslizantes",
+    "price": 34.99,
     "currency": "USD",
-    "image": "https://via.placeholder.com/300x300?text=Teclado+Gamer",
-    "category": "Electrónica",
     "store": "Amazon",
+    "category": "Calzado",
+    "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80",
     "affiliateUrl": "https://amzn.to/4bJJq22",
-    "rating": 4.8
+    "rating": 4.5,
+    "discount": "-10%"
   },
   {
-    "id": "prod-006",
-    "title": "Zapatillas Deportivas Ligeras para Running",
-    "price": 22.90,
-    "discount": "10% OFF",
+    "id": "6",
+    "title": "Conjunto Deportivo de 2 Piezas para Entrenamiento",
+    "price": 21.00,
     "currency": "USD",
-    "image": "https://via.placeholder.com/300x300?text=Zapatillas+Deportivas",
-    "category": "Ropa",
     "store": "Shein",
+    "category": "Moda",
+    "image": "https://images.unsplash.com/photo-1518458028785-8fbcd101ebb9?w=500&q=80",
     "affiliateUrl": "https://onelink.shein.com/44/5wyleaujbj2iI",
-    "rating": 4.4
+    "rating": 4.7,
+    "discount": "-25%"
   }
 ]
