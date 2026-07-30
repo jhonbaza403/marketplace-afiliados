@@ -4,14 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- SEO -->
+  <!-- SEO Básico -->
   <title>Mi Marketplace Multivendedor | Ofertas, Mayor, Detal & Servicios</title>
   <meta name="description" content="Encuentra ofertas al mayor, detal, servicios profesionales y promociones de Amazon, Shein, AliExpress y Alibaba.">
   <meta name="robots" content="index, follow">
 
+  <!-- Open Graph / Redes Sociales & WhatsApp Preview -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mi Marketplace Multivendedor & CrediOfertas">
+  <meta property="og:description" content="Compra al mayor, detal, contrata servicios o publica tus ofertas gratis.">
+  <meta property="og:image" content="logo.png">
+
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="logo.png">
 
+  <!-- Hoja de Estilos Principal -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -19,9 +26,8 @@
   <!-- Encabezado Publicitario / Hero Section -->
   <header class="hero-banner">
     <div class="user-access">
-      <!-- AÑADIDO: Botón para abrir el formulario de publicación -->
-      <button id="open-publish-btn" class="publish-btn">➕ Publicar Oferta / Servicio</button>
-      <button id="open-auth-btn" class="auth-btn">👤 CrediOfertas / KYC</button>
+      <button id="open-publish-btn" class="publish-btn" aria-label="Abrir formulario para publicar">➕ Publicar Oferta / Servicio</button>
+      <button id="open-auth-btn" class="auth-btn" aria-label="Abrir formulario de crédito y registro">👤 CrediOfertas / KYC</button>
     </div>
 
     <div class="container hero-content">
@@ -84,9 +90,10 @@
         id="search-input" 
         class="search-bar" 
         placeholder="🔍 Buscar productos, negocios, ventas al mayor o servicios..."
+        aria-label="Buscar productos o servicios"
       >
-      <!-- AÑADIDO: Nuevas categorías de filtrado -->
-      <div class="filters">
+      <!-- Categorías de filtrado -->
+      <div class="filters" role="tablist" aria-label="Filtros de tiendas y categorías">
         <button class="store-filter active" data-store="all">Todos</button>
         <button class="store-filter" data-store="Detal">🛍️ Venta al Detal</button>
         <button class="store-filter" data-store="Mayor">📦 Venta al Mayor</button>
@@ -99,17 +106,17 @@
     </section>
 
     <!-- Grid de Productos y Servicios -->
-    <section id="products-grid" class="products-grid"></section>
+    <section id="products-grid" class="products-grid" aria-live="polite"></section>
   </main>
 
   <!-- ==========================================
        MODAL 1: REGISTRO Y CRÉDITO (KYC)
        ========================================== -->
-  <div id="auth-modal" class="modal-overlay hidden">
+  <div id="auth-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="kyc-title">
     <div class="modal-card">
-      <button id="close-modal-btn" class="close-btn">&times;</button>
+      <button id="close-modal-btn" class="close-btn" aria-label="Cerrar modal de registro">&times;</button>
       
-      <h2>🔐 Registro y Solicitud de Crédito</h2>
+      <h2 id="kyc-title">🔐 Registro y Solicitud de Crédito</h2>
       <p class="modal-sub">Completa tu perfil para acceder a financiamiento inmediato y ofertas exclusivas.</p>
 
       <form id="kyc-form" action="https://formspree.io/f/xlgqkdwn" method="POST" enctype="multipart/form-data">
@@ -149,13 +156,13 @@
   </div>
 
   <!-- ==========================================
-       AÑADIDO: MODAL 2 DE PUBLICACIÓN
+       MODAL 2: PUBLICACIÓN DE OFERTAS / SERVICIOS
        ========================================== -->
-  <div id="publish-modal" class="modal-overlay hidden">
+  <div id="publish-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="publish-title">
     <div class="modal-card">
-      <button id="close-publish-modal-btn" class="close-btn">&times;</button>
+      <button id="close-publish-modal-btn" class="close-btn" aria-label="Cerrar modal de publicación">&times;</button>
       
-      <h2>📢 Publicar en el Marketplace</h2>
+      <h2 id="publish-title">📢 Publicar en el Marketplace</h2>
       <p class="modal-sub">Publica tus productos al mayor, detal o anuncia tus servicios profesionales.</p>
 
       <form id="publish-form" action="https://formspree.io/f/xlgqkdwn" method="POST" enctype="multipart/form-data">
@@ -204,7 +211,7 @@
   </div>
 
   <!-- Botón Flotante de WhatsApp -->
-  <a href="https://wa.me/18722371015" target="_blank" rel="noopener noreferrer" class="whatsapp-float">
+  <a href="https://wa.me/18722371015" target="_blank" rel="noopener noreferrer" class="whatsapp-float" aria-label="Soporte por WhatsApp">
     💬 Soporte WhatsApp
   </a>
 
@@ -216,6 +223,7 @@
     </div>
   </footer>
 
+  <!-- Lógica JavaScript en archivo externo -->
   <script src="script.js"></script>
 </body>
 </html>
