@@ -70,5 +70,77 @@
     "affiliateUrl": "https://onelink.shein.com/44/5wyleaujbj2iI",
     "rating": 4.7,
     "discount": "-25%"
+  },
+  {
+    "id": "7",
+    "title": "Cámara de Seguridad WiFi 1080P Visión Nocturna",
+    "price": 19.99,
+    "currency": "USD",
+    "store": "AliExpress",
+    "category": "Tecnología",
+    "image": "https://images.unsplash.com/photo-1557324232-b8917d3c3dcb?w=500&q=80",
+    "affiliateUrl": "https://s.click.aliexpress.com/e/_c33p0iwF",
+    "rating": 4.6,
+    "discount": "-40%"
+  },
+  {
+    "id": "8",
+    "title": "Lote por Mayor: Mini Humidificadores Ultra Silenciosos",
+    "price": 3.80,
+    "currency": "USD",
+    "store": "Alibaba",
+    "category": "Hogar",
+    "image": "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=500&q=80",
+    "affiliateUrl": "https://offer.alibaba.com/cps/t9vapivb?bm=cps&src=saf",
+    "rating": 4.8,
+    "discount": "Mayoreo"
+  },
+  {
+    "id": "9",
+    "title": "Mochila Ergonómica e Impermeable para Laptop 15.6\"",
+    "price": 27.50,
+    "currency": "USD",
+    "store": "Amazon",
+    "category": "Accesorios",
+    "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&q=80",
+    "affiliateUrl": "https://amzn.to/4bJJq22",
+    "rating": 4.9,
+    "discount": "-18%"
+  },
+  {
+    "id": "10",
+    "title": "Chaqueta Cortavientos Estilo Urbano Oversize",
+    "price": 24.00,
+    "currency": "USD",
+    "store": "Shein",
+    "category": "Moda",
+    "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?w=500&q=80",
+    "affiliateUrl": "https://onelink.shein.com/44/5wyleaujbj2iI",
+    "rating": 4.5,
+    "discount": "-30%"
+  },
+  {
+    "id": "11",
+    "title": "Teclado Mecánico Gamer RGB Retroiluminado",
+    "price": 31.20,
+    "currency": "USD",
+    "store": "AliExpress",
+    "category": "Tecnología",
+    "image": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500&q=80",
+    "affiliateUrl": "https://s.click.aliexpress.com/e/_c33p0iwF",
+    "rating": 4.8,
+    "discount": "-22%"
+  },
+  {
+    "id": "12",
+    "title": "Lote por Mayor: Fundas de Silicona Antigolpes para Móviles",
+    "price": 0.85,
+    "currency": "USD",
+    "store": "Alibaba",
+    "category": "Accesorios",
+    "image": "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=500&q=80",
+    "affiliateUrl": "https://offer.alibaba.com/cps/t9vapivb?bm=cps&src=saf",
+    "rating": 4.7,
+    "discount": "Mayoreo"
   }
 ]
