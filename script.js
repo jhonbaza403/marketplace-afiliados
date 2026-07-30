@@ -1,30 +1,66 @@
-// Manejo del Modal de Usuario y Registro
-const authModal = document.getElementById('auth-modal');
-const openAuthBtn = document.getElementById('open-auth-btn');
-const closeModalBtn = document.getElementById('close-modal-btn');
-const kycForm = document.getElementById('kyc-form');
+document.addEventListener('DOMContentLoaded', () => {
+  let allProducts = [];
 
-if (openAuthBtn) {
-  openAuthBtn.addEventListener('click', () => {
-    authModal.classList.remove('hidden');
-  });
-}
+  const productsContainer = document.getElementById('products-grid');
+  const searchInput = document.getElementById('search-input');
+  const storeButtons = document.querySelectorAll('.store-filter');
 
-if (closeModalBtn) {
-  closeModalBtn.addEventListener('click', () => {
-    authModal.classList.add('hidden');
-  });
-}
+  // Control del Modal de Registro / Verificación (KYC)
+  const authModal = document.getElementById('auth-modal');
+  const openAuthBtn = document.getElementById('open-auth-btn');
+  const closeModalBtn = document.getElementById('close-modal-btn');
+  const kycForm = document.getElementById('kyc-form');
 
-if (kycForm) {
-  kycForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    alert('¡Solicitud enviada con éxito! Tu cuenta está en proceso de verificación para otorgar tu cupo de financiamiento.');
-    authModal.classList.add('hidden');
+  if (openAuthBtn) {
+    openAuthBtn.addEventListener('click', () => {
+      authModal.classList.remove('hidden');
+    });
+  }
+
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', () => {
+      authModal.classList.add('hidden');
+    });
+  }
+
+  // Cerrar modal al hacer clic fuera de la tarjeta
+  window.addEventListener('click', (e) => {
+    if (e.target === authModal) {
+      authModal.classList.add('hidden');
+    }
   });
-}
+
+  if (kycForm) {
+    kycForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('¡Solicitud enviada con éxito! Tu cuenta y tus documentos están en proceso de verificación para otorgar tu cupo de financiamiento.');
+      kycForm.reset();
+      authModal.classList.add('hidden');
+    });
+  }
+
+  // Cargar productos desde products.json
+  async function loadProducts() {
+    try {
+      const response = await fetch('./products.json');
+      if (!response.ok) throw new Error('Error al cargar el archivo JSON');
+      allProducts = await response.json();
+      renderProducts(allProducts);
+    } catch (error) {
+      console.error(error);
+      if (productsContainer) {
+        productsContainer.innerHTML = '<p class="error" style="grid-column: 1/-1; text-align: center;">Error al cargar los productos.</p>';
+      }
+    }
+  }
+
+  // Renderizar tarjetas de productos
+  function renderProducts(products) {
+    if (!productsContainer) return;
+    productsContainer.innerHTML = '';
+
     if (products.length === 0) {
-      productsContainer.innerHTML = '<p class="no-results" style="grid-column: 1/-1; text-align: center; padding: 2rem;">No se encontraron productos que coincidan con la búsqueda.</p>';
+      productsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 2rem;">No se encontraron productos en esta categoría.</p>';
       return;
     }
 
@@ -50,10 +86,7 @@ if (kycForm) {
             <span class="price">$${product.price.toFixed(2)} ${product.currency}</span>
             <span class="rating">⭐ ${product.rating}</span>
           </div>
-          <a href="${product.affiliateUrl}" 
-             target="_blank" 
-             rel="nofollow noopener sponsored" 
-             class="buy-btn">
+          <a href="${product.affiliateUrl}" target="_blank" rel="nofollow noopener sponsored" class="buy-btn">
              Ver oferta en ${product.store}
           </a>
         </div>
@@ -62,6 +95,7 @@ if (kycForm) {
     });
   }
 
+  // Filtrado y búsqueda en tiempo real
   function filterProducts() {
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
     const activeStoreBtn = document.querySelector('.store-filter.active');
