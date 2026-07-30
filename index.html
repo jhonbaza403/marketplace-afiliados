@@ -1,56 +1,82 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Marketplace de Ofertas</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO Básico -->
+  <title>Mi Marketplace de Ofertas | Las mejores promociones de Amazon, Shein y AliExpress</title>
+  <meta name="description" content="Descubre ofertas y descuentos seleccionados en tecnología, moda y hogar de tiendas como Amazon, Shein, AliExpress y Alibaba.">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph / Redes Sociales y WhatsApp -->
+  <meta property="og:title" content="Mi Marketplace de Ofertas - Promociones Exclusivas">
+  <meta property="og:description" content="Encuentra las mejores ofertas y productos recomendados en un solo lugar.">
+  <meta property="og:type" content="website">
+
+  <!-- Hoja de Estilos Principal -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>Mi Marketplace de Ofertas</h1>
-    </header>
 
-    <main id="productos-container">
-        <!-- Producto 1: Amazon -->
-        <div class="producto">
-            <h3>Gadget Tech 2026</h3>
-            <p>Descripción del producto increíble de tecnología.</p>
-            <button class="btn-afiliado" data-url="https://amzn.to/4bJJq22">Comprar en Amazon</button>
-        </div>
+  <!-- Encabezado / Navegación principal -->
+  <header class="header">
+    <div class="container nav-container">
+      <h1 class="logo">Mi Marketplace <span>de Ofertas</span></h1>
+      <a href="https://wa.me/18722371015" target="_blank" rel="noopener noreferrer" class="btn-whatsapp-header">
+        💬 Soporte WhatsApp
+      </a>
+    </div>
+  </header>
 
-        <!-- Producto 2: Shein -->
-        <div class="producto">
-            <h3>Moda Tendencia</h3>
-            <p>Lo último en moda a un precio espectacular.</p>
-            <button class="btn-afiliado" data-url="https://onelink.shein.com/44/5wyleaujbj2iI">Comprar en Shein</button>
-        </div>
+  <main class="container">
+    <!-- Controles de Filtros y Buscador -->
+    <section class="controls-section">
+      <div class="search-box">
+        <input 
+          type="search" 
+          id="search-input" 
+          class="search-bar" 
+          placeholder="🔍 Buscar ofertas por producto o categoría..."
+        >
+      </div>
 
-        <!-- Producto 3: AliExpress -->
-        <div class="producto">
-            <h3>Oferta AliExpress</h3>
-            <p>Calidad garantizada para tu hogar.</p>
-            <button class="btn-afiliado" data-url="https://s.click.aliexpress.com/e/_c33p0iwF">Comprar en AliExpress</button>
-        </div>
+      <div class="store-filters" id="store-filters">
+        <button class="store-filter active" data-store="all">Todos</button>
+        <button class="store-filter" data-store="Amazon">Amazon</button>
+        <button class="store-filter" data-store="Shein">Shein</button>
+        <button class="store-filter" data-store="AliExpress">AliExpress</button>
+        <button class="store-filter" data-store="Alibaba">Alibaba</button>
+      </div>
+    </section>
 
-        <!-- Producto 4: Alibaba -->
-        <div class="producto">
-            <h3>Oferta Alibaba</h3>
-            <p>Encuentra productos al por mayor y proveedores directos.</p>
-            <button class="btn-afiliado" data-url="https://offer.alibaba.com/cps/t9vapivb?bm=cps&src=saf">Comprar en Alibaba</button>
-        </div>
-    </main>
+    <!-- Grid Dinámico de Productos (Gestionado por script.js) -->
+    <section id="products-grid" class="products-grid">
+      <!-- Los productos se cargarán dinámicamente aquí -->
+    </section>
+  </main>
 
-    <footer style="text-align: center; margin-top: 50px; padding: 20px; border-top: 1px solid #ccc; font-size: 14px; color: #555;">
-        <p><strong>Aviso Legal:</strong> Este sitio participa en programas de afiliados. Como tal, puedo recibir una pequeña comisión por las compras realizadas a través de mis enlaces.</p>
-        
-        <!-- Botón de WhatsApp de Soporte -->
-        <div style="margin-top: 20px;">
-            <a href="https://wa.me/18722371015" style="background-color: #25d366; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                💬 Soporte vía WhatsApp
-            </a>
-        </div>
-    </footer>
+  <!-- Pie de página con Disclaimer de Afiliados -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <p class="disclaimer">
+        <strong>Aviso de afiliados:</strong> Este sitio web participa en programas de afiliados (como Amazon Associates, AliExpress Affiliate, Shein Affiliate, entre otros). Al realizar compras a través de nuestros enlaces, podemos recibir una pequeña comisión sin ningún costo extra para ti.
+      </p>
+
+      <div class="footer-actions">
+        <a href="https://wa.me/18722371015" target="_blank" rel="noopener noreferrer" class="btn-whatsapp">
+          💬 Contactar por WhatsApp
+        </a>
+      </div>
+
+      <p class="copyright">&copy; 2026 Mi Marketplace de Ofertas. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- Script principal -->
+  <script src="script.js"></script>
+</body>
+</html>
 
     <script src="script.js"></script>
 </body>
