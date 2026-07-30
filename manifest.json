@@ -1,11 +1,14 @@
 {
+  "id": "/",
   "name": "CrediOfertas Marketplace Multivendedor",
   "short_name": "CrediOfertas",
   "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#2563eb",
   "description": "Compra al mayor, detal, contrata servicios o explora las mejores ofertas.",
+  "categories": ["shopping", "business", "finance"],
   "icons": [
     {
       "src": "logo.png",
