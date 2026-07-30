@@ -4,44 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- SEO Básico -->
-  <title>Mi Marketplace de Ofertas | Las mejores promociones de Amazon, Shein y AliExpress</title>
-  <meta name="description" content="Descubre ofertas y descuentos seleccionados en tecnología, moda y hogar de tiendas como Amazon, Shein, AliExpress y Alibaba.">
+  <!-- SEO -->
+  <title>Mi Marketplace de Ofertas | Promociones Exclusivas</title>
+  <meta name="description" content="Descubre ofertas seleccionadas en moda, tecnología y hogar de Amazon, Shein, AliExpress y Alibaba.">
   <meta name="robots" content="index, follow">
 
-  <!-- Open Graph / Redes Sociales y WhatsApp -->
-  <meta property="og:title" content="Mi Marketplace de Ofertas - Promociones Exclusivas">
-  <meta property="og:description" content="Encuentra las mejores ofertas y productos recomendados en un solo lugar.">
-  <meta property="og:type" content="website">
-
-  <!-- Hoja de Estilos Principal -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Encabezado / Navegación principal -->
-  <header class="header">
-    <div class="container nav-container">
+  <!-- Header -->
+  <header>
+    <div class="container header-content">
       <h1 class="logo">Mi Marketplace <span>de Ofertas</span></h1>
-      <a href="https://wa.me/18722371015" target="_blank" rel="noopener noreferrer" class="btn-whatsapp-header">
-        💬 Soporte WhatsApp
-      </a>
     </div>
   </header>
 
   <main class="container">
-    <!-- Controles de Filtros y Buscador -->
-    <section class="controls-section">
-      <div class="search-box">
-        <input 
-          type="search" 
-          id="search-input" 
-          class="search-bar" 
-          placeholder="🔍 Buscar ofertas por producto o categoría..."
-        >
-      </div>
-
-      <div class="store-filters" id="store-filters">
+    <!-- Buscador y Filtros -->
+    <section class="controls">
+      <input 
+        type="search" 
+        id="search-input" 
+        class="search-bar" 
+        placeholder="🔍 Buscar ofertas por producto o categoría..."
+      >
+      <div class="filters">
         <button class="store-filter active" data-store="all">Todos</button>
         <button class="store-filter" data-store="Amazon">Amazon</button>
         <button class="store-filter" data-store="Shein">Shein</button>
@@ -50,34 +38,23 @@
       </div>
     </section>
 
-    <!-- Grid Dinámico de Productos (Gestionado por script.js) -->
-    <section id="products-grid" class="products-grid">
-      <!-- Los productos se cargarán dinámicamente aquí -->
-    </section>
+    <!-- Grid de Productos -->
+    <section id="products-grid" class="products-grid"></section>
   </main>
 
-  <!-- Pie de página con Disclaimer de Afiliados -->
-  <footer class="footer">
-    <div class="container footer-content">
-      <p class="disclaimer">
-        <strong>Aviso de afiliados:</strong> Este sitio web participa en programas de afiliados (como Amazon Associates, AliExpress Affiliate, Shein Affiliate, entre otros). Al realizar compras a través de nuestros enlaces, podemos recibir una pequeña comisión sin ningún costo extra para ti.
-      </p>
+  <!-- Botón Flotante de WhatsApp -->
+  <a href="https://wa.me/18722371015" target="_blank" rel="noopener noreferrer" class="whatsapp-float">
+    💬 Soporte WhatsApp
+  </a>
 
-      <div class="footer-actions">
-        <a href="https://wa.me/18722371015" target="_blank" rel="noopener noreferrer" class="btn-whatsapp">
-          💬 Contactar por WhatsApp
-        </a>
-      </div>
-
-      <p class="copyright">&copy; 2026 Mi Marketplace de Ofertas. Todos los derechos reservados.</p>
+  <!-- Footer Legal -->
+  <footer>
+    <div class="container">
+      <p><strong>Aviso de afiliados:</strong> Este sitio participa en programas de afiliados (como Amazon Associates, AliExpress Affiliate, Shein Affiliate, entre otros). Al comprar a través de nuestros enlaces, podemos recibir una comisión sin costo extra para ti.</p>
+      <p>&copy; 2026 Mi Marketplace de Ofertas. Todos los derechos reservados.</p>
     </div>
   </footer>
 
-  <!-- Script principal -->
   <script src="script.js"></script>
-</body>
-</html>
-
-    <script src="script.js"></script>
 </body>
 </html>
