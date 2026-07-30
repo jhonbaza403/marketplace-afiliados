@@ -24,11 +24,11 @@ body {
   padding: 0 1.5rem;
 }
 
-/* Banner Publicitario Principal */
+/* Header & Banner Principal */
 .hero-banner {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   color: white;
-  padding: 3.5rem 1rem 3.5rem 1rem;
+  padding: 3.5rem 1rem;
   text-align: center;
   position: relative;
   border-bottom: 4px solid var(--primary-color);
@@ -109,7 +109,7 @@ body {
   color: #f8fafc;
 }
 
-/* Grilla de Botones Publicitarios */
+/* Grilla de Accesos Directos */
 .hero-pills {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -309,7 +309,9 @@ body {
   font-size: 0.9rem;
 }
 
-/* Modal Overlay & Card (Sistema KYC) */
+/* ==========================================
+   ESTILOS PARA EL MODAL DE REGISTRO / KYC
+   ========================================== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -326,6 +328,7 @@ body {
   box-sizing: border-box;
 }
 
+/* Regla clave para mantener oculto el modal */
 .modal-overlay.hidden {
   display: none !important;
 }
@@ -406,6 +409,11 @@ body {
   font-weight: 800;
   cursor: pointer;
   margin-top: 1rem;
+  transition: background 0.2s;
+}
+
+.submit-btn:hover {
+  background: #15803d;
 }
 
 /* WhatsApp Flotante & Footer */
