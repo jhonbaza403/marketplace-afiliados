@@ -33,8 +33,86 @@
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
+
+  <!-- ==========================================
+       MÓDULO DE SEGURIDAD Y BLOQUEO VPN / BOTS
+       ========================================== -->
+  <script>
+    async function verificarSeguridadConexion() {
+      try {
+        // 1. Detección en cliente de entorno automatizado (Bots / Puppeteer / Selenium)
+        const esBotOuEmulador = Boolean(
+          navigator.webdriver || 
+          document.documentElement.getAttribute("webdriver") ||
+          window.callPhantom || 
+          window._phantom || 
+          window.__nightmare
+        );
+
+        if (esBotOuEmulador) {
+          bloquearAplicacion("Acceso restringido: Se ha detectado un entorno de navegación automatizado o alterado.");
+          return;
+        }
+
+        // 2. Comprobación de reputación de red / VPN
+        const respuesta = await fetch('https://ipapi.co/json/');
+        if (respuesta.ok) {
+          const datosIP = await respuesta.json();
+          const esVPN = datosIP.security && (datosIP.security.is_vpn || datosIP.security.is_proxy || datosIP.security.is_tor);
+
+          if (esVPN) {
+            bloquearAplicacion("Uso de VPN o Proxy detectado. Desactiva cualquier software de alteración de red para continuar.");
+            return;
+          }
+        }
+      } catch (error) {
+        console.warn("Verificación de seguridad en red omitida:", error);
+      }
+    }
+
+    function bloquearAplicacion(mensaje) {
+      if (document.getElementById("security-overlay")) return;
+
+      const overlay = document.createElement("div");
+      overlay.id = "security-overlay";
+      overlay.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background-color: #0f172a; color: #ffffff;
+        font-family: system-ui, -apple-system, sans-serif;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        padding: 20px; z-index: 999999; text-align: center; box-sizing: border-box;
+      `;
+
+      overlay.innerHTML = `
+        <div style="font-size: 50px; margin-bottom: 20px;">🛡️</div>
+        <h1 style="color: #ef4444; margin: 0 0 10px 0;">Acceso Restringido</h1>
+        <p style="max-width: 500px; line-height: 1.6; color: #cbd5e1; margin-bottom: 20px;">${mensaje}</p>
+        <button onclick="window.location.reload()" style="
+          padding: 12px 24px; background-color: #2563eb; color: white; border: none;
+          border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px;
+        ">Reintentar Conexión</button>
+      `;
+
+      document.body.appendChild(overlay);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', verificarSeguridadConexion);
+    } else {
+      verificarSeguridadConexion();
+    }
+  </script>
 </head>
 <body>
+
+  <!-- Protección ante desactivación de JavaScript -->
+  <noscript>
+    <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #0f172a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999999; text-align: center; padding: 20px;">
+      <div style="font-size: 50px; margin-bottom: 20px;">⚠️</div>
+      <h1 style="color: #ef4444;">JavaScript Requerido</h1>
+      <p style="max-width: 500px; color: #cbd5e1;">Por motivos de seguridad e integridad del sistema, debes habilitar JavaScript en tu navegador para ingresar a la plataforma.</p>
+    </div>
+  </noscript>
 
   <!-- Encabezado Publicitario / Hero Section -->
   <header class="hero-banner">
@@ -261,4 +339,4 @@
   <!-- Script de Rastreo de Vercel Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
 </body>
-</html>
+</html>>
