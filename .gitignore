@@ -6,6 +6,10 @@
 ehthumbs.db
 Icon?
 Thumbs.db
+Desktop.ini
+*$*
+
+# Editores / IDEs
 .vscode/
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -17,6 +21,10 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
 
 # ==========================================
 # Logs y Archivos Temporales
@@ -29,6 +37,9 @@ yarn-error.log*
 lerna-debug.log*
 pnpm-debug.log*
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+*.tmp
+*.temp
+*.bak
 
 # ==========================================
 # Runtime, PID y Caches
@@ -48,6 +59,7 @@ pids
 .vite/
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+.swc/
 
 # ==========================================
 # Reportes de Cobertura de Pruebas
@@ -78,9 +90,11 @@ out/
 .docusaurus/
 .serverless/
 .temp/
+.vercel/
+.netlify/
 
 # ==========================================
-# Variables de Entorno y Datos Sensibles
+# Variables de Entorno, Datos Sensibles y Certificados
 # ==========================================
 .env
 .env.local
@@ -91,8 +105,13 @@ out/
 !.env.example
 *.pem
 *.key
+*.crt
+*.pfx
+*.p12
 
-# Vite files
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
-.vite/
+# ==========================================
+# Archivos de Base de Datos y Pruebas Locales
+# ==========================================
+*.sqlite
+*.sqlite3
+*.db
