@@ -20,18 +20,6 @@
   "icons": [
     {
       "src": "/logo.png",
-      "sizes": "500x500",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "500x500",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
@@ -52,7 +40,7 @@
       "icons": [
         { 
           "src": "/logo.png", 
-          "sizes": "500x500",
+          "sizes": "512x512",
           "type": "image/png"
         }
       ]
@@ -65,7 +53,7 @@
       "icons": [
         { 
           "src": "/logo.png", 
-          "sizes": "500x500",
+          "sizes": "512x512",
           "type": "image/png"
         }
       ]
@@ -74,14 +62,14 @@
   "screenshots": [
     {
       "src": "/logo.png",
-      "sizes": "500x500",
+      "sizes": "512x512",
       "type": "image/png",
       "form_factor": "wide",
       "label": "Vista principal de CrediOfertas"
     },
     {
       "src": "/logo.png",
-      "sizes": "500x500",
+      "sizes": "512x512",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Vista móvil de CrediOfertas"
