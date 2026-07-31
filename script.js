@@ -1,3 +1,11 @@
+// ==========================================
+// 1. CONFIGURACIÓN E INICIALIZACIÓN DE SUPABASE
+// ==========================================
+const SUPABASE_URL = 'https://vpslunexibbaapihmbrj.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_yPCMORrQyiQ1esGLUdSsJA_YfyjPhAo';
+
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 document.addEventListener('DOMContentLoaded', () => {
   let allProducts = [];
 
@@ -5,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('search-input');
   const storeButtons = document.querySelectorAll('.store-filter');
 
-  // Control del Modal 1: Registro / Verificación (KYC)
+  // Control del Modal 1: Registro / Verificación (KYC / Registro de Empresa)
   const authModal = document.getElementById('auth-modal');
   const openAuthBtn = document.getElementById('open-auth-btn');
   const closeModalBtn = document.getElementById('close-modal-btn');
@@ -23,32 +31,51 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Envío AJAX para Formspree (KYC Form)
+  // REGISTRO DE EMPRESA CON RIF EN SUPABASE (KYC Form)
   if (kycForm) {
     kycForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const submitBtn = kycForm.querySelector('button[type="submit"]');
       const originalText = submitBtn.textContent;
-      submitBtn.textContent = 'Enviando...';
+      submitBtn.textContent = 'Registrando...';
       submitBtn.disabled = true;
 
       try {
         const formData = new FormData(kycForm);
-        const response = await fetch(kycForm.action, {
-          method: kycForm.method,
-          body: formData,
-          headers: { 'Accept': 'application/json' }
+        const email = formData.get('email');
+        const password = formData.get('password');
+        const companyName = formData.get('company_name') || formData.get('nombre');
+        const rif = formData.get('rif');
+        const phone = formData.get('phone') || formData.get('telefono');
+
+        // 1. Registrar usuario en la autenticación de Supabase
+        const { data, error: authError } = await supabase.auth.signUp({
+          email: email,
+          password: password,
         });
 
-        if (response.ok) {
-          alert('¡Solicitud enviada con éxito! Tu cuenta y tus documentos están en proceso de verificación.');
-          kycForm.reset();
-          if (authModal) authModal.classList.add('hidden');
-        } else {
-          alert('Hubo un problema al enviar el formulario. Por favor, inténtalo de nuevo.');
+        if (authError) throw authError;
+
+        // 2. Guardar los datos fiscales (RIF) de la tienda
+        if (data.user) {
+          const { error: storeError } = await supabase.from('stores').insert([
+            {
+              id: data.user.id,
+              company_name: companyName,
+              rif: rif,
+              phone: phone,
+            },
+          ]);
+
+          if (storeError) throw storeError;
         }
+
+        alert('¡Registro enviado con éxito! Tu empresa y tu RIF han sido registrados.');
+        kycForm.reset();
+        if (authModal) authModal.classList.add('hidden');
       } catch (err) {
-        alert('Error de conexión. Inténtalo nuevamente.');
+        console.error('Error en el registro:', err);
+        alert('Error al registrar la empresa: ' + (err.message || 'Inténtalo nuevamente.'));
       } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
@@ -74,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Envío AJAX para Formspree (Publish Form)
+  // PUBLICAR PRODUCTO / SERVICIO EN SUPABASE (Publish Form)
   if (publishForm) {
     publishForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -84,22 +111,37 @@ document.addEventListener('DOMContentLoaded', () => {
       submitBtn.disabled = true;
 
       try {
-        const formData = new FormData(publishForm);
-        const response = await fetch(publishForm.action, {
-          method: publishForm.method,
-          body: formData,
-          headers: { 'Accept': 'application/json' }
-        });
+        const { data: { user } } = await supabase.auth.getUser();
 
-        if (response.ok) {
-          alert('¡Publicación enviada con éxito! Se revisará y aparecerá en el catálogo a la brevedad.');
-          publishForm.reset();
-          if (publishModal) publishModal.classList.add('hidden');
-        } else {
-          alert('Hubo un problema al enviar la publicación.');
+        if (!user) {
+          alert('Debes estar registrado y haber iniciado sesión para poder publicar.');
+          return;
         }
+
+        const formData = new FormData(publishForm);
+        const newProduct = {
+          store_id: user.id,
+          title: formData.get('title') || formData.get('titulo'),
+          description: formData.get('description') || formData.get('descripcion'),
+          price: parseFloat(formData.get('price') || formData.get('precio') || 0),
+          category: formData.get('category') || formData.get('categoria'),
+          image_url: formData.get('image_url') || formData.get('imagen'),
+          affiliate_link: formData.get('affiliate_link') || formData.get('enlace'),
+        };
+
+        const { error } = await supabase.from('products').insert([newProduct]);
+
+        if (error) throw error;
+
+        alert('¡Publicación creada con éxito! Ya se encuentra en el catálogo.');
+        publishForm.reset();
+        if (publishModal) publishModal.classList.add('hidden');
+
+        // Recargar los productos desde la base de datos
+        loadProductsFromSupabase();
       } catch (err) {
-        alert('Error de conexión. Inténtalo nuevamente.');
+        console.error('Error al publicar:', err);
+        alert('Error al guardar la publicación: ' + (err.message || 'Inténtalo de nuevo.'));
       } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
@@ -128,24 +170,43 @@ document.addEventListener('DOMContentLoaded', () => {
   // Detección de Accesos Directos PWA (Shortcuts de URL)
   const urlParams = new URLSearchParams(window.location.search);
   const actionParam = urlParams.get('action');
-
   if (actionParam === 'publish' && publishModal) {
     publishModal.classList.remove('hidden');
   } else if (actionParam === 'kyc' && authModal) {
     authModal.classList.remove('hidden');
   }
 
-  // Cargar productos desde products.json
-  async function loadProducts() {
+  // ==========================================
+  // CARGAR PRODUCTOS DESDE SUPABASE
+  // ==========================================
+  async function loadProductsFromSupabase() {
     try {
-      const response = await fetch('./products.json');
-      if (!response.ok) throw new Error('Error al cargar el archivo JSON');
-      allProducts = await response.json();
+      const { data: products, error } = await supabase
+        .from('products')
+        .select('*, stores(company_name, rif)');
+
+      if (error) throw error;
+
+      // Mapear los datos de la base de datos al formato del renderizado
+      allProducts = products.map((prod) => ({
+        id: prod.id,
+        title: prod.title,
+        category: prod.category || 'General',
+        price: prod.price,
+        image: prod.image_url || 'https://via.placeholder.com/300x200?text=Sin+Imagen',
+        affiliateUrl: prod.affiliate_link || '#',
+        store: prod.stores ? prod.stores.company_name : 'Tienda Externa',
+        rif: prod.stores ? prod.stores.rif : '',
+        currency: 'USD',
+        rating: '5.0',
+      }));
+
       renderProducts(allProducts);
     } catch (error) {
-      console.error(error);
+      console.error('Error al cargar desde Supabase:', error);
       if (productsContainer) {
-        productsContainer.innerHTML = '<p class="error" style="grid-column: 1/-1; text-align: center; color: #ef4444; font-weight: bold;">Error al cargar los productos.</p>';
+        productsContainer.innerHTML =
+          '<p class="error" style="grid-column: 1/-1; text-align: center; color: #ef4444; font-weight: bold;">Error al cargar las publicaciones de la base de datos.</p>';
       }
     }
   }
@@ -156,25 +217,24 @@ document.addEventListener('DOMContentLoaded', () => {
     productsContainer.innerHTML = '';
 
     if (products.length === 0) {
-      productsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #64748b;">No se encontraron publicaciones en esta categoría.</p>';
+      productsContainer.innerHTML =
+        '<p style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #64748b;">No se encontraron publicaciones en esta categoría.</p>';
       return;
     }
 
-    products.forEach(product => {
+    products.forEach((product) => {
       const card = document.createElement('article');
       card.className = 'product-card';
-      
       const storeClass = product.store.toLowerCase().replace(/\s+/g, '');
-      const discountBadge = product.discount 
-        ? `<span class="discount-badge">${product.discount}</span>` 
+      const discountBadge = product.discount
+        ? `<span class="discount-badge">${product.discount}</span>`
         : '';
 
-      // Formatear precio
-      const formattedPrice = typeof product.price === 'number' 
-        ? product.price.toFixed(2) 
-        : parseFloat(product.price || 0).toFixed(2);
+      const formattedPrice =
+        typeof product.price === 'number'
+          ? product.price.toFixed(2)
+          : parseFloat(product.price || 0).toFixed(2);
 
-      // Determinar texto del botón dinámicamente según el tipo de tienda/vendedor
       let btnText = `Ver oferta en ${product.store}`;
       if (product.store === 'Servicios') {
         btnText = '📞 Contratar Servicio';
@@ -191,14 +251,14 @@ document.addEventListener('DOMContentLoaded', () => {
           ${discountBadge}
         </div>
         <div class="card-content">
-          <span class="category">${product.category}</span>
+          <span class="category">${product.category} ${product.rif ? `| RIF: ${product.rif}` : ''}</span>
           <h3 class="title">${product.title}</h3>
           <div class="price-rating">
             <span class="price">$${formattedPrice} ${product.currency || 'USD'}</span>
             <span class="rating">⭐ ${product.rating || '5.0'}</span>
           </div>
           <a href="${product.affiliateUrl}" target="_blank" rel="nofollow noopener sponsored" class="buy-btn">
-             ${btnText}
+            ${btnText}
           </a>
         </div>
       `;
@@ -212,14 +272,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const activeStoreBtn = document.querySelector('.store-filter.active');
     const selectedStore = activeStoreBtn ? activeStoreBtn.dataset.store : 'all';
 
-    const filtered = allProducts.filter(product => {
-      const matchesSearch = product.title.toLowerCase().includes(searchTerm) || 
-                            product.category.toLowerCase().includes(searchTerm) ||
-                            product.store.toLowerCase().includes(searchTerm);
-
-      const matchesStore = selectedStore === 'all' || 
-                           product.store.toLowerCase() === selectedStore.toLowerCase();
-
+    const filtered = allProducts.filter((product) => {
+      const matchesSearch =
+        product.title.toLowerCase().includes(searchTerm) ||
+        product.category.toLowerCase().includes(searchTerm) ||
+        product.store.toLowerCase().includes(searchTerm);
+      const matchesStore =
+        selectedStore === 'all' || product.store.toLowerCase() === selectedStore.toLowerCase();
       return matchesSearch && matchesStore;
     });
 
@@ -227,14 +286,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (searchInput) searchInput.addEventListener('input', filterProducts);
-
-  storeButtons.forEach(button => {
+  storeButtons.forEach((button) => {
     button.addEventListener('click', () => {
-      storeButtons.forEach(btn => btn.classList.remove('active'));
+      storeButtons.forEach((btn) => btn.classList.remove('active'));
       button.classList.add('active');
       filterProducts();
     });
   });
 
-  loadProducts();
+  // Inicializar carga desde Supabase
+  loadProductsFromSupabase();
 });
