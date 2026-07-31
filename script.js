@@ -1,4 +1,32 @@
-renderProducts(allProducts);
+// ==========================================
+// CONFIGURACIÓN E INICIALIZACIÓN DE SUPABASE
+// ==========================================
+const SUPABASE_URL = 'https://vpslunexibbaapihmbrj.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_yPCMORrQyiQ1esGLUdSsJA_YfyjPhAo';
+
+// Cliente Supabase global
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+document.addEventListener('DOMContentLoaded', () => {
+  const productsContainer = document.getElementById('products-grid');
+  const searchInput = document.getElementById('search-input');
+  const storeButtons = document.querySelectorAll('.store-filter');
+  let allProducts = [];
+
+  // ==========================================
+  // CARGAR PUBLICACIONES DESDE SUPABASE
+  // ==========================================
+  async function loadProductsFromSupabase() {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      allProducts = data || [];
+      renderProducts(allProducts);
     } catch (error) {
       console.error('Error al cargar desde Supabase:', error);
       if (productsContainer) {
@@ -67,7 +95,7 @@ renderProducts(allProducts);
           ? product.price.toFixed(2)
           : parseFloat(product.price || 0).toFixed(2);
 
-      let btnText = `Ver oferta en ${product.store}`;
+      let btnText = `Ver oferta en ${product.store || 'Tienda'}`;
       if (product.store === 'Servicios') {
         btnText = '📞 Contratar Servicio';
       } else if (product.store === 'Mayor') {
@@ -76,15 +104,16 @@ renderProducts(allProducts);
         btnText = '🛒 Comprar al Detal';
       }
 
-      // Escapar comillas para evitar errores JS al compartir
-      const safeTitle = (product.title || '').replace(/'/g, "\\'");
-      const safeDesc = (product.description || product.title || '').replace(/'/g, "\\'");
+      // Escapar comillas dobles y simples para evitar rompidos sintácticos en onclick
+      const safeTitle = (product.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      const safeDesc = (product.description || product.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
       const targetUrl = product.affiliateUrl || product.affiliate_link || '#';
+      const imageUrl = product.image || product.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80';
 
       card.innerHTML = `
         <div class="card-image" style="position: relative;">
-          <img src="${product.image || product.image_url}" alt="${product.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Imagen+No+Disponible'">
-          <span class="store-badge ${storeClass}">${product.store}</span>
+          <img src="${imageUrl}" alt="${safeTitle}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80'">
+          <span class="store-badge ${storeClass}">${product.store || 'General'}</span>
           ${discountBadge}
         </div>
         <div class="card-content">
