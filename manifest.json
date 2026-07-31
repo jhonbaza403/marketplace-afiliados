@@ -1,5 +1,6 @@
 {
-  "id": "./index.html",
+  "$schema": "https://json.schemastore.org/web-manifest.json",
+  "id": "index.html",
   "name": "CrediOfertas Marketplace Multivendedor",
   "short_name": "CrediOfertas",
   "start_url": "./?utm_source=pwa",
@@ -19,13 +20,19 @@
   ],
   "icons": [
     {
-      "src": "./logo.png",
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./logo.png",
+      "src": "logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -39,21 +46,21 @@
       "url": "./?action=publish",
       "icons": [
         { 
-          "src": "./logo.png", 
-          "sizes": "512x512",
+          "src": "logo.png", 
+          "sizes": "192x192",
           "type": "image/png"
         }
       ]
     },
     {
-      "name": "CrediOfertas KYC",
-      "short_name": "Crédito",
-      "description": "Solicita financiamiento o verifica tu cuenta",
+      "name": "Registro de Empresa / KYC",
+      "short_name": "Empresas",
+      "description": "Verifica tu cuenta comercial o RIF",
       "url": "./?action=kyc",
       "icons": [
         { 
-          "src": "./logo.png", 
-          "sizes": "512x512",
+          "src": "logo.png", 
+          "sizes": "192x192",
           "type": "image/png"
         }
       ]
@@ -61,14 +68,14 @@
   ],
   "screenshots": [
     {
-      "src": "./logo.png",
+      "src": "logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "wide",
       "label": "Vista principal de CrediOfertas"
     },
     {
-      "src": "./logo.png",
+      "src": "logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "narrow",
