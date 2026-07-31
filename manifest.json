@@ -1,9 +1,9 @@
 {
-  "id": "/index.html",
+  "id": "./index.html",
   "name": "CrediOfertas Marketplace Multivendedor",
   "short_name": "CrediOfertas",
-  "start_url": "/?utm_source=pwa",
-  "scope": "/",
+  "start_url": "./?utm_source=pwa",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
@@ -19,13 +19,13 @@
   ],
   "icons": [
     {
-      "src": "/logo.png",
+      "src": "./logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/logo.png",
+      "src": "./logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -36,10 +36,10 @@
       "name": "Publicar Oferta",
       "short_name": "Publicar",
       "description": "Publica un producto o servicio en el marketplace",
-      "url": "/?action=publish",
+      "url": "./?action=publish",
       "icons": [
         { 
-          "src": "/logo.png", 
+          "src": "./logo.png", 
           "sizes": "512x512",
           "type": "image/png"
         }
@@ -49,10 +49,10 @@
       "name": "CrediOfertas KYC",
       "short_name": "Crédito",
       "description": "Solicita financiamiento o verifica tu cuenta",
-      "url": "/?action=kyc",
+      "url": "./?action=kyc",
       "icons": [
         { 
-          "src": "/logo.png", 
+          "src": "./logo.png", 
           "sizes": "512x512",
           "type": "image/png"
         }
@@ -61,14 +61,14 @@
   ],
   "screenshots": [
     {
-      "src": "/logo.png",
+      "src": "./logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "wide",
       "label": "Vista principal de CrediOfertas"
     },
     {
-      "src": "/logo.png",
+      "src": "./logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "narrow",
