@@ -115,11 +115,11 @@
   <!-- Encabezado Publicitario / Hero Section -->
   <header class="hero-banner">
     <div class="user-access">
-      <!-- 🌐 AÑADIDO: Contenedor para Selector de Idioma Global -->
+      <!-- 🌐 Selector de Idioma Global -->
       <div id="google_translate_element" style="display: inline-block; margin-right: 10px;"></div>
 
       <button id="open-publish-btn" class="publish-btn" aria-label="Abrir formulario para publicar">➕ Publicar Oferta / Servicio</button>
-      <button id="open-auth-btn" class="auth-btn" aria-label="Abrir formulario de crédito y registro">👤 CrediOfertas / KYC</button>
+      <button id="open-auth-btn" class="auth-btn" aria-label="Abrir formulario de crédito y registro">🏢 Registro de Empresa / RIF</button>
     </div>
 
     <div class="container hero-content">
@@ -202,47 +202,42 @@
   </main>
 
   <!-- ==========================================
-       MODAL 1: REGISTRO Y CRÉDITO (KYC)
+       MODAL 1: REGISTRO Y VERIFICACIÓN DE EMPRESA (RIF)
        ========================================== -->
   <div id="auth-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="kyc-title">
     <div class="modal-card">
       <button id="close-modal-btn" class="close-btn" aria-label="Cerrar modal de registro">&times;</button>
       
-      <h2 id="kyc-title">🔐 Registro y Solicitud de Crédito</h2>
-      <p class="modal-sub">Completa tu perfil para acceder a financiamiento inmediato y ofertas exclusivas.</p>
+      <h2 id="kyc-title">🏢 Registro de Empresa / Tienda</h2>
+      <p class="modal-sub">Ingresa los datos fiscales de tu empresa para comenzar a publicar productos y servicios.</p>
 
-      <form id="kyc-form" action="https://formspree.io/f/xlgqkdwn" method="POST" enctype="multipart/form-data">
+      <form id="kyc-form">
         <div class="form-group">
-          <label for="user-fullname">Nombre y Apellido Completo</label>
-          <input type="text" id="user-fullname" name="nombre_completo" required placeholder="Ej: Juan Pérez">
-        </div>
-
-        <div class="form-group">
-          <label for="user-email">Correo Electrónico</label>
-          <input type="email" id="user-email" name="email" required placeholder="tuemail@ejemplo.com">
+          <label for="user-fullname">Nombre de la Empresa o Tienda</label>
+          <input type="text" id="user-fullname" name="company_name" required placeholder="Ej: Inversiones Global C.A.">
         </div>
 
         <div class="form-group">
-          <label for="user-phone">Teléfono / WhatsApp</label>
-          <input type="tel" id="user-phone" name="telefono" required placeholder="+58 412 000 0000">
+          <label for="user-rif">RIF (Registro de Información Fiscal)</label>
+          <input type="text" id="user-rif" name="rif" required placeholder="Ej: J-12345678-0">
         </div>
 
         <div class="form-group">
-          <label for="user-id-doc">🪪 Foto de tu Cédula o Documento de Identidad</label>
-          <input type="file" id="user-id-doc" name="foto_cedula" accept="image/*" required>
+          <label for="user-email">Correo Electrónico Comercial</label>
+          <input type="email" id="user-email" name="email" required placeholder="empresa@ejemplo.com">
         </div>
 
         <div class="form-group">
-          <label for="user-selfie">📸 Fotografía Frontal (Selfie de Confirmación)</label>
-          <input type="file" id="user-selfie" name="foto_selfie" accept="image/*" required>
+          <label for="user-password">Contraseña de Acceso</label>
+          <input type="password" id="user-password" name="password" required placeholder="Crea tu contraseña">
         </div>
 
-        <div class="form-group checkbox-group">
-          <input type="checkbox" id="request-credit" name="solicita_credito" value="Sí" checked>
-          <label for="request-credit">Solicitar evaluación para cupo de financiamiento tipo Cashea</label>
+        <div class="form-group">
+          <label for="user-phone">Teléfono / WhatsApp de Contacto</label>
+          <input type="tel" id="user-phone" name="phone" required placeholder="+58 412 000 0000">
         </div>
 
-        <button type="submit" class="submit-btn">Enviar y Verificar Cuenta</button>
+        <button type="submit" class="submit-btn">Registrar Empresa</button>
       </form>
     </div>
   </div>
@@ -257,15 +252,15 @@
       <h2 id="publish-title">📢 Publicar en el Marketplace</h2>
       <p class="modal-sub">Publica tus productos al mayor, detal o anuncia tus servicios profesionales.</p>
 
-      <form id="publish-form" action="https://formspree.io/f/xlgqkdwn" method="POST" enctype="multipart/form-data">
+      <form id="publish-form">
         <div class="form-group">
-          <label for="seller-name">Nombre de la Empresa, Tienda o Vendedor</label>
-          <input type="text" id="seller-name" name="nombre_vendedor" required placeholder="Ej: Importadora Global C.A. / María López">
+          <label for="item-title">Título de la Publicación</label>
+          <input type="text" id="item-title" name="title" required placeholder="Ej: Lote de Franelas de Algodón / Servicio de Plomería">
         </div>
 
         <div class="form-group">
-          <label for="publish-type">Tipo de Publicación</label>
-          <select id="publish-type" name="tipo_publicacion" required class="form-select">
+          <label for="publish-type">Categoría / Tipo de Publicación</label>
+          <select id="publish-type" name="category" required class="form-select">
             <option value="Detal">🛍️ Venta al Detal</option>
             <option value="Mayor">📦 Venta al Mayor (Mayorista / Fábrica)</option>
             <option value="Servicios">🛠️ Oferta de Servicios</option>
@@ -273,41 +268,29 @@
         </div>
 
         <div class="form-group">
-          <label for="item-title">Título de la Publicación</label>
-          <input type="text" id="item-title" name="titulo_publicacion" required placeholder="Ej: Lote de Franelas de Algodón / Servicio de Plomería">
-        </div>
-
-        <div class="form-group">
           <label for="item-price">Precio ($ USD)</label>
-          <input type="number" step="0.01" id="item-price" name="precio" required placeholder="Ej: 15.00">
+          <input type="number" step="0.01" id="item-price" name="price" required placeholder="Ej: 15.00">
         </div>
 
         <div class="form-group">
-          <label for="item-description">Descripción Detallada / Condiciones</label>
-          <textarea id="item-description" name="descripcion" rows="3" required placeholder="Escribe detalles del producto, cantidad mínima al mayor o alcance del servicio..."></textarea>
+          <label for="item-description">Descripción Detallada</label>
+          <textarea id="item-description" name="description" rows="3" required placeholder="Detalles del producto, cantidades o alcance del servicio..."></textarea>
         </div>
 
         <div class="form-group">
-          <label for="item-phone">Número de WhatsApp de Contacto</label>
-          <input type="tel" id="item-phone" name="whatsapp_contacto" required placeholder="+58 412 000 0000">
+          <label for="item-image">📷 URL de la Imagen del Producto</label>
+          <input type="url" id="item-image" name="image_url" required placeholder="https://ejemplo.com/imagen.jpg">
         </div>
 
         <div class="form-group">
-          <label for="item-image">📷 Foto del Producto, Banner o Logo de la Empresa</label>
-          <input type="file" id="item-image" name="foto_producto" accept="image/*" required>
+          <label for="item-link">🔗 Enlace de Contacto / WhatsApp o Tienda</label>
+          <input type="url" id="item-link" name="affiliate_link" required placeholder="https://wa.me/584120000000">
         </div>
 
-        <!-- 🎬 AÑADIDO: Campo para enlace de Video Corto (TikTok, YouTube Shorts, Reels) -->
-        <div class="form-group">
-          <label for="item-video">🎬 Video Corto de 90s (Opcional - YouTube Shorts, TikTok o Reel)</label>
-          <input type="url" id="item-video" name="video_url" placeholder="https://www.youtube.com/shorts/...">
-        </div>
-
-        <!-- Confirmación de Políticas de Publicación -->
         <div class="form-group checkbox-group" style="margin-top: 15px;">
           <input type="checkbox" id="accept-policy" name="acepta_politicas" value="Sí" required>
           <label for="accept-policy">
-            Declaro que esta publicación cumple con las <a href="#" onclick="alert('Políticas: No publicar contenido ilegal, productos prohibidos o información falsa.'); return false;" style="color: #2563eb; text-decoration: underline;">Políticas de Publicación</a> y Términos del Servicio.
+            Declaro que esta publicación cumple con las <a href="#" onclick="alert('Políticas: No publicar contenido ilegal, productos prohibidos o información falsa.'); return false;" style="color: #2563eb; text-decoration: underline;">Políticas de Publicación</a>.
           </label>
         </div>
 
@@ -329,7 +312,7 @@
     </div>
   </footer>
 
-  <!-- 🌐 AÑADIDO: Script del Widget de Google Translate -->
+  <!-- 🌐 Script del Widget de Google Translate -->
   <script type="text/javascript">
     function googleTranslateElementInit() {
       new google.translate.TranslateElement({
@@ -341,17 +324,19 @@
   </script>
   <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
+  <!-- SDK de Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <!-- Lógica JavaScript en archivo externo -->
   <script src="script.js"></script>
 
-  <!-- ⚡ ACTUALIZADO: Service Worker con detección e instalación instantánea de actualizaciones -->
+  <!-- Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').then(reg => {
           console.log('Service Worker registrado:', reg);
           
-          // Detectar actualizaciones de código desplegadas en Vercel
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
             newWorker.addEventListener('statechange', () => {
