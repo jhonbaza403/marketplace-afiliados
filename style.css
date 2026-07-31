@@ -57,6 +57,7 @@ img {
   gap: 10px;
   flex-wrap: wrap;
   justify-content: flex-end;
+  align-items: center;
   z-index: 10;
 }
 
@@ -313,6 +314,31 @@ img {
   font-weight: 800;
 }
 
+/* Badges de Planes de Publicación (Nacional / Global / Local) */
+.plan-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.plan-badge.global {
+  background-color: #8b5cf6;
+  color: #ffffff;
+}
+
+.plan-badge.nacional {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+.plan-badge.local {
+  background-color: #64748b;
+  color: #ffffff;
+}
+
 .card-content {
   padding: 1.2rem;
   display: flex;
@@ -354,6 +380,13 @@ img {
   color: #d97706;
 }
 
+/* Grupo de Botones en la Tarjeta */
+.card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 1rem;
+}
+
 .buy-btn {
   display: block;
   text-align: center;
@@ -362,7 +395,6 @@ img {
   text-decoration: none;
   padding: 0.7rem;
   border-radius: 10px;
-  margin-top: 1rem;
   font-weight: 600;
   font-size: 0.9rem;
   transition: background-color 0.2s ease, transform 0.1s ease;
@@ -370,6 +402,16 @@ img {
 
 .buy-btn:hover {
   background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.share-btn {
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+}
+
+.share-btn:hover {
+  background-color: #e2e8f0 !important;
+  border-color: #94a3b8 !important;
   transform: translateY(-1px);
 }
 
@@ -454,6 +496,8 @@ img {
 .form-group input[type="email"],
 .form-group input[type="tel"],
 .form-group input[type="number"],
+.form-group input[type="url"],
+.form-group input[type="password"],
 .form-group input[type="file"],
 .form-group textarea,
 .form-select {
