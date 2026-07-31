@@ -1,207 +1,4 @@
-// ==========================================
-// 1. CONFIGURACIÓN E INICIALIZACIÓN DE SUPABASE
-// ==========================================
-const SUPABASE_URL = 'https://vpslunexibbaapihmbrj.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_yPCMORrQyiQ1esGLUdSsJA_YfyjPhAo';
-
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-document.addEventListener('DOMContentLoaded', () => {
-  let allProducts = [];
-
-  const productsContainer = document.getElementById('products-grid');
-  const searchInput = document.getElementById('search-input');
-  const storeButtons = document.querySelectorAll('.store-filter');
-
-  // Control del Modal 1: Registro / Verificación (KYC / Registro de Empresa)
-  const authModal = document.getElementById('auth-modal');
-  const openAuthBtn = document.getElementById('open-auth-btn');
-  const closeModalBtn = document.getElementById('close-modal-btn');
-  const kycForm = document.getElementById('kyc-form');
-
-  if (openAuthBtn && authModal) {
-    openAuthBtn.addEventListener('click', () => {
-      authModal.classList.remove('hidden');
-    });
-  }
-
-  if (closeModalBtn && authModal) {
-    closeModalBtn.addEventListener('click', () => {
-      authModal.classList.add('hidden');
-    });
-  }
-
-  // REGISTRO DE EMPRESA CON RIF EN SUPABASE (KYC Form)
-  if (kycForm) {
-    kycForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const submitBtn = kycForm.querySelector('button[type="submit"]');
-      const originalText = submitBtn.textContent;
-      submitBtn.textContent = 'Registrando...';
-      submitBtn.disabled = true;
-
-      try {
-        const formData = new FormData(kycForm);
-        const email = formData.get('email');
-        const password = formData.get('password');
-        const companyName = formData.get('company_name') || formData.get('nombre');
-        const rif = formData.get('rif');
-        const phone = formData.get('phone') || formData.get('telefono');
-
-        // 1. Registrar usuario en la autenticación de Supabase
-        const { data, error: authError } = await supabase.auth.signUp({
-          email: email,
-          password: password,
-        });
-
-        if (authError) throw authError;
-
-        // 2. Guardar los datos fiscales (RIF) de la tienda
-        if (data.user) {
-          const { error: storeError } = await supabase.from('stores').insert([
-            {
-              id: data.user.id,
-              company_name: companyName,
-              rif: rif,
-              phone: phone,
-            },
-          ]);
-
-          if (storeError) throw storeError;
-        }
-
-        alert('¡Registro enviado con éxito! Tu empresa y tu RIF han sido registrados.');
-        kycForm.reset();
-        if (authModal) authModal.classList.add('hidden');
-      } catch (err) {
-        console.error('Error en el registro:', err);
-        alert('Error al registrar la empresa: ' + (err.message || 'Inténtalo nuevamente.'));
-      } finally {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-      }
-    });
-  }
-
-  // Control del Modal 2: Publicar Oferta / Servicio
-  const publishModal = document.getElementById('publish-modal');
-  const openPublishBtn = document.getElementById('open-publish-btn');
-  const closePublishModalBtn = document.getElementById('close-publish-modal-btn');
-  const publishForm = document.getElementById('publish-form');
-
-  if (openPublishBtn && publishModal) {
-    openPublishBtn.addEventListener('click', () => {
-      publishModal.classList.remove('hidden');
-    });
-  }
-
-  if (closePublishModalBtn && publishModal) {
-    closePublishModalBtn.addEventListener('click', () => {
-      publishModal.classList.add('hidden');
-    });
-  }
-
-  // PUBLICAR PRODUCTO / SERVICIO EN SUPABASE (Publish Form)
-  if (publishForm) {
-    publishForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const submitBtn = publishForm.querySelector('button[type="submit"]');
-      const originalText = submitBtn.textContent;
-      submitBtn.textContent = 'Publicando...';
-      submitBtn.disabled = true;
-
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-          alert('Debes estar registrado y haber iniciado sesión para poder publicar.');
-          return;
-        }
-
-        const formData = new FormData(publishForm);
-        const newProduct = {
-          store_id: user.id,
-          title: formData.get('title') || formData.get('titulo'),
-          description: formData.get('description') || formData.get('descripcion'),
-          price: parseFloat(formData.get('price') || formData.get('precio') || 0),
-          category: formData.get('category') || formData.get('categoria'),
-          image_url: formData.get('image_url') || formData.get('imagen'),
-          affiliate_link: formData.get('affiliate_link') || formData.get('enlace'),
-        };
-
-        const { error } = await supabase.from('products').insert([newProduct]);
-
-        if (error) throw error;
-
-        alert('¡Publicación creada con éxito! Ya se encuentra en el catálogo.');
-        publishForm.reset();
-        if (publishModal) publishModal.classList.add('hidden');
-
-        // Recargar los productos desde la base de datos
-        loadProductsFromSupabase();
-      } catch (err) {
-        console.error('Error al publicar:', err);
-        alert('Error al guardar la publicación: ' + (err.message || 'Inténtalo de nuevo.'));
-      } finally {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-      }
-    });
-  }
-
-  // Cerrar modales al hacer clic fuera del recuadro
-  window.addEventListener('click', (e) => {
-    if (e.target === authModal) {
-      authModal.classList.add('hidden');
-    }
-    if (e.target === publishModal) {
-      publishModal.classList.add('hidden');
-    }
-  });
-
-  // Cerrar modales al presionar la tecla Esc
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      if (authModal) authModal.classList.add('hidden');
-      if (publishModal) publishModal.classList.add('hidden');
-    }
-  });
-
-  // Detección de Accesos Directos PWA (Shortcuts de URL)
-  const urlParams = new URLSearchParams(window.location.search);
-  const actionParam = urlParams.get('action');
-  if (actionParam === 'publish' && publishModal) {
-    publishModal.classList.remove('hidden');
-  } else if (actionParam === 'kyc' && authModal) {
-    authModal.classList.remove('hidden');
-  }
-
-  // ==========================================
-  // CARGAR PRODUCTOS DESDE SUPABASE
-  // ==========================================
-  async function loadProductsFromSupabase() {
-    try {
-      const { data: products, error } = await supabase
-        .from('products')
-        .select('*, stores(company_name, rif)');
-
-      if (error) throw error;
-
-      // Mapear los datos de la base de datos al formato del renderizado
-      allProducts = products.map((prod) => ({
-        id: prod.id,
-        title: prod.title,
-        category: prod.category || 'General',
-        price: prod.price,
-        image: prod.image_url || 'https://via.placeholder.com/300x200?text=Sin+Imagen',
-        affiliateUrl: prod.affiliate_link || '#',
-        store: prod.stores ? prod.stores.company_name : 'Tienda Externa',
-        rif: prod.stores ? prod.stores.rif : '',
-        currency: 'USD',
-        rating: '5.0',
-      }));
-
-      renderProducts(allProducts);
+renderProducts(allProducts);
     } catch (error) {
       console.error('Error al cargar desde Supabase:', error);
       if (productsContainer) {
@@ -211,7 +8,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Renderizar tarjetas de productos / servicios
+  // ==========================================
+  // FUNCIÓN PARA COMPARTIR EN REDES SOCIALES
+  // ==========================================
+  window.compartirPublicacion = function(titulo, descripcion, url) {
+    const textoCompartir = `🔥 ¡Mira esta oferta en CrediOfertas! ${titulo} - ${descripcion}`;
+    const linkFinal = url || window.location.href;
+
+    // 1. Si está en un dispositivo móvil con soporte Web Share API
+    if (navigator.share) {
+      navigator.share({
+        title: titulo,
+        text: textoCompartir,
+        url: linkFinal
+      }).catch((err) => console.log('Compartir cancelado o no soportado:', err));
+    } else {
+      // 2. Si está en PC, abre WhatsApp Web como opción directa
+      const urlWA = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoCompartir + ' ' + linkFinal)}`;
+      window.open(urlWA, '_blank');
+    }
+  };
+
+  // ==========================================
+  // RENDERIZAR TARJETAS DE PRODUCTOS / SERVICIOS
+  // ==========================================
   function renderProducts(products) {
     if (!productsContainer) return;
     productsContainer.innerHTML = '';
@@ -225,10 +45,22 @@ document.addEventListener('DOMContentLoaded', () => {
     products.forEach((product) => {
       const card = document.createElement('article');
       card.className = 'product-card';
-      const storeClass = product.store.toLowerCase().replace(/\s+/g, '');
+      const storeClass = (product.store || 'generico').toLowerCase().replace(/\s+/g, '');
+      
+      // Insignia de descuento
       const discountBadge = product.discount
         ? `<span class="discount-badge">${product.discount}</span>`
         : '';
+
+      // Insignia de Alcance de Plan ($20 Nacional / $35 Global / Local)
+      let planBadge = '';
+      if (product.plan === 'global') {
+        planBadge = `<span class="plan-badge global" style="background: #8b5cf6; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">🌍 Global</span>`;
+      } else if (product.plan === 'nacional') {
+        planBadge = `<span class="plan-badge nacional" style="background: #2563eb; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">🇻🇪 Nacional</span>`;
+      } else if (product.region) {
+        planBadge = `<span class="plan-badge local" style="background: #64748b; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">📍 ${product.region}</span>`;
+      }
 
       const formattedPrice =
         typeof product.price === 'number'
@@ -244,41 +76,75 @@ document.addEventListener('DOMContentLoaded', () => {
         btnText = '🛒 Comprar al Detal';
       }
 
+      // Escapar comillas para evitar errores JS al compartir
+      const safeTitle = (product.title || '').replace(/'/g, "\\'");
+      const safeDesc = (product.description || product.title || '').replace(/'/g, "\\'");
+      const targetUrl = product.affiliateUrl || product.affiliate_link || '#';
+
       card.innerHTML = `
-        <div class="card-image">
-          <img src="${product.image}" alt="${product.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Imagen+No+Disponible'">
+        <div class="card-image" style="position: relative;">
+          <img src="${product.image || product.image_url}" alt="${product.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Imagen+No+Disponible'">
           <span class="store-badge ${storeClass}">${product.store}</span>
           ${discountBadge}
         </div>
         <div class="card-content">
-          <span class="category">${product.category} ${product.rif ? `| RIF: ${product.rif}` : ''}</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span class="category">${product.category || 'General'} ${product.rif ? `| RIF: ${product.rif}` : ''}</span>
+            ${planBadge}
+          </div>
+          
           <h3 class="title">${product.title}</h3>
+          
           <div class="price-rating">
             <span class="price">$${formattedPrice} ${product.currency || 'USD'}</span>
             <span class="rating">⭐ ${product.rating || '5.0'}</span>
           </div>
-          <a href="${product.affiliateUrl}" target="_blank" rel="nofollow noopener sponsored" class="buy-btn">
-            ${btnText}
-          </a>
+
+          <!-- Botones Acción: Comprar/Contactar y Compartir Redes -->
+          <div class="card-actions" style="display: flex; gap: 8px; margin-top: 12px;">
+            <a href="${targetUrl}" target="_blank" rel="nofollow noopener sponsored" class="buy-btn" style="flex: 1; text-align: center;">
+              ${btnText}
+            </a>
+            <button 
+              type="button"
+              onclick="compartirPublicacion('${safeTitle}', '${safeDesc}', '${targetUrl}')" 
+              class="share-btn" 
+              title="Compartir en WhatsApp, Instagram, Facebook..."
+              style="padding: 10px 14px; background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer; font-weight: bold;"
+              aria-label="Compartir en redes sociales"
+            >
+              📲
+            </button>
+          </div>
         </div>
       `;
       productsContainer.appendChild(card);
     });
   }
 
-  // Filtrado y búsqueda en tiempo real
+  // ==========================================
+  // FILTRADO Y BÚSQUEDA EN TIEMPO REAL
+  // ==========================================
   function filterProducts() {
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
     const activeStoreBtn = document.querySelector('.store-filter.active');
     const selectedStore = activeStoreBtn ? activeStoreBtn.dataset.store : 'all';
 
     const filtered = allProducts.filter((product) => {
+      const title = (product.title || '').toLowerCase();
+      const category = (product.category || '').toLowerCase();
+      const store = (product.store || '').toLowerCase();
+      const region = (product.region || '').toLowerCase();
+
       const matchesSearch =
-        product.title.toLowerCase().includes(searchTerm) ||
-        product.category.toLowerCase().includes(searchTerm) ||
-        product.store.toLowerCase().includes(searchTerm);
+        title.includes(searchTerm) ||
+        category.includes(searchTerm) ||
+        store.includes(searchTerm) ||
+        region.includes(searchTerm);
+
       const matchesStore =
-        selectedStore === 'all' || product.store.toLowerCase() === selectedStore.toLowerCase();
+        selectedStore === 'all' || store === selectedStore.toLowerCase();
+
       return matchesSearch && matchesStore;
     });
 
@@ -294,6 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Inicializar carga desde Supabase
+  // Inicializar carga de datos
   loadProductsFromSupabase();
 });
