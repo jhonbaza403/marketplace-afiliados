@@ -22,8 +22,8 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="logo.png">
 
-  <!-- Optimización de Carga Previa -->
-  <link rel="preconnect" href="https://formspree.io">
+  <!-- Optimización de Carga Previa (Preconnect) -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="dns-prefetch" href="https://images.unsplash.com">
 
   <!-- Hoja de Estilos Principal -->
@@ -81,15 +81,27 @@
         padding: 20px; z-index: 999999; text-align: center; box-sizing: border-box;
       `;
 
-      overlay.innerHTML = `
-        <div style="font-size: 50px; margin-bottom: 20px;">🛡️</div>
-        <h1 style="color: #ef4444; margin: 0 0 10px 0;">Acceso Restringido</h1>
-        <p style="max-width: 500px; line-height: 1.6; color: #cbd5e1; margin-bottom: 20px;">${mensaje}</p>
-        <button onclick="window.location.reload()" style="
-          padding: 12px 24px; background-color: #2563eb; color: white; border: none;
-          border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px;
-        ">Reintentar Conexión</button>
-      `;
+      const icon = document.createElement("div");
+      icon.style.cssText = "font-size: 50px; margin-bottom: 20px;";
+      icon.textContent = "🛡️";
+
+      const title = document.createElement("h1");
+      title.style.cssText = "color: #ef4444; margin: 0 0 10px 0;";
+      title.textContent = "Acceso Restringido";
+
+      const text = document.createElement("p");
+      text.style.cssText = "max-width: 500px; line-height: 1.6; color: #cbd5e1; margin-bottom: 20px;";
+      text.textContent = mensaje;
+
+      const btn = document.createElement("button");
+      btn.style.cssText = "padding: 12px 24px; background-color: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px;";
+      btn.textContent = "Reintentar Conexión";
+      btn.onclick = () => window.location.reload();
+
+      overlay.appendChild(icon);
+      overlay.appendChild(title);
+      overlay.appendChild(text);
+      overlay.appendChild(btn);
 
       document.body.appendChild(overlay);
     }
@@ -118,8 +130,8 @@
       <!-- 🌐 Selector de Idioma Global -->
       <div id="google_translate_element" style="display: inline-block; margin-right: 10px;"></div>
 
-      <button id="open-publish-btn" class="publish-btn" aria-label="Abrir formulario para publicar">➕ Publicar Oferta / Servicio</button>
-      <button id="open-auth-btn" class="auth-btn" aria-label="Abrir formulario de crédito y registro">🏢 Registro de Empresa / RIF</button>
+      <button id="open-publish-btn" class="publish-btn" aria-label="Abrir formulario para publicar ofertas o servicios">➕ Publicar Oferta / Servicio</button>
+      <button id="open-auth-btn" class="auth-btn" aria-label="Abrir formulario de registro comercial o RIF">🏢 Registro de Empresa / RIF</button>
     </div>
 
     <div class="container hero-content">
@@ -186,14 +198,14 @@
       >
       <!-- Categorías de filtrado -->
       <div class="filters" role="tablist" aria-label="Filtros de tiendas y categorías">
-        <button class="store-filter active" data-store="all">Todos</button>
-        <button class="store-filter" data-store="Detal">🛍️ Venta al Detal</button>
-        <button class="store-filter" data-store="Mayor">📦 Venta al Mayor</button>
-        <button class="store-filter" data-store="Servicios">🛠️ Servicios</button>
-        <button class="store-filter" data-store="Amazon">Amazon</button>
-        <button class="store-filter" data-store="Shein">Shein</button>
-        <button class="store-filter" data-store="AliExpress">AliExpress</button>
-        <button class="store-filter" data-store="Alibaba">Alibaba</button>
+        <button class="store-filter active" role="tab" aria-selected="true" data-store="all">Todos</button>
+        <button class="store-filter" role="tab" aria-selected="false" data-store="Detal">🛍️ Venta al Detal</button>
+        <button class="store-filter" role="tab" aria-selected="false" data-store="Mayor">📦 Venta al Mayor</button>
+        <button class="store-filter" role="tab" aria-selected="false" data-store="Servicios">🛠️ Servicios</button>
+        <button class="store-filter" role="tab" aria-selected="false" data-store="Amazon">Amazon</button>
+        <button class="store-filter" role="tab" aria-selected="false" data-store="Shein">Shein</button>
+        <button class="store-filter" role="tab" aria-selected="false" data-store="AliExpress">AliExpress</button>
+        <button class="store-filter" role="tab" aria-selected="false" data-store="Alibaba">Alibaba</button>
       </div>
     </section>
 
@@ -322,31 +334,33 @@
       }, 'google_translate_element');
     }
   </script>
-  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async defer></script>
 
   <!-- SDK de Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 
-  <!-- Lógica JavaScript en archivo externo -->
-  <script src="script.js"></script>
+  <!-- Lógica JavaScript Principal -->
+  <script src="script.js" defer></script>
 
-  <!-- Service Worker -->
+  <!-- Registro del Service Worker PWA -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(reg => {
-          console.log('Service Worker registrado:', reg);
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+          console.log('[SW] Service Worker registrado con éxito:', reg);
           
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                console.log('Nueva versión detectada. Actualizando la aplicación...');
-                window.location.reload();
-              }
-            });
+            if (newWorker) {
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('[SW] Nueva versión detectada. Actualizando la aplicación...');
+                  window.location.reload();
+                }
+              });
+            }
           });
-        }).catch(err => console.error('Error al registrar Service Worker:', err));
+        }).catch(err => console.error('[SW] Error al registrar Service Worker:', err));
       });
     }
   </script>
