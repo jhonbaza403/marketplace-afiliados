@@ -40,7 +40,6 @@
   <script>
     async function verificarSeguridadConexion() {
       try {
-        // 1. Detección en cliente de entorno automatizado (Bots / Puppeteer / Selenium)
         const esBotOuEmulador = Boolean(
           navigator.webdriver || 
           document.documentElement.getAttribute("webdriver") ||
@@ -54,7 +53,6 @@
           return;
         }
 
-        // 2. Comprobación de reputación de red / VPN
         const respuesta = await fetch('https://ipapi.co/json/');
         if (respuesta.ok) {
           const datosIP = await respuesta.json();
@@ -117,6 +115,9 @@
   <!-- Encabezado Publicitario / Hero Section -->
   <header class="hero-banner">
     <div class="user-access">
+      <!-- 🌐 AÑADIDO: Contenedor para Selector de Idioma Global -->
+      <div id="google_translate_element" style="display: inline-block; margin-right: 10px;"></div>
+
       <button id="open-publish-btn" class="publish-btn" aria-label="Abrir formulario para publicar">➕ Publicar Oferta / Servicio</button>
       <button id="open-auth-btn" class="auth-btn" aria-label="Abrir formulario de crédito y registro">👤 CrediOfertas / KYC</button>
     </div>
@@ -296,6 +297,12 @@
           <input type="file" id="item-image" name="foto_producto" accept="image/*" required>
         </div>
 
+        <!-- 🎬 AÑADIDO: Campo para enlace de Video Corto (TikTok, YouTube Shorts, Reels) -->
+        <div class="form-group">
+          <label for="item-video">🎬 Video Corto de 90s (Opcional - YouTube Shorts, TikTok o Reel)</label>
+          <input type="url" id="item-video" name="video_url" placeholder="https://www.youtube.com/shorts/...">
+        </div>
+
         <!-- Confirmación de Políticas de Publicación -->
         <div class="form-group checkbox-group" style="margin-top: 15px;">
           <input type="checkbox" id="accept-policy" name="acepta_politicas" value="Sí" required>
@@ -322,16 +329,39 @@
     </div>
   </footer>
 
+  <!-- 🌐 AÑADIDO: Script del Widget de Google Translate -->
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'es',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false
+      }, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
   <!-- Lógica JavaScript en archivo externo -->
   <script src="script.js"></script>
 
-  <!-- Script de Registro del Service Worker PWA -->
+  <!-- ⚡ ACTUALIZADO: Service Worker con detección e instalación instantánea de actualizaciones -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(reg => console.log('Service Worker registrado con éxito:', reg))
-          .catch(err => console.error('Error al registrar Service Worker:', err));
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+          console.log('Service Worker registrado:', reg);
+          
+          // Detectar actualizaciones de código desplegadas en Vercel
+          reg.addEventListener('updatefound', () => {
+            const newWorker = reg.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('Nueva versión detectada. Actualizando la aplicación...');
+                window.location.reload();
+              }
+            });
+          });
+        }).catch(err => console.error('Error al registrar Service Worker:', err));
       });
     }
   </script>
@@ -339,4 +369,4 @@
   <!-- Script de Rastreo de Vercel Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
 </body>
-</html>>
+</html>
