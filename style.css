@@ -10,6 +10,11 @@
   --shadow-hover: 0 12px 25px -5px rgba(0, 0, 0, 0.12);
 }
 
+/* Reset Global & Accesibilidad */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background-color: var(--bg-color);
