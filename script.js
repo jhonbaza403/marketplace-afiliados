@@ -23,12 +23,36 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Envío AJAX para Formspree (KYC Form)
   if (kycForm) {
-    kycForm.addEventListener('submit', (e) => {
+    kycForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      alert('¡Solicitud enviada con éxito! Tu cuenta y tus documentos están en proceso de verificación.');
-      kycForm.reset();
-      if (authModal) authModal.classList.add('hidden');
+      const submitBtn = kycForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Enviando...';
+      submitBtn.disabled = true;
+
+      try {
+        const formData = new FormData(kycForm);
+        const response = await fetch(kycForm.action, {
+          method: kycForm.method,
+          body: formData,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+          alert('¡Solicitud enviada con éxito! Tu cuenta y tus documentos están en proceso de verificación.');
+          kycForm.reset();
+          if (authModal) authModal.classList.add('hidden');
+        } else {
+          alert('Hubo un problema al enviar el formulario. Por favor, inténtalo de nuevo.');
+        }
+      } catch (err) {
+        alert('Error de conexión. Inténtalo nuevamente.');
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
     });
   }
 
@@ -50,12 +74,36 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Envío AJAX para Formspree (Publish Form)
   if (publishForm) {
-    publishForm.addEventListener('submit', (e) => {
+    publishForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      alert('¡Publicación enviada con éxito! Se revisará y aparecerá en el catálogo a la brevedad.');
-      publishForm.reset();
-      if (publishModal) publishModal.classList.add('hidden');
+      const submitBtn = publishForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Publicando...';
+      submitBtn.disabled = true;
+
+      try {
+        const formData = new FormData(publishForm);
+        const response = await fetch(publishForm.action, {
+          method: publishForm.method,
+          body: formData,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+          alert('¡Publicación enviada con éxito! Se revisará y aparecerá en el catálogo a la brevedad.');
+          publishForm.reset();
+          if (publishModal) publishModal.classList.add('hidden');
+        } else {
+          alert('Hubo un problema al enviar la publicación.');
+        }
+      } catch (err) {
+        alert('Error de conexión. Inténtalo nuevamente.');
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
     });
   }
 
@@ -68,6 +116,24 @@ document.addEventListener('DOMContentLoaded', () => {
       publishModal.classList.add('hidden');
     }
   });
+
+  // Cerrar modales al presionar la tecla Esc
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (authModal) authModal.classList.add('hidden');
+      if (publishModal) publishModal.classList.add('hidden');
+    }
+  });
+
+  // Detección de Accesos Directos PWA (Shortcuts de URL)
+  const urlParams = new URLSearchParams(window.location.search);
+  const actionParam = urlParams.get('action');
+
+  if (actionParam === 'publish' && publishModal) {
+    publishModal.classList.remove('hidden');
+  } else if (actionParam === 'kyc' && authModal) {
+    authModal.classList.remove('hidden');
+  }
 
   // Cargar productos desde products.json
   async function loadProducts() {
