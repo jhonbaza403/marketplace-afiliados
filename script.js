@@ -4,7 +4,7 @@
 const SUPABASE_URL = 'https://vpslunexibbaapihmbrj.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_yPCMORrQyiQ1esGLUdSsJA_YfyjPhAo';
 
-// Cliente global de Supabase
+// Inicialización del cliente Supabase
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -28,18 +28,28 @@ document.addEventListener('DOMContentLoaded', () => {
   let allProducts = [];
 
   // ==========================================
-  // 1. MANEJO DE MODALES
+  // 1. MANEJO Y CONTROL DE MODALES
   // ==========================================
-  if (openAuthBtn) openAuthBtn.addEventListener('click', () => authModal?.classList.remove('hidden'));
-  if (closeModalBtn) closeModalBtn.addEventListener('click', () => authModal?.classList.add('hidden'));
+  const abrirModal = (modal) => modal?.classList.remove('hidden');
+  const cerrarModal = (modal) => modal?.classList.add('hidden');
 
-  if (openPublishBtn) openPublishBtn.addEventListener('click', () => publishModal?.classList.remove('hidden'));
-  if (closePublishModalBtn) closePublishModalBtn.addEventListener('click', () => publishModal?.classList.add('hidden'));
+  if (openAuthBtn) openAuthBtn.addEventListener('click', () => abrirModal(authModal));
+  if (closeModalBtn) closeModalBtn.addEventListener('click', () => cerrarModal(authModal));
 
-  // Cerrar modales al hacer clic fuera del contenido
+  if (openPublishBtn) openPublishBtn.addEventListener('click', () => abrirModal(publishModal));
+  if (closePublishModalBtn) closePublishModalBtn.addEventListener('click', () => cerrarModal(publishModal));
+
+  // Cerrar modal al hacer clic en el fondo o presionar 'Esc'
   window.addEventListener('click', (e) => {
-    if (e.target === authModal) authModal.classList.add('hidden');
-    if (e.target === publishModal) publishModal.classList.add('hidden');
+    if (e.target === authModal) cerrarModal(authModal);
+    if (e.target === publishModal) cerrarModal(publishModal);
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      cerrarModal(authModal);
+      cerrarModal(publishModal);
+    }
   });
 
   // ==========================================
@@ -57,10 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
       allProducts = data || [];
       renderProducts(allProducts);
     } catch (error) {
-      console.error('Error al cargar datos de Supabase:', error.message);
+      console.error('Error al cargar datos desde Supabase:', error.message);
       if (productsContainer) {
         productsContainer.innerHTML =
-          '<p class="error" style="grid-column: 1/-1; text-align: center; color: #ef4444; font-weight: bold; padding: 2rem;">Error al conectar con la base de datos. Por favor, reintenta más tarde.</p>';
+          '<p class="error" style="grid-column: 1/-1; text-align: center; color: #ef4444; font-weight: bold; padding: 2rem;">Error al conectar con la base de datos. Por favor, intenta de nuevo más tarde.</p>';
       }
     }
   }
@@ -113,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (products.length === 0) {
       productsContainer.innerHTML =
-        '<p style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #64748b;">No se encontraron publicaciones en esta categoría.</p>';
+        '<p style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #64748b;">No se encontraron publicaciones disponibles.</p>';
       return;
     }
 
@@ -127,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ? `<span class="discount-badge">${product.discount}</span>`
         : '';
 
-      // Insignias de Plan (Global / Nacional / Local)
+      // Insignia de Plan o Alcance
       let planBadge = '';
       if (product.plan === 'global') {
         planBadge = `<span class="plan-badge global" style="background: #8b5cf6; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">🌍 Global</span>`;
@@ -151,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnText = '🛒 Comprar al Detal';
       }
 
-      // Sanitización para evitar errores sintácticos en HTML inline
+      // Sanitización contra inyección de caracteres en atributos JS
       const safeTitle = (product.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
       const targetUrl = product.affiliateUrl || product.affiliate_link || '#';
       const imageUrl = product.image || product.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80';
@@ -202,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // 5. REGISTRO DE EMPRESA (FORMULARIO KYC)
+  // 5. REGISTRO DE EMPRESA (FORMULARIO KYC/RIF)
   // ==========================================
   if (kycForm) {
     kycForm.addEventListener('submit', async (e) => {
@@ -221,8 +231,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (error) {
         alert('Error al registrar la empresa: ' + error.message);
       } else {
-        alert('¡Empresa registrada con éxito!');
-        authModal?.classList.add('hidden');
+        alert('¡Empresa registrada con éxito en CrediOfertas!');
+        cerrarModal(authModal);
         kycForm.reset();
       }
     });
@@ -254,9 +264,9 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Error al publicar: ' + error.message);
       } else {
         alert('¡Publicación creada exitosamente!');
-        publishModal?.classList.add('hidden');
+        cerrarModal(publishModal);
         publishForm.reset();
-        loadProductsFromSupabase(); // Recargar cuadrícula
+        loadProductsFromSupabase(); // Recargar cuadrícula en tiempo real
       }
     });
   }
@@ -299,6 +309,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Cargar datos iniciales
+  // Inicializar carga de publicaciones
   loadProductsFromSupabase();
 });
