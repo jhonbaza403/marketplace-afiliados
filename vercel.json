@@ -1,142 +1,57 @@
-// ==========================================
-// 1. FUNCIÓN AUXILIAR: VALIDAR Y NORMALIZAR URLS
-// ==========================================
-function normalizarUrlContacto(urlOriginal) {
-  if (!urlOriginal) return '#';
-  
-  let url = urlOriginal.trim();
-
-  // Si es un número de teléfono de WhatsApp sin formato URL
-  if (/^\+?\d{8,15}$/.test(url)) {
-    const numLimpio = url.replace(/\+/g, '');
-    return `https://wa.me/${numLimpio}?text=Hola!%20Me%20interesa%20tu%20publicación%20en%20CrediOfertas`;
-  }
-
-  // Asegurar protocolo https:// si falta
-  if (!url.startsWith('http://') && !url.startsWith('https://')) {
-    return `https://${url}`;
-  }
-
-  return url;
-}
-
-// ==========================================
-// 2. RENDERIZADO DE TARJETAS EN EL GRID
-// ==========================================
-function renderProducts(productsList) {
-  const grid = document.getElementById('products-grid');
-  if (!grid) return;
-
-  grid.innerHTML = '';
-
-  if (!productsList || productsList.length === 0) {
-    grid.innerHTML = '<p class="no-results" style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #cbd5e1;">No se encontraron ofertas o servicios disponibles.</p>';
-    return;
-  }
-
-  productsList.forEach(item => {
-    const card = document.createElement('article');
-    card.className = 'product-card';
-
-    // Capturar cualquier variación del nombre de la propiedad del enlace
-    const rawLink = item.affiliate_link || item.affiliateUrl || item.url || item.link || '';
-    const actionUrl = normalizarUrlContacto(rawLink);
-
-    // Identificar si es tienda afiliada externa o servicio/publicación local
-    const storeLower = (item.store || '').toLowerCase();
-    const categoryLower = (item.category || '').toLowerCase();
-    
-    const esAfiliadoExterno = ['amazon', 'shein', 'aliexpress', 'alibaba'].includes(storeLower) || 
-                               ['amazon', 'shein', 'aliexpress', 'alibaba'].includes(categoryLower);
-
-    // Definir texto y estilo del botón dinámicamente
-    let btnText = '💬 Contactar por WhatsApp';
-    let btnClass = 'whatsapp-btn';
-
-    if (esAfiliadoExterno) {
-      const nombreTienda = item.store || item.category || 'Tienda';
-      btnText = `🛒 Ver Oferta en ${nombreTienda}`;
-      btnClass = 'affiliate-btn';
-    } else if (categoryLower.includes('servicio')) {
-      btnText = '🛠️ Contratar Servicio';
-      btnClass = 'service-btn';
-    } else if (categoryLower.includes('mayor')) {
-      btnText = '📦 Cotizar al Mayor';
-      btnClass = 'mayor-btn';
-    }
-
-    // Normalizar Imagen y Video
-    const imageUrl = item.image_url || item.image || 'logo.png';
-    const videoUrl = item.video_url || item.videoUrl || '';
-
-    card.innerHTML = `
-      <div class="card-media">
-        ${videoUrl 
-          ? `<video src="${videoUrl}" controls poster="${imageUrl}" preload="metadata"></video>` 
-          : `<img src="${imageUrl}" alt="${item.title}" loading="lazy" onerror="this.src='logo.png'">`
+{
+  "version": 2,
+  "name": "crediofertas-marketplace",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
         }
-        <span class="badge ${categoryLower}">${item.category || item.store || 'Oferta'}</span>
-      </div>
-      <div class="card-body">
-        <h3>${item.title}</h3>
-        <p class="price">$${parseFloat(item.price || 0).toFixed(2)} <small>USD</small></p>
-        <p class="description">${item.description || 'Sin descripción disponible.'}</p>
-        
-        <a href="${actionUrl}" 
-           target="_blank" 
-           rel="noopener noreferrer" 
-           class="btn-action ${btnClass}">
-           ${btnText}
-        </a>
-      </div>
-    `;
-
-    grid.appendChild(card);
-  });
-}
-
-// ==========================================
-// 3. CAPTURA DEL FORMULARIO DE PUBLICACIÓN
-// ==========================================
-const publishForm = document.getElementById('publish-form');
-
-if (publishForm) {
-  publishForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(publishForm);
-    
-    const nuevoProducto = {
-      id: Date.now(),
-      title: formData.get('title'),
-      category: formData.get('category'), // Mayor, Detal, Servicios
-      store: formData.get('category'),
-      price: parseFloat(formData.get('price')) || 0,
-      description: formData.get('description'),
-      image_url: formData.get('image_url') || 'logo.png',
-      video_url: formData.get('video_url') || '',
-      affiliate_link: formData.get('affiliate_link'), // Link o WhatsApp
-      created_at: new Date().toISOString()
-    };
-
-    // A) Insertar en Supabase si está disponible
-    try {
-      if (window.supabaseClient) {
-        await window.supabaseClient.from('products').insert([nuevoProducto]);
-      }
-    } catch (err) {
-      console.warn('Error al guardar en Supabase, agregando localmente:', err);
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(js|css|logo.png)/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
-
-    // B) Actualizar Arreglo en Memoria y Volver a Renderizar
-    if (window.allProducts) {
-      window.allProducts.unshift(nuevoProducto);
-      renderProducts(window.allProducts);
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-
-    // C) Limpiar y Cerrar Modal
-    document.getElementById('publish-modal')?.classList.add('hidden');
-    publishForm.reset();
-    alert('🚀 ¡Publicación creada e integrada con éxito!');
-  });
+  ]
 }
