@@ -7,6 +7,33 @@ const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_yPCMORrQyiQ1esGLUdSsJA_YfyjPhAo
 // Inicialización del cliente Supabase
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
+// ==========================================
+// HELPER: NORMALIZACIÓN Y VALIDACIÓN DE URLS
+// ==========================================
+function normalizarUrlContacto(urlOriginal, titulo = '') {
+  if (!urlOriginal) return '#';
+  
+  let url = urlOriginal.trim();
+
+  // Si es solo un número de teléfono (formato WhatsApp)
+  if (/^\+?\d{8,15}$/.test(url)) {
+    const numLimpio = url.replace(/\+/g, '');
+    const mensaje = encodeURIComponent(`¡Hola! Me interesa tu publicación "${titulo}" en CrediOfertas.`);
+    return `https://wa.me/${numLimpio}?text=${mensaje}`;
+  }
+
+  // Si no especifica protocolo, forzar https://
+  if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('wa.me/')) {
+    return `https://${url}`;
+  }
+
+  if (url.startsWith('wa.me/')) {
+    return `https://${url}`;
+  }
+
+  return url;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Elementos DOM Principales
   const productsContainer = document.getElementById('products-grid');
@@ -75,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Detectar si ya está instalada la PWA
   window.addEventListener('appinstalled', () => {
     console.log('🎉 ¡CrediOfertas PWA se instaló correctamente!');
     if (pwaInstallBanner) pwaInstallBanner.classList.add('hidden');
@@ -115,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (openPublishBtn) openPublishBtn.addEventListener('click', () => abrirModal(publishModal));
   if (closePublishModalBtn) closePublishModalBtn.addEventListener('click', () => cerrarModal(publishModal));
 
-  // Modales con atributo data-modal genérico
   document.querySelectorAll('[data-modal]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const targetId = btn.getAttribute('data-modal');
@@ -131,7 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Cerrar modal al hacer clic en el fondo o presionar 'Esc'
   window.addEventListener('click', (e) => {
     if (e.target === authModal) cerrarModal(authModal);
     if (e.target === publishModal) cerrarModal(publishModal);
@@ -151,7 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let supabaseProducts = [];
     let localProducts = [];
 
-    // 1. Cargar desde Supabase
     try {
       const { data, error } = await supabase
         .from('products')
@@ -164,7 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
       console.warn('Conexión remota con Supabase omitida o con error:', error.message);
     }
 
-    // 2. Fallback: Cargar catálogo estático si existe
     try {
       const res = await fetch('./products.json');
       if (res.ok) {
@@ -174,7 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
       console.warn('Archivo local products.json no encontrado.');
     }
 
-    // Unificar catálogos (los nuevos de Supabase van primero)
     allProducts = [...supabaseProducts, ...localProducts];
 
     if (allProducts.length === 0 && productsContainer) {
@@ -232,7 +253,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (videoUrl && videoUrl.trim() !== '') {
       const videoTrimmed = videoUrl.trim();
       
-      // Si es un enlace de YouTube
       if (videoTrimmed.includes('youtube.com') || videoTrimmed.includes('youtu.be')) {
         let embedUrl = videoTrimmed;
         if (videoTrimmed.includes('watch?v=')) {
@@ -247,7 +267,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }
 
-      // Si es un archivo de video directo MP4/WebM
       return `
         <video controls playsinline preload="metadata" poster="${imageUrl}" style="width: 100%; max-height: 230px; object-fit: cover; border-radius: 8px 8px 0 0;">
           <source src="${videoTrimmed}" type="video/mp4">
@@ -256,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
     }
 
-    // Por defecto, renderiza la imagen previa
     return `
       <img src="${imageUrl}" alt="${safeTitle}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80'" style="width: 100%; height: 200px; object-fit: cover;">
     `;
@@ -278,6 +296,9 @@ document.addEventListener('DOMContentLoaded', () => {
     products.forEach((product) => {
       const card = document.createElement('article');
       card.className = 'product-card';
+      
+      const storeLower = (product.store || '').toLowerCase();
+      const categoryLower = (product.category || '').toLowerCase();
       const storeClass = (product.store || product.category || 'generico').toLowerCase().replace(/\s+/g, '');
 
       // Insignia de descuento
@@ -300,19 +321,32 @@ document.addEventListener('DOMContentLoaded', () => {
           ? product.price.toFixed(2)
           : parseFloat(product.price || 0).toFixed(2);
 
+      // Determinar enlace válido
+      const rawUrl = product.affiliateUrl || product.affiliate_link || product.url || product.link || '';
+      const safeTitle = (product.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      const targetUrl = normalizarUrlContacto(rawUrl, product.title);
+
+      // Determinar si es un Afiliado Externo o Publicación Local
+      const esAfiliado = ['amazon', 'shein', 'aliexpress', 'alibaba'].includes(storeLower) || 
+                         ['amazon', 'shein', 'aliexpress', 'alibaba'].includes(categoryLower);
+
       let btnText = `Ver oferta en ${product.store || product.category || 'Tienda'}`;
-      const storeType = (product.store || product.category || '').toLowerCase();
-      if (storeType.includes('servicio')) {
-        btnText = '📞 Contratar Servicio';
-      } else if (storeType.includes('mayor')) {
+      let btnClass = 'affiliate-btn';
+
+      if (esAfiliado) {
+        btnText = `🛒 Ver oferta en ${product.store || product.category || 'Tienda'}`;
+        btnClass = 'affiliate-btn';
+      } else if (categoryLower.includes('servicio') || storeLower.includes('servicio')) {
+        btnText = '🛠️ Contratar Servicio';
+        btnClass = 'service-btn';
+      } else if (categoryLower.includes('mayor') || storeLower.includes('mayor')) {
         btnText = '📦 Contactar Mayorista';
-      } else if (storeType.includes('detal')) {
-        btnText = '🛒 Comprar al Detal';
+        btnClass = 'mayor-btn';
+      } else {
+        btnText = '💬 Contactar por WhatsApp';
+        btnClass = 'whatsapp-btn';
       }
 
-      // Sanitización contra inyección de caracteres en atributos JS
-      const safeTitle = (product.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-      const targetUrl = product.affiliateUrl || product.affiliate_link || '#';
       const imageUrl = product.image || product.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80';
       const videoUrl = product.video_url || product.video || '';
 
@@ -343,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           <!-- Botonera de Acción y Viralización Redes -->
           <div class="card-actions-viral">
-            <a href="${targetUrl}" target="_blank" rel="nofollow noopener sponsored" class="buy-btn">
+            <a href="${targetUrl}" target="_blank" rel="nofollow noopener sponsored" class="btn-action ${btnClass}">
               ${btnText}
             </a>
             
@@ -412,11 +446,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const formData = new FormData(publishForm);
       const categoryVal = formData.get('category');
+      const contactVal = formData.get('affiliate_link');
       
       let imageUrl = formData.get('image_url');
       const imageFile = formData.get('image_file');
 
-      // Soporte para subida local de archivos de imagen mediante FileReader (convertir a Base64)
       if (imageFile && imageFile.size > 0) {
         const reader = new FileReader();
         reader.readAsDataURL(imageFile);
@@ -436,8 +470,8 @@ document.addEventListener('DOMContentLoaded', () => {
         image: imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80',
         image_url: imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80',
         video_url: formData.get('video_url') || null,
-        affiliateUrl: formData.get('affiliate_link'),
-        affiliate_link: formData.get('affiliate_link'),
+        affiliateUrl: contactVal,
+        affiliate_link: contactVal,
         store: categoryVal,
         accept_policy: true
       };
@@ -450,7 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('🚀 ¡Publicación creada exitosamente!');
         cerrarModal(publishModal);
         publishForm.reset();
-        loadProductsFromSupabase(); // Recargar cuadrícula
+        loadProductsFromSupabase();
       }
 
       if (submitBtn) submitBtn.disabled = false;
@@ -464,7 +498,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
     const activeStoreBtn = document.querySelector('.store-filter.active');
     
-    // Capturar valor de 'data-filter' o 'data-store' de forma flexible
     const rawFilter = activeStoreBtn 
       ? (activeStoreBtn.dataset.filter || activeStoreBtn.dataset.store || 'all')
       : 'all';
@@ -478,7 +511,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const region = (product.region || '').toLowerCase();
       const description = (product.description || '').toLowerCase();
 
-      // Coincidencia con el texto del buscador
       const matchesSearch =
         !searchTerm ||
         title.includes(searchTerm) ||
@@ -487,7 +519,6 @@ document.addEventListener('DOMContentLoaded', () => {
         region.includes(searchTerm) ||
         description.includes(searchTerm);
 
-      // Coincidencia con los botones de filtro
       let matchesStore = false;
       if (selectedFilter === 'all') {
         matchesStore = true;
@@ -504,12 +535,10 @@ document.addEventListener('DOMContentLoaded', () => {
     renderProducts(filtered);
   }
 
-  // Evento para el buscador
   if (searchInput) {
     searchInput.addEventListener('input', filterProducts);
   }
 
-  // Evento para los botones de las categorías / tiendas
   storeButtons.forEach((button) => {
     button.addEventListener('click', (e) => {
       e.preventDefault();
