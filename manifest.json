@@ -3,11 +3,11 @@
   "id": "/?utm_source=pwa",
   "name": "CrediOfertas Marketplace Multivendedor",
   "short_name": "CrediOfertas",
-  "start_url": "./?utm_source=pwa",
+  "start_url": "./index.html?utm_source=pwa",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
+  "background_color": "#0f172a",
   "theme_color": "#2563eb",
   "description": "Compra al mayor, detal, contrata servicios o explora promociones de Amazon, Shein, AliExpress y Alibaba.",
   "lang": "es",
@@ -21,28 +21,16 @@
   ],
   "icons": [
     {
-      "src": "./icons/icon-192x192.png",
+      "src": "./logo.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "./icons/icon-192x192-maskable.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
       "src": "./logo.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "./icons/icon-512x512-maskable.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ],
   "shortcuts": [
@@ -50,10 +38,10 @@
       "name": "Publicar Oferta / Servicio",
       "short_name": "Publicar",
       "description": "Publica productos al mayor, detal o anuncia tus servicios",
-      "url": "./?action=publish",
+      "url": "./index.html?action=publish",
       "icons": [
         { 
-          "src": "./icons/icon-192x192.png", 
+          "src": "./logo.png", 
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -63,10 +51,10 @@
       "name": "Servicios & Profesionales",
       "short_name": "Servicios",
       "description": "Explora contrataciones de servicios profesionales",
-      "url": "./?store=Servicios",
+      "url": "./index.html?store=Servicios",
       "icons": [
         { 
-          "src": "./icons/icon-192x192.png", 
+          "src": "./logo.png", 
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -76,10 +64,10 @@
       "name": "Registro de Empresa / RIF",
       "short_name": "Empresas",
       "description": "Verifica tu cuenta comercial o RIF",
-      "url": "./?action=kyc",
+      "url": "./index.html?action=kyc",
       "icons": [
         { 
-          "src": "./icons/icon-192x192.png", 
+          "src": "./logo.png", 
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -88,14 +76,14 @@
   ],
   "screenshots": [
     {
-      "src": "./screenshots/desktop.png",
+      "src": "./logo.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
       "label": "Vista principal de CrediOfertas Marketplace en Escritorio"
     },
     {
-      "src": "./screenshots/mobile.png",
+      "src": "./logo.png",
       "sizes": "750x1334",
       "type": "image/png",
       "form_factor": "narrow",
