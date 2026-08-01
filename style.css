@@ -35,7 +35,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-img {
+img, video {
   max-width: 100%;
   height: auto;
   display: block;
@@ -296,6 +296,29 @@ img {
   transform: scale(1.05);
 }
 
+/* ==========================================
+   MULTIMEDIA: SOPORTE DE VIDEO EN TARJETAS
+   ========================================== */
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
+  height: 0;
+  overflow: hidden;
+  background-color: #0f172a;
+}
+
+.video-container iframe,
+.video-container video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: cover;
+}
+
 /* Badges de Tiendas y Categorías */
 .store-badge {
   position: absolute;
@@ -306,6 +329,7 @@ img {
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
+  z-index: 2;
 }
 
 .store-badge.amazon { background-color: #fef3c7; color: #b45309; }
@@ -326,6 +350,7 @@ img {
   border-radius: 20px;
   font-size: 0.7rem;
   font-weight: 800;
+  z-index: 2;
 }
 
 /* Badges de Planes de Publicación */
@@ -393,7 +418,8 @@ img {
   margin-top: 12px;
 }
 
-.buy-btn {
+.card-actions-viral .buy-btn {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -578,6 +604,15 @@ footer {
   padding: 2.5rem 0;
   text-align: center;
   font-size: 0.85rem;
+}
+
+/* Mensajes de error en cuadrícula */
+.products-grid .error {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #ef4444;
+  font-weight: bold;
+  padding: 2rem;
 }
 
 /* ==========================================
