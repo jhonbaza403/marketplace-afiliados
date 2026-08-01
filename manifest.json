@@ -67,5 +67,21 @@
         }
       ]
     }
+  ],
+  "screenshots": [
+    {
+      "src": "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1280&h=720&fit=crop",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Vista de escritorio de CrediOfertas Marketplace"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1512499617640-c74ae3a79d37?w=750&h=1334&fit=crop",
+      "sizes": "750x1334",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Vista móvil de CrediOfertas Marketplace"
+    }
   ]
 }
