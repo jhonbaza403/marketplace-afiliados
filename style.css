@@ -1,4 +1,4 @@
-/* ==========================================
+ /* ==========================================
    VARIABLES GLOBALES & TEMA
    ========================================== */
 :root {
@@ -400,7 +400,8 @@ img, video {
   box-shadow: var(--shadow-hover);
 }
 
-.card-image {
+.card-image,
+.card-media {
   position: relative;
   width: 100%;
   height: 210px;
@@ -411,14 +412,16 @@ img, video {
   overflow: hidden;
 }
 
-.card-image img {
+.card-image img,
+.card-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
 
-.product-card:hover .card-image img {
+.product-card:hover .card-image img,
+.product-card:hover .card-media img {
   transform: scale(1.05);
 }
 
@@ -433,7 +436,8 @@ img, video {
 }
 
 .video-container iframe,
-.video-container video {
+.video-container video,
+.card-media video {
   position: absolute;
   top: 0;
   left: 0;
@@ -444,7 +448,8 @@ img, video {
 }
 
 /* Badges de Tiendas y Categorías */
-.store-badge {
+.store-badge,
+.badge {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -456,14 +461,14 @@ img, video {
   z-index: 2;
 }
 
-.store-badge.amazon { background-color: #fef3c7; color: #b45309; }
-.store-badge.shein { background-color: #f1f5f9; color: #0f172a; }
-.store-badge.aliexpress { background-color: #fee2e2; color: #dc2626; }
-.store-badge.alibaba { background-color: #ffedd5; color: #c2410c; }
-.store-badge.detal { background-color: #dbeafe; color: #1e40af; }
-.store-badge.mayor { background-color: #fef9c3; color: #854d0e; }
-.store-badge.servicios, 
-.store-badge.servicio { background-color: #dcfce7; color: #166534; }
+.store-badge.amazon, .badge.amazon { background-color: #fef3c7; color: #b45309; }
+.store-badge.shein, .badge.shein { background-color: #f1f5f9; color: #0f172a; }
+.store-badge.aliexpress, .badge.aliexpress { background-color: #fee2e2; color: #dc2626; }
+.store-badge.alibaba, .badge.alibaba { background-color: #ffedd5; color: #c2410c; }
+.store-badge.detal, .badge.detal { background-color: #dbeafe; color: #1e40af; }
+.store-badge.mayor, .badge.mayor { background-color: #fef9c3; color: #854d0e; }
+.store-badge.servicios, .store-badge.servicio,
+.badge.servicios, .badge.servicio { background-color: #dcfce7; color: #166534; }
 
 .discount-badge {
   position: absolute;
@@ -491,7 +496,8 @@ img, video {
 .plan-badge.nacional { background-color: #2563eb; color: #ffffff; }
 .plan-badge.local { background-color: #64748b; color: #ffffff; }
 
-.card-content {
+.card-content,
+.card-body {
   padding: 1.2rem;
   display: flex;
   flex-direction: column;
@@ -505,7 +511,8 @@ img, video {
   text-transform: uppercase;
 }
 
-.title {
+.title,
+.card-body h3 {
   font-size: 0.95rem;
   font-weight: 600;
   margin: 0.4rem 0 0.8rem 0;
@@ -553,24 +560,80 @@ img, video {
   margin-top: 12px;
 }
 
+/* ESTILOS DE BOTONES DINÁMICOS DE ACCIÓN */
+.btn-action,
 .card-actions-viral .buy-btn {
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--primary-color);
-  color: #ffffff;
-  text-decoration: none;
-  padding: 0.7rem;
-  border-radius: 10px;
+  width: 100%;
+  text-align: center;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
   font-weight: 700;
   font-size: 0.85rem;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  text-decoration: none;
+  margin-top: auto;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.btn-action:hover,
 .buy-btn:hover {
-  background: var(--primary-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+}
+
+/* Variación 1: Enlaces de Afiliados (Amazon, Shein, etc.) */
+.btn-action.affiliate-btn,
+.btn-action.affiliate {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.btn-action.affiliate-btn:hover,
+.btn-action.affiliate:hover {
+  background-color: var(--primary-hover);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+}
+
+/* Variación 2: Contacto directo WhatsApp (Detal) */
+.btn-action.whatsapp-btn,
+.btn-action.whatsapp {
+  background-color: #16a34a;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+}
+
+.btn-action.whatsapp-btn:hover,
+.btn-action.whatsapp:hover {
+  background-color: #15803d;
+  box-shadow: 0 6px 16px rgba(22, 163, 74, 0.35);
+}
+
+/* Variación 3: Contratar Servicios */
+.btn-action.service-btn {
+  background-color: #0284c7;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+}
+
+.btn-action.service-btn:hover {
+  background-color: #0369a1;
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
+}
+
+/* Variación 4: Ventas al Mayor */
+.btn-action.mayor-btn {
+  background-color: #d97706;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+}
+
+.btn-action.mayor-btn:hover {
+  background-color: #b45309;
+  box-shadow: 0 6px 16px rgba(217, 119, 6, 0.35);
 }
 
 .share-btn {
