@@ -39,7 +39,20 @@
       ]
     },
     {
-      "source": "/(js|css|logo.png)/(.*)",
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(js|css|images|logo.png)/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -50,7 +63,7 @@
   ],
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!.*\\.).*)",
       "destination": "/index.html"
     }
   ]
