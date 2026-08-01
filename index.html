@@ -119,6 +119,19 @@
 </head>
 <body>
 
+  <!-- BANNERS DINÁMICOS DE PWA Y CONEXIÓN -->
+  <div id="offline-banner" class="offline-banner hidden" style="position: sticky; top: 0; z-index: 10000; background-color: #ef4444; color: white; text-align: center; padding: 10px; font-weight: bold;">
+    📡 Estás en modo sin conexión (Offline). Mostrando datos guardados en caché.
+  </div>
+
+  <div id="pwa-install-banner" class="pwa-banner hidden" style="background: #1e293b; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #2563eb;">
+    <span>📱 ¡Instala la App de CrediOfertas para una mejor experiencia!</span>
+    <div>
+      <button id="install-pwa-btn" style="background: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-right: 10px;">Instalar</button>
+      <button id="close-pwa-banner-btn" style="background: transparent; color: #cbd5e1; border: none; font-size: 18px; cursor: pointer;">&times;</button>
+    </div>
+  </div>
+
   <!-- Protección ante desactivación de JavaScript -->
   <noscript>
     <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #0f172a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999999; text-align: center; padding: 20px;">
@@ -254,7 +267,7 @@
   </div>
 
   <!-- ==========================================
-       MODAL 2: PUBLICACIÓN DE OFERTAS / SERVICIOS (CON VIDEO)
+       MODAL 2: PUBLICACIÓN DE OFERTAS / SERVICIOS (CON VIDEO E IMAGEN LOCAL/URL)
        ========================================== -->
   <div id="publish-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="publish-title">
     <div class="modal-card">
@@ -290,11 +303,16 @@
 
         <div class="form-group">
           <label for="item-image">📷 URL de la Imagen del Producto / Servicio</label>
-          <input type="url" id="item-image" name="image_url" required placeholder="https://ejemplo.com/imagen.jpg">
+          <input type="url" id="item-image" name="image_url" placeholder="https://ejemplo.com/imagen.jpg">
         </div>
 
         <div class="form-group">
-          <label for="item-video">🎥 Video Demostrativo (Opcional - Máx 90s MP4 o YouTube)</label>
+          <label for="item-image-file">📁 O Sube la Imagen desde tu Dispositivo</label>
+          <input type="file" id="item-image-file" name="image_file" accept="image/*">
+        </div>
+
+        <div class="form-group">
+          <label for="item-video">🎥 Video Demostrativo (Opcional - MP4 o YouTube)</label>
           <input type="url" id="item-video" name="video_url" placeholder="https://ejemplo.com/video.mp4 o enlace de YouTube">
         </div>
 
@@ -343,39 +361,8 @@
   <!-- SDK de Supabase (Versión 2) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Lógica JavaScript Principal -->
-  <script src="script.js" defer></script>
-
-  <!-- Registro del Service Worker PWA -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').then(reg => {
-          console.log('[SW] Service Worker registrado con éxito:', reg);
-          
-          reg.addEventListener('updatefound', () => {
-            const newWorker = reg.installing;
-            if (newWorker) {
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('[SW] Nueva versión detectada. Actualizando la aplicación...');
-                  window.location.reload();
-                }
-              });
-            }
-          });
-        }).catch(err => console.error('[SW] Error al registrar Service Worker:', err));
-      });
-    }
-
-    // Captura del evento de instalación PWA en dispositivos móviles
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      console.log('[PWA] Aplicación lista para ser instalada.');
-    });
-  </script>
+  <!-- Lógica JavaScript Principal (Enlazado correctamente a js/app.js) -->
+  <script src="js/app.js" defer></script>
 
   <!-- Script de Rastreo de Vercel Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
