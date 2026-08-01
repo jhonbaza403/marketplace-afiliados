@@ -1,8 +1,8 @@
 // ==========================================
 // CONFIGURACIÓN E INICIALIZACIÓN DE SUPABASE
 // ==========================================
-const SUPABASE_URL = 'https://TU_PROYECTO_SUPABASE.supabase.co'; // Reemplazar con tu URL de Supabase
-const SUPABASE_ANON_KEY = 'TU_ANON_KEY';                        // Reemplazar con tu Anon Key de Supabase
+const SUPABASE_URL = 'https://TU_PROYECTO_SUPABASE.supabase.co'; // <--- Pega aquí la URL de tu proyecto Supabase
+const SUPABASE_ANON_KEY = 'sb_publishable_yPCMORrQyiQ1esGLUdSsJA_YfyjPhAo';
 
 let supabaseClient = null;
 if (typeof supabase !== 'undefined' && SUPABASE_URL !== 'https://TU_PROYECTO_SUPABASE.supabase.co') {
