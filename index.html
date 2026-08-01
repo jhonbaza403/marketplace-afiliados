@@ -7,6 +7,9 @@
 
   <!-- Manifest PWA -->
   <link rel="manifest" href="manifest.json">
+  
+  <!-- Apple Touch Icon (PWA iOS) -->
+  <link rel="apple-touch-icon" href="logo.png">
 
   <!-- SEO Básico -->
   <title>CrediOfertas Marketplace Multivendedor | Mayor, Detal & Servicios</title>
@@ -131,8 +134,8 @@
       <!-- Selector de Idioma Global -->
       <div id="google_translate_element" style="display: inline-block; margin-right: 10px;"></div>
 
-      <button id="open-publish-btn" class="publish-btn" aria-label="Abrir formulario para publicar ofertas o servicios">➕ Publicar Oferta / Servicio Gratis</button>
-      <button id="open-auth-btn" class="auth-btn" aria-label="Abrir formulario de registro comercial o RIF">🏢 Registro de Empresa / RIF</button>
+      <button id="open-publish-btn" data-modal="publish-modal" class="publish-btn" aria-label="Abrir formulario para publicar ofertas o servicios">➕ Publicar Oferta / Servicio Gratis</button>
+      <button id="open-auth-btn" data-modal="auth-modal" class="auth-btn" aria-label="Abrir formulario de registro comercial o RIF">🏢 Registro de Empresa / RIF</button>
     </div>
 
     <div class="container hero-content">
@@ -192,21 +195,21 @@
     <section class="controls">
       <input 
         type="search" 
-        id="search-input" 
+        id="search-bar" 
         class="search-bar" 
         placeholder="🔍 Buscar por productos, servicios, ventas al mayor, Amazon, Shein..."
         aria-label="Buscar productos o servicios"
       >
       <!-- Categorías de filtrado -->
       <div class="filters" role="tablist" aria-label="Filtros de tiendas y categorías">
-        <button class="store-filter active" role="tab" aria-selected="true" data-store="all">Todos</button>
-        <button class="store-filter" role="tab" aria-selected="false" data-store="Mayor">📦 Venta al Mayor</button>
-        <button class="store-filter" role="tab" aria-selected="false" data-store="Detal">🛍️ Venta al Detal</button>
-        <button class="store-filter" role="tab" aria-selected="false" data-store="Servicios">🛠️ Servicios Profesionales</button>
-        <button class="store-filter" role="tab" aria-selected="false" data-store="Amazon">Amazon</button>
-        <button class="store-filter" role="tab" aria-selected="false" data-store="Shein">Shein</button>
-        <button class="store-filter" role="tab" aria-selected="false" data-store="AliExpress">AliExpress</button>
-        <button class="store-filter" role="tab" aria-selected="false" data-store="Alibaba">Alibaba</button>
+        <button class="store-filter active" role="tab" aria-selected="true" data-filter="all">Todos</button>
+        <button class="store-filter" role="tab" aria-selected="false" data-filter="mayor">📦 Venta al Mayor</button>
+        <button class="store-filter" role="tab" aria-selected="false" data-filter="detal">🛍️ Venta al Detal</button>
+        <button class="store-filter" role="tab" aria-selected="false" data-filter="servicios">🛠️ Servicios Profesionales</button>
+        <button class="store-filter" role="tab" aria-selected="false" data-filter="amazon">Amazon</button>
+        <button class="store-filter" role="tab" aria-selected="false" data-filter="shein">Shein</button>
+        <button class="store-filter" role="tab" aria-selected="false" data-filter="aliexpress">AliExpress</button>
+        <button class="store-filter" role="tab" aria-selected="false" data-filter="alibaba">Alibaba</button>
       </div>
     </section>
 
@@ -219,7 +222,7 @@
        ========================================== -->
   <div id="auth-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="kyc-title">
     <div class="modal-card">
-      <button id="close-modal-btn" class="close-btn" aria-label="Cerrar modal de registro">&times;</button>
+      <button class="close-btn" aria-label="Cerrar modal de registro">&times;</button>
       
       <h2 id="kyc-title">🏢 Registro de Empresa / Tienda (RIF)</h2>
       <p class="modal-sub">Ingresa los datos fiscales de tu empresa para verificar tu perfil comercial y acceder a financiamiento.</p>
@@ -255,7 +258,7 @@
        ========================================== -->
   <div id="publish-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="publish-title">
     <div class="modal-card">
-      <button id="close-publish-modal-btn" class="close-btn" aria-label="Cerrar modal de publicación">&times;</button>
+      <button class="close-btn" aria-label="Cerrar modal de publicación">&times;</button>
       
       <h2 id="publish-title">📢 Publicar Oferta o Servicio Gratis</h2>
       <p class="modal-sub">Anuncia productos al mayor, detal o promociona tus servicios profesionales con video demostrativo.</p>
