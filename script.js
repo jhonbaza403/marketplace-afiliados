@@ -115,7 +115,44 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // ==========================================
-  // 4. RENDERIZAR TARJETAS EN EL DOM
+  // 4. HELPER: MOSTRAR VIDEO O IMAGEN
+  // ==========================================
+  function renderMediaElement(videoUrl, imageUrl, safeTitle) {
+    if (videoUrl && videoUrl.trim() !== '') {
+      const videoTrimmed = videoUrl.trim();
+      
+      // Si es un enlace de YouTube
+      if (videoTrimmed.includes('youtube.com') || videoTrimmed.includes('youtu.be')) {
+        let embedUrl = videoTrimmed;
+        if (videoTrimmed.includes('watch?v=')) {
+          embedUrl = videoTrimmed.replace('watch?v=', 'embed/');
+        } else if (videoTrimmed.includes('youtu.be/')) {
+          embedUrl = videoTrimmed.replace('youtu.be/', 'www.youtube.com/embed/');
+        }
+        return `
+          <div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+            <iframe src="${embedUrl}" style="position: absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen loading="lazy"></iframe>
+          </div>
+        `;
+      }
+
+      // Si es un archivo de video directo MP4/WebM
+      return `
+        <video controls playsinline preload="metadata" poster="${imageUrl}" style="width: 100%; max-height: 230px; object-fit: cover; border-radius: 8px 8px 0 0;">
+          <source src="${videoTrimmed}" type="video/mp4">
+          Tu navegador no soporta reproducción de video.
+        </video>
+      `;
+    }
+
+    // Por defecto, renderiza la imagen previa
+    return `
+      <img src="${imageUrl}" alt="${safeTitle}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80'" style="width: 100%; height: 200px; object-fit: cover;">
+    `;
+  }
+
+  // ==========================================
+  // 5. RENDERIZAR TARJETAS EN EL DOM
   // ==========================================
   function renderProducts(products) {
     if (!productsContainer) return;
@@ -165,29 +202,36 @@ document.addEventListener('DOMContentLoaded', () => {
       const safeTitle = (product.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
       const targetUrl = product.affiliateUrl || product.affiliate_link || '#';
       const imageUrl = product.image || product.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80';
+      const videoUrl = product.video_url || product.video || '';
+
+      const mediaHtml = renderMediaElement(videoUrl, imageUrl, safeTitle);
 
       card.innerHTML = `
-        <div class="card-image" style="position: relative;">
-          <img src="${imageUrl}" alt="${safeTitle}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80'">
-          <span class="store-badge ${storeClass}">${product.store || 'General'}</span>
+        <div class="card-image" style="position: relative; overflow: hidden; border-radius: 8px 8px 0 0;">
+          ${mediaHtml}
+          <span class="store-badge ${storeClass}" style="position: absolute; top: 10px; left: 10px; z-index: 2;">${product.store || 'General'}</span>
           ${discountBadge}
         </div>
-        <div class="card-content">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span class="category">${product.category || 'General'} ${product.rif ? `| RIF: ${product.rif}` : ''}</span>
+        <div class="card-content" style="padding: 15px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span class="category" style="font-size: 0.8rem; color: #64748b; font-weight: 600;">${product.category || 'General'} ${product.rif ? `| RIF: ${product.rif}` : ''}</span>
             ${planBadge}
           </div>
           
-          <h3 class="title">${product.title}</h3>
+          <h3 class="title" style="font-size: 1.1rem; margin: 0 0 8px 0; color: #0f172a;">${product.title}</h3>
           
-          <div class="price-rating">
-            <span class="price">$${formattedPrice} ${product.currency || 'USD'}</span>
-            <span class="rating">⭐ ${product.rating || '5.0'}</span>
+          <p class="description" style="font-size: 0.85rem; color: #475569; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+            ${product.description || ''}
+          </p>
+
+          <div class="price-rating" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span class="price" style="font-size: 1.25rem; font-weight: 800; color: #2563eb;">$${formattedPrice} ${product.currency || 'USD'}</span>
+            <span class="rating" style="font-size: 0.9rem; font-weight: bold; color: #f59e0b;">⭐ ${product.rating || '5.0'}</span>
           </div>
 
           <!-- Botonera de Acción y Viralización Redes -->
           <div class="card-actions-viral" style="display: flex; gap: 6px; margin-top: 12px;">
-            <a href="${targetUrl}" target="_blank" rel="nofollow noopener sponsored" class="buy-btn" style="flex: 1; text-align: center;">
+            <a href="${targetUrl}" target="_blank" rel="nofollow noopener sponsored" class="buy-btn" style="flex: 1; text-align: center; text-decoration: none;">
               ${btnText}
             </a>
             
@@ -212,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // 5. REGISTRO DE EMPRESA (FORMULARIO KYC/RIF)
+  // 6. REGISTRO DE EMPRESA (FORMULARIO KYC/RIF)
   // ==========================================
   if (kycForm) {
     kycForm.addEventListener('submit', async (e) => {
@@ -239,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // 6. PUBLICAR OFERTA O SERVICIO
+  // 7. PUBLICAR OFERTA O SERVICIO
   // ==========================================
   if (publishForm) {
     publishForm.addEventListener('submit', async (e) => {
@@ -253,6 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
         description: formData.get('description'),
         image: formData.get('image_url'),
         image_url: formData.get('image_url'),
+        video_url: formData.get('video_url'),
         affiliateUrl: formData.get('affiliate_link'),
         affiliate_link: formData.get('affiliate_link'),
         store: formData.get('category')
@@ -272,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // 7. FILTRADO Y BÚSQUEDA EN TIEMPO REAL
+  // 8. FILTRADO Y BÚSQUEDA EN TIEMPO REAL
   // ==========================================
   function filterProducts() {
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
@@ -284,12 +329,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const category = (product.category || '').toLowerCase();
       const store = (product.store || '').toLowerCase();
       const region = (product.region || '').toLowerCase();
+      const description = (product.description || '').toLowerCase();
 
       const matchesSearch =
         title.includes(searchTerm) ||
         category.includes(searchTerm) ||
         store.includes(searchTerm) ||
-        region.includes(searchTerm);
+        region.includes(searchTerm) ||
+        description.includes(searchTerm);
 
       const matchesStore =
         selectedStore === 'all' || store === selectedStore.toLowerCase();
