@@ -148,7 +148,8 @@
       <div id="google_translate_element" style="display: inline-block; margin-right: 10px;"></div>
 
       <button id="open-publish-btn" data-modal="publish-modal" class="publish-btn" aria-label="Abrir formulario para publicar ofertas o servicios">➕ Publicar Oferta / Servicio Gratis</button>
-      <button id="open-auth-btn" data-modal="auth-modal" class="auth-btn" aria-label="Abrir formulario de registro comercial o RIF">🏢 Registro de Empresa / RIF</button>
+      <button id="open-auth-btn" data-modal="auth-modal" class="auth-btn" aria-label="Abrir formulario de inicio de sesión o cuenta">🔑 Iniciar Sesión / Registro</button>
+      <button id="open-kyc-btn" data-modal="kyc-modal" class="auth-btn" style="background-color: #059669;" aria-label="Abrir formulario de registro comercial o RIF">🏢 Registro Empresa / RIF</button>
     </div>
 
     <div class="container hero-content">
@@ -216,7 +217,7 @@
       <!-- Categorías de filtrado -->
       <div class="filters" role="tablist" aria-label="Filtros de tiendas y categorías">
         <button class="store-filter active" role="tab" aria-selected="true" data-filter="all" data-store="all">Todos</button>
-        <button class="store-filter" role="tab" aria-selected="false" data-filter="mayor" data-store="mayor">📦 Venta al Mayor</button>
+        <button class="store-filter" role="tab" aria-selected="false" data-filter="mayorista" data-store="mayorista">📦 Venta al Mayor</button>
         <button class="store-filter" role="tab" aria-selected="false" data-filter="detal" data-store="detal">🛍️ Venta al Detal</button>
         <button class="store-filter" role="tab" aria-selected="false" data-filter="servicio" data-store="servicio">🛠️ Servicios Profesionales</button>
         <button class="store-filter" role="tab" aria-selected="false" data-filter="amazon" data-store="amazon">Amazon</button>
@@ -231,9 +232,37 @@
   </main>
 
   <!-- ==========================================
-       MODAL 1: REGISTRO Y VERIFICACIÓN DE EMPRESA (RIF)
+       MODAL 1: AUTENTICACIÓN Y REGISTRO DE USUARIO
        ========================================== -->
-  <div id="auth-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="kyc-title">
+  <div id="auth-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+    <div class="modal-card">
+      <button class="close-btn" aria-label="Cerrar modal">&times;</button>
+      <h2 id="auth-title">🔑 Acceso a CrediOfertas</h2>
+      <p class="modal-sub">Inicia sesión o regístrate para publicar y gestionar tus ofertas.</p>
+
+      <form id="login-form" data-mode="login">
+        <div class="form-group">
+          <label for="auth-email">Correo Electrónico</label>
+          <input type="email" id="auth-email" name="email" required placeholder="tu@correo.com">
+        </div>
+
+        <div class="form-group">
+          <label for="auth-password">Contraseña</label>
+          <input type="password" id="auth-password" name="password" required placeholder="••••••••">
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+          <button type="submit" class="submit-btn">Ingresar a la Plataforma</button>
+          <button type="button" style="background: transparent; color: #2563eb; border: none; cursor: pointer; text-decoration: underline;" onclick="this.form.dataset.mode = this.form.dataset.mode === 'login' ? 'signup' : 'login'; this.textContent = this.form.dataset.mode === 'login' ? '¿No tienes cuenta? Regístrate gratis' : '¿Ya tienes cuenta? Inicia Sesión';">¿No tienes cuenta? Regístrate gratis</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 2: REGISTRO Y VERIFICACIÓN DE EMPRESA (RIF)
+       ========================================== -->
+  <div id="kyc-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="kyc-title">
     <div class="modal-card">
       <button class="close-btn" aria-label="Cerrar modal de registro">&times;</button>
       
@@ -267,58 +296,62 @@
   </div>
 
   <!-- ==========================================
-       MODAL 2: PUBLICACIÓN DE OFERTAS / SERVICIOS (CON VIDEO E IMAGEN LOCAL/URL)
+       MODAL 3: PUBLICACIÓN DE OFERTAS / SERVICIOS (CON VIDEO DE 90s E IMAGEN)
        ========================================== -->
   <div id="publish-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="publish-title">
     <div class="modal-card">
-      <button class="close-btn" aria-label="Cerrar modal de publicación">&times;</button>
+      <button id="close-publish-modal-btn" class="close-btn" aria-label="Cerrar modal de publicación">&times;</button>
       
       <h2 id="publish-title">📢 Publicar Oferta o Servicio Gratis</h2>
       <p class="modal-sub">Anuncia productos al mayor, detal o promociona tus servicios profesionales con video demostrativo.</p>
 
-      <form id="publish-form">
+      <form id="publish-form" enctype="multipart/form-data">
         <div class="form-group">
-          <label for="item-title">Título de la Publicación</label>
-          <input type="text" id="item-title" name="title" required placeholder="Ej: Lote de Franelas de Algodón / Servicio de Plomería">
-        </div>
-
-        <div class="form-group">
-          <label for="publish-type">Categoría / Tipo de Publicación</label>
-          <select id="publish-type" name="category" required class="form-select">
-            <option value="Mayor">📦 Venta al Mayor (Mayorista / Fábrica)</option>
-            <option value="Detal">🛍️ Venta al Detal</option>
-            <option value="Servicios">🛠️ Oferta de Servicios Profesionales</option>
+          <label for="pub-type">Tipo de Oferta / Rol</label>
+          <select id="pub-type" name="type" required class="form-select">
+            <option value="detal">🛍️ Venta al Detal</option>
+            <option value="mayorista">📦 Venta al Mayor (Mayorista / Fábrica)</option>
+            <option value="servicio">🛠️ Oferta de Servicios Profesionales</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label for="item-price">Precio ($ USD)</label>
-          <input type="number" step="0.01" id="item-price" name="price" required placeholder="Ej: 15.00">
+          <label for="pub-title">Título de la Publicación</label>
+          <input type="text" id="pub-title" name="title" required placeholder="Ej: Lote de Franelas de Algodón / Servicio Técnico">
         </div>
 
         <div class="form-group">
-          <label for="item-description">Descripción Detallada</label>
-          <textarea id="item-description" name="description" rows="3" required placeholder="Detalles del producto, cantidades al mayor o alcance del servicio..."></textarea>
+          <label for="pub-category">Categoría</label>
+          <input type="text" id="pub-category" name="category" required placeholder="Ej: Calzado, Tecnología, Hogar, Salud">
         </div>
 
         <div class="form-group">
-          <label for="item-image">📷 URL de la Imagen del Producto / Servicio</label>
-          <input type="url" id="item-image" name="image_url" placeholder="https://ejemplo.com/imagen.jpg">
+          <label for="pub-price">Precio ($ USD)</label>
+          <input type="number" step="0.01" id="pub-price" name="price" required placeholder="Ej: 15.00">
         </div>
 
         <div class="form-group">
-          <label for="item-image-file">📁 O Sube la Imagen desde tu Dispositivo</label>
-          <input type="file" id="item-image-file" name="image_file" accept="image/*">
+          <label for="pub-description">Descripción Detallada</label>
+          <textarea id="pub-description" name="description" rows="3" required placeholder="Detalles del producto, cantidades al mayor o alcance del servicio..."></textarea>
         </div>
 
         <div class="form-group">
-          <label for="item-video">🎥 Video Demostrativo (Opcional - MP4 o YouTube)</label>
-          <input type="url" id="item-video" name="video_url" placeholder="https://ejemplo.com/video.mp4 o enlace de YouTube">
+          <label for="pub-image-file">📷 Imagen Principal (Archivo Local)</label>
+          <input type="file" id="pub-image-file" name="image_file" accept="image/*">
+          <small style="color: #64748b; margin-top: 4px; display: block;">O pega la URL de una imagen:</small>
+          <input type="url" id="pub-image-url" name="image_url" placeholder="https://ejemplo.com/imagen.jpg">
         </div>
 
         <div class="form-group">
-          <label for="item-link">🔗 Enlace de Contacto / WhatsApp o Tienda</label>
-          <input type="url" id="item-link" name="affiliate_link" required placeholder="https://wa.me/584120000000">
+          <label for="pub-video-file">🎥 Video Promocional hasta 90 seg (Archivo MP4)</label>
+          <input type="file" id="pub-video-file" name="video_file" accept="video/mp4,video/m4v,video/*">
+          <small style="color: #64748b; margin-top: 4px; display: block;">O pega enlace de video (YouTube / MP4 público):</small>
+          <input type="url" id="pub-video-url" name="video_url" placeholder="https://youtube.com/watch?v=...">
+        </div>
+
+        <div class="form-group">
+          <label for="pub-affiliate">🔗 Enlace de Contacto / WhatsApp o Tienda</label>
+          <input type="text" id="pub-affiliate" name="affiliate_link" required placeholder="Ej: +584120000000 o https://wa.me/...">
         </div>
 
         <div class="form-group checkbox-group" style="margin-top: 15px;">
