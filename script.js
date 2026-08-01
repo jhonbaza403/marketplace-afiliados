@@ -28,6 +28,82 @@ document.addEventListener('DOMContentLoaded', () => {
   let allProducts = [];
 
   // ==========================================
+  // PWA 1. REGISTRO DE SERVICE WORKER
+  // ==========================================
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then((reg) => {
+          console.log('✅ Service Worker registrado con éxito. Escopo:', reg.scope);
+        })
+        .catch((err) => {
+          console.warn('⚠️ Error al registrar el Service Worker:', err);
+        });
+    });
+  }
+
+  // ==========================================
+  // PWA 2. CONTROL DE EVENTO E INSTALACIÓN (BANNER PWA)
+  // ==========================================
+  let deferredPrompt = null;
+  const pwaInstallBanner = document.getElementById('pwa-install-banner');
+  const installPwaBtn = document.getElementById('install-pwa-btn');
+  const closePwaBannerBtn = document.getElementById('close-pwa-banner-btn');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (pwaInstallBanner) {
+      pwaInstallBanner.classList.remove('hidden');
+    }
+  });
+
+  if (installPwaBtn) {
+    installPwaBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`Respuesta de instalación PWA: ${outcome}`);
+      deferredPrompt = null;
+      if (pwaInstallBanner) pwaInstallBanner.classList.add('hidden');
+    });
+  }
+
+  if (closePwaBannerBtn) {
+    closePwaBannerBtn.addEventListener('click', () => {
+      if (pwaInstallBanner) pwaInstallBanner.classList.add('hidden');
+    });
+  }
+
+  // Detectar si ya está instalada la PWA
+  window.addEventListener('appinstalled', () => {
+    console.log('🎉 ¡CrediOfertas PWA se instaló correctamente!');
+    if (pwaInstallBanner) pwaInstallBanner.classList.add('hidden');
+  });
+
+  // ==========================================
+  // PWA 3. DETECCIÓN DE CONEXIÓN (OFFLINE/ONLINE)
+  // ==========================================
+  const offlineBanner = document.getElementById('offline-banner');
+
+  function updateOnlineStatus() {
+    if (!navigator.onLine) {
+      if (offlineBanner) {
+        offlineBanner.textContent = '📡 Estás en modo sin conexión (Offline). Mostrando datos guardados en caché.';
+        offlineBanner.classList.add('visible');
+      }
+    } else {
+      if (offlineBanner) {
+        offlineBanner.classList.remove('visible');
+      }
+    }
+  }
+
+  window.addEventListener('online', updateOnlineStatus);
+  window.addEventListener('offline', updateOnlineStatus);
+  updateOnlineStatus();
+
+  // ==========================================
   // 1. MANEJO Y CONTROL DE MODALES
   // ==========================================
   const abrirModal = (modal) => modal?.classList.remove('hidden');
@@ -165,8 +241,8 @@ document.addEventListener('DOMContentLoaded', () => {
           embedUrl = videoTrimmed.replace('youtu.be/', 'www.youtube.com/embed/');
         }
         return `
-          <div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-            <iframe src="${embedUrl}" style="position: absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen loading="lazy"></iframe>
+          <div class="video-container">
+            <iframe src="${embedUrl}" allowfullscreen loading="lazy"></iframe>
           </div>
         `;
       }
@@ -212,11 +288,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // Insignia de Plan o Alcance
       let planBadge = '';
       if (product.plan === 'global') {
-        planBadge = `<span class="plan-badge global" style="background: #8b5cf6; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">🌍 Global</span>`;
+        planBadge = `<span class="plan-badge global">🌍 Global</span>`;
       } else if (product.plan === 'nacional') {
-        planBadge = `<span class="plan-badge nacional" style="background: #2563eb; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">🇻🇪 Nacional</span>`;
+        planBadge = `<span class="plan-badge nacional">🇻🇪 Nacional</span>`;
       } else if (product.region) {
-        planBadge = `<span class="plan-badge local" style="background: #64748b; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">📍 ${product.region}</span>`;
+        planBadge = `<span class="plan-badge local">📍 ${product.region}</span>`;
       }
 
       const formattedPrice =
@@ -243,46 +319,47 @@ document.addEventListener('DOMContentLoaded', () => {
       const mediaHtml = renderMediaElement(videoUrl, imageUrl, safeTitle);
 
       card.innerHTML = `
-        <div class="card-image" style="position: relative; overflow: hidden; border-radius: 8px 8px 0 0;">
+        <div class="card-image">
           ${mediaHtml}
-          <span class="store-badge ${storeClass}" style="position: absolute; top: 10px; left: 10px; z-index: 2;">${product.store || product.category || 'General'}</span>
+          <span class="store-badge ${storeClass}">${product.store || product.category || 'General'}</span>
           ${discountBadge}
         </div>
-        <div class="card-content" style="padding: 15px;">
+        <div class="card-content">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span class="category" style="font-size: 0.8rem; color: #64748b; font-weight: 600;">${product.category || 'General'} ${product.rif ? `| RIF: ${product.rif}` : ''}</span>
+            <span class="category">${product.category || 'General'} ${product.rif ? `| RIF: ${product.rif}` : ''}</span>
             ${planBadge}
           </div>
           
-          <h3 class="title" style="font-size: 1.1rem; margin: 0 0 8px 0; color: #0f172a;">${product.title}</h3>
+          <h3 class="title">${product.title}</h3>
           
-          <p class="description" style="font-size: 0.85rem; color: #475569; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+          <p class="description">
             ${product.description || ''}
           </p>
 
-          <div class="price-rating" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <span class="price" style="font-size: 1.25rem; font-weight: 800; color: #2563eb;">$${formattedPrice} ${product.currency || 'USD'}</span>
-            <span class="rating" style="font-size: 0.9rem; font-weight: bold; color: #f59e0b;">⭐ ${product.rating || '5.0'}</span>
+          <div class="price-rating">
+            <span class="price">$${formattedPrice} ${product.currency || 'USD'}</span>
+            <span class="rating">⭐ ${product.rating || '5.0'}</span>
           </div>
 
           <!-- Botonera de Acción y Viralización Redes -->
-          <div class="card-actions-viral" style="display: flex; gap: 6px; margin-top: 12px;">
-            <a href="${targetUrl}" target="_blank" rel="nofollow noopener sponsored" class="buy-btn" style="flex: 1; text-align: center; text-decoration: none;">
+          <div class="card-actions-viral">
+            <a href="${targetUrl}" target="_blank" rel="nofollow noopener sponsored" class="buy-btn">
               ${btnText}
             </a>
             
             <button 
               type="button"
+              class="share-btn"
               onclick="compartirRedSocial('whatsapp', '${safeTitle}', '${targetUrl}')" 
               title="Compartir en WhatsApp"
-              style="padding: 8px 10px; background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;"
             >💬</button>
 
             <button 
               type="button"
+              class="share-btn"
+              style="background-color: #64748b;"
               onclick="compartirRedSocial('native', '${safeTitle}', '${targetUrl}')" 
               title="Copiar enlace o Compartir"
-              style="padding: 8px 10px; background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer; font-weight: bold;"
             >📲</button>
           </div>
         </div>
@@ -335,18 +412,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const formData = new FormData(publishForm);
       const categoryVal = formData.get('category');
+      
+      let imageUrl = formData.get('image_url');
+      const imageFile = formData.get('image_file');
+
+      // Soporte para subida local de archivos de imagen mediante FileReader (convertir a Base64)
+      if (imageFile && imageFile.size > 0) {
+        const reader = new FileReader();
+        reader.readAsDataURL(imageFile);
+        await new Promise((resolve) => {
+          reader.onload = () => {
+            imageUrl = reader.result;
+            resolve();
+          };
+        });
+      }
+
       const newProduct = {
         title: formData.get('title'),
         category: categoryVal,
-        price: parseFloat(formData.get('price')),
+        price: parseFloat(formData.get('price') || 0),
         description: formData.get('description'),
-        image: formData.get('image_url'),
-        image_url: formData.get('image_url'),
+        image: imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80',
+        image_url: imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80',
         video_url: formData.get('video_url') || null,
         affiliateUrl: formData.get('affiliate_link'),
         affiliate_link: formData.get('affiliate_link'),
         store: categoryVal,
-        accept_policy: formData.get('acepta_politicas') === 'Sí' || true
+        accept_policy: true
       };
 
       const { data, error } = await supabase.from('products').insert([newProduct]);
