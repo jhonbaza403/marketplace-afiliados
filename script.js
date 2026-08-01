@@ -1,9 +1,8 @@
 // ==========================================
 // CONFIGURACIÓN E INICIALIZACIÓN DE SUPABASE
 // ==========================================
-const SUPABASE_URL = 'https://vpslunexibbaapihmbrj.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_yPCMORrQyiQ1esGLUdSsJA_YfyjPhAo';
-
+const SUPABASE_URL = 'https://TU_PROYECTO_SUPABASE.supabase.co'; // <--- Pega aquí la URL de tu proyecto Supabase
+const SUPABASE_ANON_KEY = 'sb_publishable_yPCMORrQyiQ1esGLUdSsJA_YfyjPhAo';
 // Inicialización del cliente Supabase
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
