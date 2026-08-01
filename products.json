@@ -1,70 +1,86 @@
-// Array de productos (o cargado mediante fetch('products.json'))
-const products = [ /* ...aquí tu JSON... */ ];
-
-const container = document.getElementById('products-grid');
-
-function renderProducts(items) {
-  if (!container) return;
-  
-  if (items.length === 0) {
-    container.innerHTML = `<p class="error">No se encontraron productos disponibles.</p>`;
-    return;
+[
+  {
+    "id": 1,
+    "title": "Auriculares Inalámbricos Bluetooth con Cancelación de Ruido",
+    "category": "Tecnología",
+    "price": 29.99,
+    "currency": "USD",
+    "rating": 4.8,
+    "discount": "-30%",
+    "store": "Amazon",
+    "plan": "global",
+    "image": "https://via.placeholder.com/400x400/0f172a/ffffff?text=Auriculares+Bluetooth",
+    "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "affiliateUrl": "https://amazon.com"
+  },
+  {
+    "id": 2,
+    "title": "Chaqueta Camisa Estampada de Moda Casual para Hombre",
+    "category": "Ropa",
+    "price": 18.50,
+    "currency": "USD",
+    "rating": 4.5,
+    "discount": "-15%",
+    "store": "Shein",
+    "plan": "global",
+    "image": "https://via.placeholder.com/400x400/1e293b/ffffff?text=Chaqueta+Shein",
+    "videoUrl": "",
+    "affiliateUrl": "https://shein.com"
+  },
+  {
+    "id": 3,
+    "title": "Reloj Inteligente Deportivo con Monitor de Ritmo Cardíaco",
+    "category": "Electrónica",
+    "price": 12.99,
+    "currency": "USD",
+    "rating": 4.3,
+    "discount": "-50%",
+    "store": "AliExpress",
+    "plan": "global",
+    "image": "https://via.placeholder.com/400x400/2563eb/ffffff?text=Smartwatch",
+    "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-smartwatch-close-up-42805-large.mp4",
+    "affiliateUrl": "https://aliexpress.com"
+  },
+  {
+    "id": 4,
+    "title": "Lote x100 Fundas de Silicona Transparentes para Smartphone",
+    "category": "Mayorista",
+    "price": 45.00,
+    "currency": "USD",
+    "rating": 4.9,
+    "discount": "-20%",
+    "store": "Alibaba",
+    "plan": "global",
+    "image": "https://via.placeholder.com/400x400/c2410c/ffffff?text=Lote+Fundas",
+    "videoUrl": "",
+    "affiliateUrl": "https://alibaba.com"
+  },
+  {
+    "id": 5,
+    "title": "Zapatos Deportivos Casuales de Cuerina Duradera",
+    "category": "Calzado",
+    "price": 35.00,
+    "currency": "USD",
+    "rating": 4.7,
+    "discount": "-10%",
+    "store": "Detal",
+    "plan": "nacional",
+    "image": "https://via.placeholder.com/400x400/1e40af/ffffff?text=Zapatos+Deportivos",
+    "videoUrl": "",
+    "affiliateUrl": "https://wa.me/1234567890"
+  },
+  {
+    "id": 6,
+    "title": "Servicio de Mantenimiento y Reparación de Computadoras",
+    "category": "Servicios",
+    "price": 25.00,
+    "currency": "USD",
+    "rating": 5.0,
+    "discount": "",
+    "store": "Servicios",
+    "plan": "local",
+    "image": "https://via.placeholder.com/400x400/166534/ffffff?text=Servicio+Tecnico",
+    "videoUrl": "",
+    "affiliateUrl": "https://wa.me/1234567890"
   }
-
-  container.innerHTML = items.map(product => {
-    // Determinar la clase de insignia de la tienda para los estilos CSS
-    const storeClass = product.store.toLowerCase().replace(/\s+/g, '');
-    
-    // Determinar el plan si aplica (o por defecto según la tienda)
-    const isGlobal = ['amazon', 'shein', 'aliexpress', 'alibaba'].includes(storeClass);
-    const planType = isGlobal ? 'global' : 'nacional';
-
-    return `
-      <article class="product-card">
-        <div class="card-image">
-          <span class="discount-badge">${product.discount}</span>
-          <span class="store-badge ${storeClass}">${product.store}</span>
-          <img src="${product.image}" alt="${product.title}" loading="lazy" />
-        </div>
-        
-        <div class="card-content">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="category">${product.category}</span>
-            <span class="plan-badge ${planType}">${planType}</span>
-          </div>
-          
-          <h3 class="title">${product.title}</h3>
-          
-          <div class="price-rating">
-            <span class="price">$${product.price.toFixed(2)} ${product.currency}</span>
-            <span class="rating">★ ${product.rating}</span>
-          </div>
-          
-          <div class="card-actions">
-            <a href="${product.affiliateUrl}" target="_blank" rel="noopener noreferrer" class="buy-btn" style="flex: 1;">
-              ${product.store === 'Mayor' || product.store === 'Servicios' || product.store === 'Detal' ? 'Contactar' : 'Ver Oferta'}
-            </a>
-            <button class="share-btn" onclick="shareProduct('${product.title}', '${product.affiliateUrl}')" style="background:#f1f5f9; border:1px solid #cbd5e1; padding: 0 12px; border-radius: 10px; cursor: pointer;">
-              🔗
-            </button>
-          </div>
-        </div>
-      </article>
-    `;
-  }).join('');
-}
-
-// Función para compartir enlace
-function shareProduct(title, url) {
-  if (navigator.share) {
-    navigator.share({ title: title, url: url }).catch(() => {});
-  } else {
-    navigator.clipboard.writeText(url);
-    alert('¡Enlace copiado al portapapeles!');
-  }
-}
-
-// Inicializar la vista
-document.addEventListener('DOMContentLoaded', () => {
-  renderProducts(products);
-});
+]
