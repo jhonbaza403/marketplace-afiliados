@@ -334,9 +334,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (submitBtn) submitBtn.disabled = true;
 
       const formData = new FormData(publishForm);
+      const categoryVal = formData.get('category');
       const newProduct = {
         title: formData.get('title'),
-        category: formData.get('category'),
+        category: categoryVal,
         price: parseFloat(formData.get('price')),
         description: formData.get('description'),
         image: formData.get('image_url'),
@@ -344,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
         video_url: formData.get('video_url') || null,
         affiliateUrl: formData.get('affiliate_link'),
         affiliate_link: formData.get('affiliate_link'),
-        store: formData.get('category'),
+        store: categoryVal,
         accept_policy: formData.get('acepta_politicas') === 'Sí' || true
       };
 
@@ -370,27 +371,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
     const activeStoreBtn = document.querySelector('.store-filter.active');
     
-    // Compatible con data-store y data-filter
-    const selectedStore = activeStoreBtn 
-      ? (activeStoreBtn.dataset.store || activeStoreBtn.dataset.filter || 'all').toLowerCase()
+    // Capturar valor de 'data-filter' o 'data-store' de forma flexible
+    const rawFilter = activeStoreBtn 
+      ? (activeStoreBtn.dataset.filter || activeStoreBtn.dataset.store || 'all')
       : 'all';
+
+    const selectedFilter = rawFilter.toLowerCase().trim();
 
     const filtered = allProducts.filter((product) => {
       const title = (product.title || '').toLowerCase();
       const category = (product.category || '').toLowerCase();
-      const store = (product.store || product.category || '').toLowerCase();
+      const store = (product.store || '').toLowerCase();
       const region = (product.region || '').toLowerCase();
       const description = (product.description || '').toLowerCase();
 
+      // Coincidencia con el texto del buscador
       const matchesSearch =
+        !searchTerm ||
         title.includes(searchTerm) ||
         category.includes(searchTerm) ||
         store.includes(searchTerm) ||
         region.includes(searchTerm) ||
         description.includes(searchTerm);
 
-      const matchesStore =
-        selectedStore === 'all' || store.includes(selectedStore);
+      // Coincidencia con los botones de filtro
+      let matchesStore = false;
+      if (selectedFilter === 'all') {
+        matchesStore = true;
+      } else {
+        matchesStore =
+          category.includes(selectedFilter) ||
+          store.includes(selectedFilter) ||
+          description.includes(selectedFilter);
+      }
 
       return matchesSearch && matchesStore;
     });
@@ -398,9 +411,15 @@ document.addEventListener('DOMContentLoaded', () => {
     renderProducts(filtered);
   }
 
-  if (searchInput) searchInput.addEventListener('input', filterProducts);
+  // Evento para el buscador
+  if (searchInput) {
+    searchInput.addEventListener('input', filterProducts);
+  }
+
+  // Evento para los botones de las categorías / tiendas
   storeButtons.forEach((button) => {
-    button.addEventListener('click', () => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
       storeButtons.forEach((btn) => btn.classList.remove('active'));
       button.classList.add('active');
       filterProducts();
