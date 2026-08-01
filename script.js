@@ -10,7 +10,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE
 document.addEventListener('DOMContentLoaded', () => {
   // Elementos DOM Principales
   const productsContainer = document.getElementById('products-grid');
-  const searchInput = document.getElementById('search-input');
+  const searchInput = document.getElementById('search-input') || document.getElementById('search-bar');
   const storeButtons = document.querySelectorAll('.store-filter');
 
   // Modales
@@ -39,6 +39,22 @@ document.addEventListener('DOMContentLoaded', () => {
   if (openPublishBtn) openPublishBtn.addEventListener('click', () => abrirModal(publishModal));
   if (closePublishModalBtn) closePublishModalBtn.addEventListener('click', () => cerrarModal(publishModal));
 
+  // Modales con atributo data-modal genérico
+  document.querySelectorAll('[data-modal]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-modal');
+      const targetModal = document.getElementById(targetId);
+      if (targetModal) abrirModal(targetModal);
+    });
+  });
+
+  document.querySelectorAll('.close-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      cerrarModal(authModal);
+      cerrarModal(publishModal);
+    });
+  });
+
   // Cerrar modal al hacer clic en el fondo o presionar 'Esc'
   window.addEventListener('click', (e) => {
     if (e.target === authModal) cerrarModal(authModal);
@@ -53,9 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ==========================================
-  // 2. CARGAR PUBLICACIONES DESDE SUPABASE
+  // 2. CARGAR PUBLICACIONES (SUPABASE + LOCAL)
   // ==========================================
   async function loadProductsFromSupabase() {
+    let supabaseProducts = [];
+    let localProducts = [];
+
+    // 1. Cargar desde Supabase
     try {
       const { data, error } = await supabase
         .from('products')
@@ -63,16 +83,31 @@ document.addEventListener('DOMContentLoaded', () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-
-      allProducts = data || [];
-      renderProducts(allProducts);
+      supabaseProducts = data || [];
     } catch (error) {
-      console.error('Error al cargar datos desde Supabase:', error.message);
-      if (productsContainer) {
-        productsContainer.innerHTML =
-          '<p class="error" style="grid-column: 1/-1; text-align: center; color: #ef4444; font-weight: bold; padding: 2rem;">Error al conectar con la base de datos. Por favor, intenta de nuevo más tarde.</p>';
-      }
+      console.warn('Conexión remota con Supabase omitida o con error:', error.message);
     }
+
+    // 2. Fallback: Cargar catálogo estático si existe
+    try {
+      const res = await fetch('./products.json');
+      if (res.ok) {
+        localProducts = await res.json();
+      }
+    } catch (e) {
+      console.warn('Archivo local products.json no encontrado.');
+    }
+
+    // Unificar catálogos (los nuevos de Supabase van primero)
+    allProducts = [...supabaseProducts, ...localProducts];
+
+    if (allProducts.length === 0 && productsContainer) {
+      productsContainer.innerHTML =
+        '<p class="error" style="grid-column: 1/-1; text-align: center; color: #64748b; font-weight: bold; padding: 2rem;">No hay publicaciones disponibles en este momento.</p>';
+      return;
+    }
+
+    renderProducts(allProducts);
   }
 
   // ==========================================
@@ -160,14 +195,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (products.length === 0) {
       productsContainer.innerHTML =
-        '<p style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #64748b;">No se encontraron publicaciones disponibles.</p>';
+        '<p style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #64748b;">No se encontraron publicaciones disponibles para este filtro.</p>';
       return;
     }
 
     products.forEach((product) => {
       const card = document.createElement('article');
       card.className = 'product-card';
-      const storeClass = (product.store || 'generico').toLowerCase().replace(/\s+/g, '');
+      const storeClass = (product.store || product.category || 'generico').toLowerCase().replace(/\s+/g, '');
 
       // Insignia de descuento
       const discountBadge = product.discount
@@ -189,12 +224,13 @@ document.addEventListener('DOMContentLoaded', () => {
           ? product.price.toFixed(2)
           : parseFloat(product.price || 0).toFixed(2);
 
-      let btnText = `Ver oferta en ${product.store || 'Tienda'}`;
-      if (product.store === 'Servicios') {
+      let btnText = `Ver oferta en ${product.store || product.category || 'Tienda'}`;
+      const storeType = (product.store || product.category || '').toLowerCase();
+      if (storeType.includes('servicio')) {
         btnText = '📞 Contratar Servicio';
-      } else if (product.store === 'Mayor') {
+      } else if (storeType.includes('mayor')) {
         btnText = '📦 Contactar Mayorista';
-      } else if (product.store === 'Detal') {
+      } else if (storeType.includes('detal')) {
         btnText = '🛒 Comprar al Detal';
       }
 
@@ -209,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
       card.innerHTML = `
         <div class="card-image" style="position: relative; overflow: hidden; border-radius: 8px 8px 0 0;">
           ${mediaHtml}
-          <span class="store-badge ${storeClass}" style="position: absolute; top: 10px; left: 10px; z-index: 2;">${product.store || 'General'}</span>
+          <span class="store-badge ${storeClass}" style="position: absolute; top: 10px; left: 10px; z-index: 2;">${product.store || product.category || 'General'}</span>
           ${discountBadge}
         </div>
         <div class="card-content" style="padding: 15px;">
@@ -262,6 +298,9 @@ document.addEventListener('DOMContentLoaded', () => {
     kycForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      const submitBtn = kycForm.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+
       const formData = new FormData(kycForm);
       const companyData = {
         company_name: formData.get('company_name'),
@@ -273,12 +312,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const { data, error } = await supabase.from('companies').insert([companyData]);
 
       if (error) {
-        alert('Error al registrar la empresa: ' + error.message);
+        alert('⚠️ Error al registrar la empresa: ' + error.message);
       } else {
-        alert('¡Empresa registrada con éxito en CrediOfertas!');
+        alert('🎉 ¡Empresa registrada con éxito en CrediOfertas!');
         cerrarModal(authModal);
         kycForm.reset();
       }
+
+      if (submitBtn) submitBtn.disabled = false;
     });
   }
 
@@ -289,6 +330,9 @@ document.addEventListener('DOMContentLoaded', () => {
     publishForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      const submitBtn = publishForm.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+
       const formData = new FormData(publishForm);
       const newProduct = {
         title: formData.get('title'),
@@ -297,22 +341,25 @@ document.addEventListener('DOMContentLoaded', () => {
         description: formData.get('description'),
         image: formData.get('image_url'),
         image_url: formData.get('image_url'),
-        video_url: formData.get('video_url'),
+        video_url: formData.get('video_url') || null,
         affiliateUrl: formData.get('affiliate_link'),
         affiliate_link: formData.get('affiliate_link'),
-        store: formData.get('category')
+        store: formData.get('category'),
+        accept_policy: formData.get('acepta_politicas') === 'Sí' || true
       };
 
       const { data, error } = await supabase.from('products').insert([newProduct]);
 
       if (error) {
-        alert('Error al publicar: ' + error.message);
+        alert('⚠️ Error al publicar: ' + error.message);
       } else {
-        alert('¡Publicación creada exitosamente!');
+        alert('🚀 ¡Publicación creada exitosamente!');
         cerrarModal(publishModal);
         publishForm.reset();
-        loadProductsFromSupabase(); // Recargar cuadrícula en tiempo real
+        loadProductsFromSupabase(); // Recargar cuadrícula
       }
+
+      if (submitBtn) submitBtn.disabled = false;
     });
   }
 
@@ -322,12 +369,16 @@ document.addEventListener('DOMContentLoaded', () => {
   function filterProducts() {
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
     const activeStoreBtn = document.querySelector('.store-filter.active');
-    const selectedStore = activeStoreBtn ? activeStoreBtn.dataset.store : 'all';
+    
+    // Compatible con data-store y data-filter
+    const selectedStore = activeStoreBtn 
+      ? (activeStoreBtn.dataset.store || activeStoreBtn.dataset.filter || 'all').toLowerCase()
+      : 'all';
 
     const filtered = allProducts.filter((product) => {
       const title = (product.title || '').toLowerCase();
       const category = (product.category || '').toLowerCase();
-      const store = (product.store || '').toLowerCase();
+      const store = (product.store || product.category || '').toLowerCase();
       const region = (product.region || '').toLowerCase();
       const description = (product.description || '').toLowerCase();
 
@@ -339,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
         description.includes(searchTerm);
 
       const matchesStore =
-        selectedStore === 'all' || store === selectedStore.toLowerCase();
+        selectedStore === 'all' || store.includes(selectedStore);
 
       return matchesSearch && matchesStore;
     });
@@ -355,6 +406,18 @@ document.addEventListener('DOMContentLoaded', () => {
       filterProducts();
     });
   });
+
+  // ==========================================
+  // 9. ACTUALIZACIONES EN TIEMPO REAL (REALTIME)
+  // ==========================================
+  supabase
+    .channel('public:products')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'products' }, (payload) => {
+      console.log('⚡ Nueva oferta detectada en tiempo real:', payload.new);
+      allProducts.unshift(payload.new);
+      renderProducts(allProducts);
+    })
+    .subscribe();
 
   // Inicializar carga de publicaciones
   loadProductsFromSupabase();
