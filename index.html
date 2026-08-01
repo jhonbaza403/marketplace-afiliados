@@ -340,8 +340,8 @@
   </script>
   <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async defer></script>
 
-  <!-- SDK de Supabase (Versión 2) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <!-- SDK de Supabase (Versión 2) - Carga Síncrona Prioritaria -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Lógica JavaScript Principal -->
   <script src="script.js" defer></script>
@@ -367,6 +367,14 @@
         }).catch(err => console.error('[SW] Error al registrar Service Worker:', err));
       });
     }
+
+    // Captura del evento de instalación PWA en dispositivos móviles
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      console.log('[PWA] Aplicación lista para ser instalada.');
+    });
   </script>
 
   <!-- Script de Rastreo de Vercel Analytics -->
