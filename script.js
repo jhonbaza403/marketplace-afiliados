@@ -3,8 +3,11 @@
 // ==========================================
 const SUPABASE_URL = 'https://TU_PROYECTO_SUPABASE.supabase.co'; // <--- Pega aquí la URL de tu proyecto Supabase
 const SUPABASE_ANON_KEY = 'sb_publishable_yPCMORrQyiQ1esGLUdSsJA_YfyjPhAo';
-// Inicialización del cliente Supabase
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+// Inicialización segura del cliente Supabase
+const supabase = (window.supabase && typeof window.supabase.createClient === 'function')
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
 
 // Correo receptor de ingresos por suscripciones y comisiones
 const PAYPAL_RECEIVER_EMAIL = 'bazwjhon@gmail.com';
@@ -24,12 +27,12 @@ function normalizarUrlContacto(urlOriginal, titulo = '') {
     return `https://wa.me/${numLimpio}?text=${mensaje}`;
   }
 
-  // Si no especifica protocolo, forzar https://
-  if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('wa.me/')) {
+  if (url.startsWith('wa.me/')) {
     return `https://${url}`;
   }
 
-  if (url.startsWith('wa.me/')) {
+  // Si no especifica protocolo, forzar https://
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
     return `https://${url}`;
   }
 
@@ -137,9 +140,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 1. AUTENTICACIÓN Y CONTROL DE SESIÓN
   // ==========================================
   async function checkUserSession() {
-    const { data: { session } } = await supabase.auth.getSession();
-    currentUser = session ? session.user : null;
-    updateAuthUI();
+    if (!supabase) return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      currentUser = session ? session.user : null;
+      updateAuthUI();
+    } catch (e) {
+      console.warn('⚠️ No se pudo obtener la sesión:', e.message);
+    }
   }
 
   function updateAuthUI() {
@@ -154,14 +162,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  supabase.auth.onAuthStateChange((_event, session) => {
-    currentUser = session ? session.user : null;
-    updateAuthUI();
-  });
+  if (supabase) {
+    supabase.auth.onAuthStateChange((_event, session) => {
+      currentUser = session ? session.user : null;
+      updateAuthUI();
+    });
 
-  await checkUserSession();
+    await checkUserSession();
+  }
 
-  if (loginForm) {
+  if (loginForm && supabase) {
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = loginForm.email.value;
@@ -196,7 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (openPublishBtn) {
     openPublishBtn.addEventListener('click', () => {
-      if (!currentUser) {
+      if (!currentUser && supabase) {
         alert('Debes iniciar sesión para publicar un producto o servicio.');
         abrirModal(authModal);
         return;
@@ -240,17 +250,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     let supabaseProducts = [];
     let localProducts = [];
 
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      supabaseProducts = data || [];
-    } catch (error) {
-      console.warn('Conexión remota con Supabase omitida o con error:', error.message);
+        if (error) throw error;
+        supabaseProducts = data || [];
+      } catch (error) {
+        console.warn('Conexión remota con Supabase omitida o con error:', error.message);
+      }
     }
 
     try {
@@ -313,7 +325,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   // ==========================================
-  // 5. HELPER: MOSTRAR VIDEO O IMAGEN (SOPORTE 90s)
+  // 5. HELPER: MOSTRAR VIDEO O IMAGEN
   // ==========================================
   function renderMediaElement(videoUrl, imageUrl, safeTitle) {
     if (videoUrl && videoUrl.trim() !== '') {
@@ -328,7 +340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         return `
           <div class="video-container">
-            <iframe src="${embedUrl}" allowfullscreen loading="lazy"></iframe>
+            <iframe src="${embedUrl}" allowfullscreen loading="lazy" title="${safeTitle}"></iframe>
           </div>
         `;
       }
@@ -464,7 +476,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ==========================================
   // 7. REGISTRO DE EMPRESA (FORMULARIO KYC/RIF)
   // ==========================================
-  if (kycForm) {
+  if (kycForm && supabase) {
     kycForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -497,7 +509,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ==========================================
   // 8. PUBLICAR OFERTA CON SUBIDA DE ARCHIVOS (STORAGE 'media')
   // ==========================================
-  if (publishForm) {
+  if (publishForm && supabase) {
     publishForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -516,24 +528,28 @@ document.addEventListener('DOMContentLoaded', async () => {
       const imageFile = formData.get('image_file');
       const videoFile = formData.get('video_file');
 
-      // Subida de imagen a Supabase Storage
-      if (imageFile && imageFile.size > 0) {
-        const filePath = `images/${Date.now()}_${imageFile.name}`;
-        const { data, error } = await supabase.storage.from('media').upload(filePath, imageFile);
-        if (!error && data) {
-          const { data: publicUrlData } = supabase.storage.from('media').getPublicUrl(filePath);
-          imageUrl = publicUrlData.publicUrl;
+      try {
+        // Subida de imagen a Supabase Storage
+        if (imageFile && imageFile.size > 0) {
+          const filePath = `images/${Date.now()}_${imageFile.name}`;
+          const { data, error } = await supabase.storage.from('media').upload(filePath, imageFile);
+          if (!error && data) {
+            const { data: publicUrlData } = supabase.storage.from('media').getPublicUrl(filePath);
+            imageUrl = publicUrlData.publicUrl;
+          }
         }
-      }
 
-      // Subida de video a Supabase Storage
-      if (videoFile && videoFile.size > 0) {
-        const filePath = `videos/${Date.now()}_${videoFile.name}`;
-        const { data, error } = await supabase.storage.from('media').upload(filePath, videoFile);
-        if (!error && data) {
-          const { data: publicUrlData } = supabase.storage.from('media').getPublicUrl(filePath);
-          videoUrl = publicUrlData.publicUrl;
+        // Subida de video a Supabase Storage
+        if (videoFile && videoFile.size > 0) {
+          const filePath = `videos/${Date.now()}_${videoFile.name}`;
+          const { data, error } = await supabase.storage.from('media').upload(filePath, videoFile);
+          if (!error && data) {
+            const { data: publicUrlData } = supabase.storage.from('media').getPublicUrl(filePath);
+            videoUrl = publicUrlData.publicUrl;
+          }
         }
+      } catch (err) {
+        console.warn('⚠️ Ocurrió una advertencia en la carga de archivos a Storage:', err.message);
       }
 
       const newProduct = {
@@ -624,14 +640,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ==========================================
   // 10. ACTUALIZACIONES EN TIEMPO REAL (REALTIME)
   // ==========================================
-  supabase
-    .channel('public:products')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'products' }, (payload) => {
-      console.log('⚡ Nueva oferta detectada en tiempo real:', payload.new);
-      allProducts.unshift(payload.new);
-      renderProducts(allProducts);
-    })
-    .subscribe();
+  if (supabase) {
+    supabase
+      .channel('public:products')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'products' }, (payload) => {
+        console.log('⚡ Nueva oferta detectada en tiempo real:', payload.new);
+        allProducts.unshift(payload.new);
+        renderProducts(allProducts);
+      })
+      .subscribe();
+  }
 
   // Inicializar carga de publicaciones
   loadProductsFromSupabase();
