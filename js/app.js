@@ -78,11 +78,17 @@ export function compartirRedSocial(red, titulo, url) {
   }
 }
 
+// Asignación explícita al objeto global window para asegurar compatibilidad en HTML
+if (typeof window !== 'undefined') {
+  window.normalizarUrlContacto = normalizarUrlContacto;
+  window.compartirRedSocial = compartirRedSocial;
+}
+
 // Inicializador de eventos para el DOM en cliente
 export function initRegisterKyc() {
   if (typeof window === 'undefined') return;
 
-  document.addEventListener('DOMContentLoaded', async () => {
+  const init = async () => {
     // Elementos DOM Principales
     const productsContainer = document.getElementById('products-grid');
     const searchInput = document.getElementById('search-input') || document.getElementById('search-bar');
@@ -655,5 +661,16 @@ export function initRegisterKyc() {
 
     // Inicializar carga de publicaciones
     loadProductsFromSupabase();
-  });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+}
+
+// Auto-ejecución si no se utiliza como módulo importado
+if (typeof window !== 'undefined') {
+  initRegisterKyc();
 }
