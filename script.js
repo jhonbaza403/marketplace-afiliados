@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIGURACIÓN E INICIALIZACIÓN DE SUPABASE
 // ==========================================
-const SUPABASE_URL = 'https://TU_PROYECTO_SUPABASE.supabase.co'; // <--- Pega aquí la URL de tu proyecto Supabase
+const SUPABASE_URL = 'https://TU_PROYECTO_SUPABASE.supabase.co'; // <--- Reemplaza con la URL de tu proyecto Supabase
 const SUPABASE_ANON_KEY = 'sb_publishable_yPCMORrQyiQ1esGLUdSsJA_YfyjPhAo';
 
 // Inicialización segura del cliente Supabase
@@ -38,6 +38,43 @@ function normalizarUrlContacto(urlOriginal, titulo = '') {
 
   return url;
 }
+
+// Helper global para compartir en redes sociales
+window.compartirRedSocial = function(red, titulo, url) {
+  const linkFinal = url || window.location.href;
+  const mensaje = encodeURIComponent(`🔥 ¡Mira esta oferta en CrediOfertas! ${titulo}\n👉 ${linkFinal}`);
+
+  let shareUrl = '';
+
+  switch (red) {
+    case 'whatsapp':
+      shareUrl = `https://api.whatsapp.com/send?text=${mensaje}`;
+      break;
+    case 'facebook':
+      shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(linkFinal)}`;
+      break;
+    case 'x':
+      shareUrl = `https://twitter.com/intent/tweet?text=${mensaje}`;
+      break;
+    case 'native':
+      if (navigator.share) {
+        navigator.share({
+          title: titulo,
+          text: `🔥 ¡Mira esta oferta! ${titulo}`,
+          url: linkFinal
+        }).catch(() => {});
+        return;
+      } else {
+        navigator.clipboard.writeText(linkFinal);
+        alert('¡Enlace copiado al portapapeles!');
+        return;
+      }
+  }
+
+  if (shareUrl) {
+    window.open(shareUrl, '_blank', 'width=600,height=450');
+  }
+};
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Elementos DOM Principales
@@ -286,46 +323,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ==========================================
-  // 4. VIRALIZACIÓN Y COMPARTIR EN REDES
-  // ==========================================
-  window.compartirRedSocial = function(red, titulo, url) {
-    const linkFinal = url || window.location.href;
-    const mensaje = encodeURIComponent(`🔥 ¡Mira esta oferta en CrediOfertas! ${titulo}\n👉 ${linkFinal}`);
-
-    let shareUrl = '';
-
-    switch (red) {
-      case 'whatsapp':
-        shareUrl = `https://api.whatsapp.com/send?text=${mensaje}`;
-        break;
-      case 'facebook':
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(linkFinal)}`;
-        break;
-      case 'x':
-        shareUrl = `https://twitter.com/intent/tweet?text=${mensaje}`;
-        break;
-      case 'native':
-        if (navigator.share) {
-          navigator.share({
-            title: titulo,
-            text: `🔥 ¡Mira esta oferta! ${titulo}`,
-            url: linkFinal
-          }).catch(() => {});
-          return;
-        } else {
-          navigator.clipboard.writeText(linkFinal);
-          alert('¡Enlace copiado al portapapeles!');
-          return;
-        }
-    }
-
-    if (shareUrl) {
-      window.open(shareUrl, '_blank', 'width=600,height=450');
-    }
-  };
-
-  // ==========================================
-  // 5. HELPER: MOSTRAR VIDEO O IMAGEN
+  // 4. HELPER: MOSTRAR VIDEO O IMAGEN
   // ==========================================
   function renderMediaElement(videoUrl, imageUrl, safeTitle) {
     if (videoUrl && videoUrl.trim() !== '') {
@@ -359,7 +357,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ==========================================
-  // 6. RENDERIZAR TARJETAS EN EL DOM
+  // 5. RENDERIZAR TARJETAS EN EL DOM
   // ==========================================
   function renderProducts(products) {
     if (!productsContainer) return;
@@ -474,7 +472,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ==========================================
-  // 7. REGISTRO DE EMPRESA (FORMULARIO KYC/RIF)
+  // 6. REGISTRO DE EMPRESA (FORMULARIO KYC/RIF)
   // ==========================================
   if (kycForm && supabase) {
     kycForm.addEventListener('submit', async (e) => {
@@ -507,7 +505,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ==========================================
-  // 8. PUBLICAR OFERTA CON SUBIDA DE ARCHIVOS (STORAGE 'media')
+  // 7. PUBLICAR OFERTA CON SUBIDA DE ARCHIVOS (STORAGE 'media')
   // ==========================================
   if (publishForm && supabase) {
     publishForm.addEventListener('submit', async (e) => {
@@ -581,7 +579,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ==========================================
-  // 9. FILTRADO Y BÚSQUEDA EN TIEMPO REAL
+  // 8. FILTRADO Y BÚSQUEDA EN TIEMPO REAL
   // ==========================================
   function filterProducts() {
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
@@ -638,7 +636,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ==========================================
-  // 10. ACTUALIZACIONES EN TIEMPO REAL (REALTIME)
+  // 9. ACTUALIZACIONES EN TIEMPO REAL (REALTIME)
   // ==========================================
   if (supabase) {
     supabase
