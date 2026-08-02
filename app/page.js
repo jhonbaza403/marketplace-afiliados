@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
+// Tipado/Estructura base para Supabase o Estado Local
 export default function Home() {
   // Estados para Modales
   const [activeModal, setActiveModal] = useState(null); // 'auth' | 'kyc' | 'publish' | null
@@ -10,26 +11,56 @@ export default function Home() {
   const [isOffline, setIsOffline] = useState(false);
   const [showPWA, setShowPWA] = useState(true);
 
+  // Estados para Productos/Ofertas y Formulario de Publicación
+  const [products, setProducts] = useState([
+    {
+      id: '1',
+      title: 'Lote de Franelas 100% Algodón al Mayor',
+      price: 4.50,
+      category: 'mayorista',
+      store: 'mayor',
+      image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500',
+      description: 'Franelas de alta calidad para estampados. Envíos a todo el país.',
+      link: 'https://wa.me/18722371015?text=Hola,%20busco%20informacion%20del%20lote%20de%20franelas',
+    },
+    {
+      id: '2',
+      title: 'Servicio de Diseño Web & Tiendas Online',
+      price: 150.00,
+      category: 'servicio',
+      store: 'servicios',
+      image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500',
+      description: 'Desarrollo de páginas optimizadas y con integración de pagos.',
+      link: 'https://wa.me/18722371015?text=Consulta%20por%20servicio%20web',
+    }
+  ]);
+
+  const [newPublish, setNewPublish] = useState({
+    type: 'detal',
+    title: '',
+    price: '',
+    affiliateLink: '',
+    description: '',
+  });
+
   // Módulo de seguridad y estado online/offline
   useEffect(() => {
-    // Detección offline
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Módulo de seguridad
     const verificarSeguridad = () => {
       try {
         const esBot = Boolean(
           navigator.webdriver ||
           document.documentElement.getAttribute('webdriver') ||
-          (window as any).callPhantom ||
-          (window as any)._phantom ||
-          (window as any).__nightmare
+          window.callPhantom ||
+          window._phantom ||
+          window.__nightmare
         );
         if (esBot) {
-          alert('Acceso restringido: Se ha detectado un entorno automatizado.');
+          console.warn('Entorno automatizado detectado.');
         }
       } catch (error) {
         console.warn('Verificación de seguridad omitida:', error);
@@ -43,6 +74,35 @@ export default function Home() {
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
+
+  // Manejador de Publicación
+  const handlePublishSubmit = (e) => {
+    e.preventDefault();
+    const newOffer = {
+      id: Date.now().toString(),
+      title: newPublish.title,
+      price: parseFloat(newPublish.price) || 0,
+      category: newPublish.type,
+      store: newPublish.type,
+      image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500',
+      description: newPublish.description,
+      link: newPublish.affiliateLink.startsWith('http') 
+        ? newPublish.affiliateLink 
+        : `https://wa.me/${newPublish.affiliateLink.replace(/\D/g, '')}`,
+    };
+
+    setProducts([newOffer, ...products]);
+    setActiveModal(null);
+    setNewPublish({ type: 'detal', title: '', price: '', affiliateLink: '', description: '' });
+  };
+
+  // Filtrado dinámico de publicaciones
+  const filteredProducts = products.filter((item) => {
+    const matchesFilter = filter === 'all' || item.category === filter || item.store === filter;
+    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          item.description.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesFilter && matchesSearch;
+  });
 
   return (
     <>
@@ -73,7 +133,7 @@ export default function Home() {
       <nav className="top-nav">
         <div className="top-nav-container">
           <a href="#" className="brand-logo-small">
-            <img src="/logo.png" alt="CrediOfertas Logo" />
+            <img src="/logo.png" alt="CrediOfertas Logo" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
             <span>CrediOfertas</span>
           </a>
 
@@ -165,7 +225,36 @@ export default function Home() {
 
         {/* GRID DE PUBLICACIONES */}
         <section id="products-grid" className="products-grid" aria-live="polite">
-          {/* Aquí mapearás las ofertas cargadas de Supabase */}
+          {filteredProducts.length === 0 ? (
+            <div className="no-results">No se encontraron ofertas que coincidan con la búsqueda.</div>
+          ) : (
+            filteredProducts.map((item) => (
+              <article key={item.id} className="product-card">
+                <div className="card-media">
+                  <span className={`badge ${item.store || 'detal'}`}>{item.category || 'Oferta'}</span>
+                  <img src={item.image} alt={item.title} loading="lazy" />
+                </div>
+                <div className="card-content">
+                  <span className="category">{item.category}</span>
+                  <h3>{item.title}</h3>
+                  <p className="description">{item.description}</p>
+                  <div className="price-rating">
+                    <span className="price">${item.price.toFixed(2)}</span>
+                  </div>
+                  <div className="card-actions-viral">
+                    <a 
+                      href={item.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="buy-btn btn-primary"
+                    >
+                      📲 Contactar / Comprar
+                    </a>
+                  </div>
+                </div>
+              </article>
+            ))
+          )}
         </section>
       </main>
 
@@ -243,10 +332,16 @@ export default function Home() {
             <h2>📢 Publicar Oferta / Servicio</h2>
             <p className="modal-sub">Anuncia productos al mayor, detal o servicios profesionales con video de 90 segundos.</p>
 
-            <form onSubmit={(e) => e.preventDefault()}>
+            <form onSubmit={handlePublishSubmit}>
               <div className="form-group">
                 <label htmlFor="pub-type">Tipo de Oferta</label>
-                <select id="pub-type" required className="form-select">
+                <select 
+                  id="pub-type" 
+                  required 
+                  className="form-select"
+                  value={newPublish.type}
+                  onChange={(e) => setNewPublish({ ...newPublish, type: e.target.value })}
+                >
                   <option value="detal">🛍️ Venta al Detal</option>
                   <option value="mayorista">📦 Venta al Mayor</option>
                   <option value="servicio">🛠️ Servicio Profesional</option>
@@ -254,15 +349,37 @@ export default function Home() {
               </div>
               <div className="form-group">
                 <label htmlFor="pub-title">Título</label>
-                <input type="text" id="pub-title" required placeholder="Ej: Lote de Franelas de Algodón" />
+                <input 
+                  type="text" 
+                  id="pub-title" 
+                  required 
+                  placeholder="Ej: Lote de Franelas de Algodón" 
+                  value={newPublish.title}
+                  onChange={(e) => setNewPublish({ ...newPublish, title: e.target.value })}
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="pub-price">Precio ($ USD)</label>
-                <input type="number" step="0.01" id="pub-price" required placeholder="15.00" />
+                <input 
+                  type="number" 
+                  step="0.01" 
+                  id="pub-price" 
+                  required 
+                  placeholder="15.00" 
+                  value={newPublish.price}
+                  onChange={(e) => setNewPublish({ ...newPublish, price: e.target.value })}
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="pub-affiliate">Enlace de Contacto / WhatsApp / Web</label>
-                <input type="text" id="pub-affiliate" required placeholder="+584120000000 o https://tienda.com" />
+                <input 
+                  type="text" 
+                  id="pub-affiliate" 
+                  required 
+                  placeholder="+584120000000 o https://tienda.com" 
+                  value={newPublish.affiliateLink}
+                  onChange={(e) => setNewPublish({ ...newPublish, affiliateLink: e.target.value })}
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="pub-image">Imagen Promocional</label>
@@ -274,7 +391,14 @@ export default function Home() {
               </div>
               <div className="form-group">
                 <label htmlFor="pub-description">Descripción</label>
-                <textarea id="pub-description" rows={3} required placeholder="Detalles de la oferta..."></textarea>
+                <textarea 
+                  id="pub-description" 
+                  rows={3} 
+                  required 
+                  placeholder="Detalles de la oferta..."
+                  value={newPublish.description}
+                  onChange={(e) => setNewPublish({ ...newPublish, description: e.target.value })}
+                ></textarea>
               </div>
               <button type="submit" className="submit-btn">🚀 Publicar Ahora</button>
             </form>
