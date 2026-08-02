@@ -82,7 +82,7 @@ export function compartirRedSocial(red, titulo, url) {
 export function initRegisterKyc() {
   if (typeof window === 'undefined') return;
 
-  document.addEventListener('DOMContentLoaded', async () => {
+  const startApp = async () => {
     // Elementos DOM Principales
     const productsContainer = document.getElementById('products-grid');
     const searchInput = document.getElementById('search-input') || document.getElementById('search-bar');
@@ -478,9 +478,9 @@ export function initRegisterKyc() {
     }
 
     // ==========================================
-    // 6. REGISTRO DE EMPRESA (FORMULARIO KYC/RIF)
+    // 6. REGISTRO DE EMPRESA (FORMULARIO KYC/RIF VÍA API)
     // ==========================================
-    if (kycForm && supabase) {
+    if (kycForm) {
       kycForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -488,25 +488,30 @@ export function initRegisterKyc() {
         if (submitBtn) submitBtn.disabled = true;
 
         const formData = new FormData(kycForm);
-        const companyData = {
-          user_id: currentUser ? currentUser.id : null,
-          company_name: formData.get('company_name'),
-          rif: formData.get('rif'),
-          email: formData.get('email'),
-          phone: formData.get('phone')
-        };
-
-        const { error } = await supabase.from('companies').insert([companyData]);
-
-        if (error) {
-          alert('⚠️ Error al registrar la empresa: ' + error.message);
-        } else {
-          alert('🎉 ¡Empresa registrada con éxito en CrediOfertas!');
-          cerrarModal(authModal);
-          kycForm.reset();
+        if (currentUser) {
+          formData.append('userId', currentUser.id);
         }
 
-        if (submitBtn) submitBtn.disabled = false;
+        try {
+          const response = await fetch('/api/kyc', {
+            method: 'POST',
+            body: formData,
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.error || 'Error al procesar la solicitud.');
+          }
+
+          alert('🎉 ' + result.message);
+          cerrarModal(authModal);
+          kycForm.reset();
+        } catch (err) {
+          alert('⚠️ Error al registrar KYC: ' + err.message);
+        } finally {
+          if (submitBtn) submitBtn.disabled = false;
+        }
       });
     }
 
@@ -655,5 +660,11 @@ export function initRegisterKyc() {
 
     // Inicializar carga de publicaciones
     loadProductsFromSupabase();
-  });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startApp);
+  } else {
+    startApp();
+  }
 }
