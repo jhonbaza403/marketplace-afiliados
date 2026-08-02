@@ -883,6 +883,7 @@ footer {
   }
   
   .modal-card {
-    padding: 1.5rem;
+    padding: 1.5rem 1.25rem;
+    margin: 0 10px;
   }
 }
