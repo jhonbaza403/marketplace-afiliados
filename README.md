@@ -1,6 +1,6 @@
 # 🛒 Mi Marketplace de Ofertas & CrediOfertas
 
-Plataforma web de agregación de ofertas y productos populares de **Amazon**, **Shein**, **AliExpress** y **Alibaba**, integrada con un módulo de **Registro y Verificación de Identidad (KYC)** para la evaluación y solicitud de financiamiento / crédito (estilo Cashea).
+Plataforma web PWA multivendedor de agregación de ofertas y productos populares de **Amazon**, **Shein**, **AliExpress** y **Alibaba**, integrada con módulos de **Publicación de Ofertas/Servicios**, **Autenticación**, **Subida de Archivos** y **Verificación Comercial (KYC / RIF)**.
 
 🌐 **Sitio en vivo:** [marketplace-afiliados.vercel.app](https://marketplace-afiliados.vercel.app/)
 
@@ -8,27 +8,34 @@ Plataforma web de agregación de ofertas y productos populares de **Amazon**, **
 
 ## 🚀 Características Principales
 
-- **Filtro y Búsqueda en Tiempo Real:** Buscador dinámico por nombre o categoría y filtrado instantáneo por tienda.
-- **Sistema de Afiliados:** Enlaces optimizados hacia Amazon, Shein, AliExpress y Alibaba con insignias de descuento y calificaciones.
-- **Módulo de Registro & KYC:** Formulario modal para verificación de usuarios con carga de documento de identidad (cédula) y fotografía (selfie) para solicitudes de crédito.
-- **Soporte Integrado:** Botón flotante para atención directa vía WhatsApp.
-- **Diseño Responsive:** Interfaz moderna y adaptable a dispositivos móviles y escritorios.
+- **Búsqueda y Filtro en Tiempo Real:** Buscador dinámico multi-propiedad por título, categoría o tipo de tienda (Al mayor, Detal, Servicios y Afiliados).
+- **Sistema de Afiliados y Contacto Directo:** Enlaces a tiendas externas y generación automática de enlaces para contacto por WhatsApp con mensaje preconfigurado.
+- **Soporte Multimedia Completo:** Renderizado de imágenes y reproductores de video (archivos MP4 subidos a Storage o embebidos de YouTube).
+- **Modales e Interacción:** Sistema de modales para inicio de sesión, publicación de productos/servicios y verificación de empresas.
+- **Soporte PWA (Progressive Web App):** Instalable en dispositivos móviles y de escritorio, con soporte offline gestionado mediante Service Worker y `manifest.json`.
+- **Integración en Tiempo Real:** Actualización dinámica de productos vía canales de Supabase Realtime.
 
 ---
 
 ## 🛠️ Tecnologías Utilizadas
 
-- **HTML5** (Semántico)
-- **CSS3** (Flexbox, CSS Grid, Variables y Animaciones)
-- **JavaScript (Vanilla ES6+)** (Carga dinámica de datos JSON, filtrado en vivo y control de modales)
+- **Frontend:** Next.js (React), JavaScript (ES6+), HTML5, CSS3.
+- **Backend y Base de Datos:** Supabase (Auth, Database & Storage).
+- **PWA:** Web App Manifest (`manifest.json`) y Service Worker (`sw.js`).
+- **Despliegue:** Vercel.
 
 ---
 
 ## 📁 Estructura del Proyecto
 
 ```text
-├── index.html        # Estructura HTML principal y modal KYC
-├── style.css         # Estilos globales, grid y ventana modal
-├── script.js        # Lógica de renderizado, búsqueda y eventos
-├── products.json     # Base de datos local de ofertas
-└── README.md         # Documentación del proyecto
+├── public/
+│   ├── manifest.json      # Configuración de PWA e iconos de acceso directo
+│   ├── sw.js              # Service Worker para caché y soporte offline
+│   ├── productos.json     # Base de datos local/fallback de ofertas
+│   └── logo.png           # Logotipo principal e icono de la PWA
+├── app.js                 # Lógica de cliente, modales, filtros y Supabase
+├── registerkyc.js         # Módulo KYC, helpers de URL, utilidades PWA y eventos
+├── vercel.json            # Configuración de despliegue en Vercel
+├── .gitignore             # Exclusión de node_modules, .next y archivos sensibles
+└── README.md              # Documentación del proyecto
