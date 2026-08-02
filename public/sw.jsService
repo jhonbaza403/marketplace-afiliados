@@ -1,39 +1,53 @@
-// Nombre y versión de la caché
+// ==========================================
+// CONFIGURACIÓN Y VERSIÓN DE LA CACHÉ PWA
+// ==========================================
 const CACHE_NAME = 'crediofertas-v1.0.3';
 
-// Recursos estáticos principales a precachear
+// Recursos estáticos indispensables para el funcionamiento offline
 const STATIC_ASSETS = [
   '/',
+  '/index.html',
   '/manifest.json',
-  '/productos.json'
+  '/products.json',
+  '/productos.json',
+  '/css/styles.css',
+  '/js/app.js'
 ];
 
-// 1. INSTALACIÓN DEL SERVICE WORKER (Pre-cache de recursos)
+// ==========================================
+// 1. INSTALACIÓN DEL SERVICE WORKER
+// Precaché tolerante a fallos mediante Promise.allSettled
+// ==========================================
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
       console.log('[SW] Guardando recursos estáticos en caché...');
-      await Promise.allSettled(
+      
+      const results = await Promise.allSettled(
         STATIC_ASSETS.map(async (asset) => {
           try {
             await cache.add(asset);
           } catch (err) {
-            console.warn(`[SW] No se pudo precachear: ${asset}`, err);
+            console.warn(`[SW] No se pudo precachear el recurso: ${asset}`, err);
           }
         })
       );
+      
+      console.log('[SW] Precaché completado.');
     }).then(() => self.skipWaiting())
   );
 });
 
+// ==========================================
 // 2. ACTIVACIÓN Y LIMPIEZA DE CACHÉ ANTIGUA
+// ==========================================
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cache) => {
           if (cache !== CACHE_NAME) {
-            console.log('[SW] Eliminando caché antigua:', cache);
+            console.log('[SW] Eliminando caché obsoleta:', cache);
             return caches.delete(cache);
           }
         })
@@ -42,24 +56,29 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 3. ESTRATEGIA DE RED Y CACHÉ (Network First con Fallback a Cache)
+// ==========================================
+// 3. ESTRATEGIA DE RED Y CACHÉ (Network First con Fallback a Caché)
+// ==========================================
 self.addEventListener('fetch', (event) => {
-  // Solo procesar peticiones GET
+  // Solo interceptar solicitudes HTTP/HTTPS de tipo GET
   if (event.request.method !== 'GET') return;
 
   const requestUrl = new URL(event.request.url);
 
-  // Ignorar esquemas no HTTP/HTTPS (ej. extensiones del navegador)
+  // Ignorar esquemas que no sean HTTP/HTTPS (extensiones de Chrome, etc.)
   if (!requestUrl.protocol.startsWith('http')) return;
+
+  // Ignorar llamadas a la API de Supabase o servicios externos en la caché estática
+  if (requestUrl.hostname.includes('supabase.co')) return;
 
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
-        // Almacenar en caché respuestas válidas de origen local
+        // Almacenar únicamente respuestas válidas de origen propio
         if (
-          networkResponse && 
-          networkResponse.status === 200 && 
-          networkResponse.type === 'basic'
+          networkResponse &&
+          networkResponse.status === 200 &&
+          (networkResponse.type === 'basic' || networkResponse.type === 'cors')
         ) {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -69,16 +88,28 @@ self.addEventListener('fetch', (event) => {
         return networkResponse;
       })
       .catch(async () => {
-        // Fallback: Si no hay red, servir desde la caché
+        console.log(`[SW] Modo Offline: Intentando recuperar "${event.request.url}" desde caché`);
+        
+        // 1. Intentar responder con la copia exacta en caché
         const cachedResponse = await caches.match(event.request);
         if (cachedResponse) {
           return cachedResponse;
         }
 
-        // Si es navegación HTML y está offline, servir la ruta raíz
+        // 2. Fallback de navegación: Si el usuario está navegando entre páginas offline, servir "/"
         if (event.request.mode === 'navigate') {
-          return caches.match('/');
+          const fallbackPage = await caches.match('/') || await caches.match('/index.html');
+          if (fallbackPage) {
+            return fallbackPage;
+          }
         }
+
+        // 3. Responder con un error HTTP básico si no existe copia en caché
+        return new Response('Contenido no disponible sin conexión', {
+          status: 533,
+          statusText: 'Offline',
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+        });
       })
   );
 });
