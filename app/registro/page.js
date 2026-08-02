@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { supabase } from '../admin/page'; // O tu ruta de inicialización de Supabase client
 
 export default function RegistroPage() {
-  const router = Router();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -38,17 +39,56 @@ export default function RegistroPage() {
     setSuccessMsg('');
 
     if (formData.password !== formData.confirmPassword) {
-      setErrorMsg('Las contraseñas no coinciden');
+      setErrorMsg('Las contraseñas no coinciden.');
       return;
     }
 
     setLoading(true);
 
     try {
-      // AQUÍ IMPLEMENTAS LA LÓGICA DE REGISTRO / SUPABASE
-      // Ejemplo: Creación de usuario y carga de documentos de KYC
-      
-      setSuccessMsg('¡Registro completado con éxito! Revisa tu correo o inicia sesión.');
+      // 1. Registro de usuario en Supabase Auth (si el cliente está disponible)
+      let userId = null;
+      if (supabase) {
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            data: {
+              company_name: formData.companyName,
+              phone: formData.phone,
+            },
+          },
+        });
+
+        if (authError) throw new Error(authError.message);
+        userId = authData.user?.id || null;
+      }
+
+      // 2. Preparar los datos multipart para enviar a la API KYC
+      const kycData = new FormData();
+      kycData.append('companyName', formData.companyName);
+      kycData.append('rifNumber', formData.rif);
+      kycData.append('phone', formData.phone);
+      kycData.append('email', formData.email);
+      if (userId) kycData.append('userId', userId);
+
+      if (formData.documentFile) {
+        kycData.append('rifFile', formData.documentFile);
+      }
+
+      // 3. Envío al endpoint del backend
+      const response = await fetch('/api/kyc', {
+        method: 'POST',
+        body: kycData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Error al procesar la verificación KYC.');
+      }
+
+      setSuccessMsg('¡Registro y solicitud KYC enviados con éxito! Redirigiendo...');
       setTimeout(() => {
         router.push('/');
       }, 2000);
@@ -68,13 +108,13 @@ export default function RegistroPage() {
         </p>
 
         {errorMsg && (
-          <div style={{ background: '#fee2e2', color: '#dc2626', padding: '10px 14px', borderRadius: 'var(--radius-sm)', marginBottom: '1rem', fontSize: '0.85rem' }}>
+          <div style={{ background: '#fee2e2', color: '#dc2626', padding: '10px 14px', borderRadius: 'var(--radius-sm, 6px)', marginBottom: '1rem', fontSize: '0.85rem' }}>
             ⚠️ {errorMsg}
           </div>
         )}
 
         {successMsg && (
-          <div style={{ background: '#dcfce7', color: '#166534', padding: '10px 14px', borderRadius: 'var(--radius-sm)', marginBottom: '1rem', fontSize: '0.85rem' }}>
+          <div style={{ background: '#dcfce7', color: '#166534', padding: '10px 14px', borderRadius: 'var(--radius-sm, 6px)', marginBottom: '1rem', fontSize: '0.85rem' }}>
             ✅ {successMsg}
           </div>
         )}
@@ -121,7 +161,7 @@ export default function RegistroPage() {
             </div>
           </div>
 
-          <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '1.5rem 0' }} />
+          <hr style={{ border: 'none', borderTop: '1px solid var(--border-color, #e2e8f0)', margin: '1.5rem 0' }} />
 
           {/* DATOS COMERCIALES / KYC */}
           <div className="form-group">
@@ -214,15 +254,15 @@ export default function RegistroPage() {
             </div>
           </div>
 
-          <button type="submit" className="submit-btn" disabled={loading}>
+          <button type="submit" className="submit-btn" disabled={loading} style={{ width: '100%', marginTop: '1rem' }}>
             {loading ? 'Procesando Registro...' : '✅ Enviar para Verificación'}
           </button>
         </form>
 
-        <p style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+        <p style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-muted, #64748b)' }}>
           ¿Ya tienes cuenta?{' '}
-          <Link href="/" style={{ color: 'var(--primary-color)', fontWeight: 'bold' }}>
-            Inicia sesión aquí
+          <Link href="/" style={{ color: 'var(--primary-color, #2563eb)', fontWeight: 'bold' }}>
+            Iniciar Sesión
           </Link>
         </p>
       </div>
