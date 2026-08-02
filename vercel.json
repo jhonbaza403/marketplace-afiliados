@@ -22,6 +22,10 @@
         {
           "key": "Referrer-Policy",
           "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "geolocation=(), microphone=(), camera=()"
         }
       ]
     },
@@ -52,7 +56,7 @@
       ]
     },
     {
-      "source": "/(js|css|images|logo.png)/(.*)",
+      "source": "/(.*\\.(?:css|js|png|jpg|jpeg|gif|ico|svg|webp|woff2?))",
       "headers": [
         {
           "key": "Cache-Control",
@@ -63,7 +67,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!.*\\.).*)",
+      "source": "/((?!api/|sw\\.js|manifest\\.json|.*\\..*).*)",
       "destination": "/index.html"
     }
   ]
