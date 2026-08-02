@@ -55,6 +55,7 @@ pids
 *.tgz
 .yarn-integrity
 .cache
+.next/cache/
 .parcel-cache
 .vite/
 vite.config.js.timestamp-*
