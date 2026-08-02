@@ -1,39 +1,40 @@
-// Nombre y versión de la caché (Incrementa la versión para forzar actualización)
-const CACHE_NAME = 'crediofertas-v1.0.1';
+// Nombre y versión de la caché (Incrementa la versión para forzar actualización en clientes)
+const CACHE_NAME = 'crediofertas-v1.0.2';
 
-// Recursos estáticos principales
+// Recursos estáticos principales a precachear
 const STATIC_ASSETS = [
-  './',
-  './index.html',
-  './css/style.css',
-  './js/script.js',
-  './js/supabase-client.js',
-  './manifest.json',
-  './products.json',
-  './assets/brand/logo.png',
-  './assets/brand/favicon.ico',
-  './assets/brand/favicon.svg',
-  './assets/icons/icon-192x192.png',
-  './assets/icons/icon-192x192-maskable.png',
-  './assets/icons/icon-512x512.png',
-  './assets/icons/icon-512x512-maskable.png',
-  './assets/icons/apple-touch-icon.png'
+  '/',
+  '/index.html',
+  '/styles.css',
+  '/script.js',
+  '/manifest.json',
+  '/products.json'
 ];
 
-// Instalación: Almacena en caché de forma individual para evitar caídas por 404
+// ==========================================
+// 1. INSTALACIÓN DEL SERVICE WORKER
+// ==========================================
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
       console.log('[SW] Guardando recursos estáticos en caché...');
-      // Usamos Promise.allSettled para que si un recurso secundario falta, no cancele toda la instalación
+      // Usamos Promise.allSettled para que si un recurso opcional falla, no invalide el resto
       await Promise.allSettled(
-        STATIC_ASSETS.map((asset) => cache.add(asset).catch((err) => console.warn(`[SW] Omitido: ${asset}`, err)))
+        STATIC_ASSETS.map(async (asset) => {
+          try {
+            await cache.add(asset);
+          } catch (err) {
+            console.warn(`[SW] No se pudo cachear: ${asset}`, err);
+          }
+        })
       );
     }).then(() => self.skipWaiting())
   );
 });
 
-// Activación: Limpia cachés obsoletas y toma control de inmediato
+// ==========================================
+// 2. ACTIVACIÓN Y LIMPIEZA DE CACHÉ ANTIGUA
+// ==========================================
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -49,21 +50,23 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Estrategia Fetch: Network-First con fallback en Caché
+// ==========================================
+// 3. ESTRATEGIA DE RED & CACHÉ (NETWORK FIRST)
+// ==========================================
 self.addEventListener('fetch', (event) => {
-  // Ignorar métodos no-GET (POST, PUT, DELETE, etc.)
+  // Ignorar peticiones que no sean métodos GET
   if (event.request.method !== 'GET') return;
 
   const requestUrl = new URL(event.request.url);
 
-  // Ignorar esquemas no soportados por el Cache API (ej: extensiones de navegador)
+  // Ignorar protocolos no http/https (ej. chrome-extension://)
   if (!requestUrl.protocol.startsWith('http')) return;
 
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
-        // Solo cachear respuestas válidas de origen propio o recursos exitosos (status 200)
-        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+        // Guardar copia en caché si la respuesta es válida (200 OK)
+        if (networkResponse && networkResponse.status === 200) {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);
@@ -72,15 +75,15 @@ self.addEventListener('fetch', (event) => {
         return networkResponse;
       })
       .catch(async () => {
-        // Si no hay red, intenta obtener el recurso guardado en caché
+        // Fallback a caché si el usuario está Offline o falla la red
         const cachedResponse = await caches.match(event.request);
         if (cachedResponse) {
           return cachedResponse;
         }
 
-        // Si es una navegación de página HTML y falla la red, devuelve index.html
+        // Si es una navegación SPA/Página HTML y no hay red, servir index.html
         if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
+          return caches.match('/index.html') || caches.match('./index.html');
         }
       })
   );
