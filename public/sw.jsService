@@ -4,11 +4,8 @@ const CACHE_NAME = 'crediofertas-v1.0.2';
 // Recursos estáticos principales a precachear
 const STATIC_ASSETS = [
   '/',
-  '/index.html',
-  '/styles.css',
-  '/script.js',
   '/manifest.json',
-  '/products.json'
+  '/productos.json'
 ];
 
 // ==========================================
@@ -59,14 +56,18 @@ self.addEventListener('fetch', (event) => {
 
   const requestUrl = new URL(event.request.url);
 
-  // Ignorar protocolos no http/https (ej. chrome-extension://)
+  // Ignorar protocolos no http/https (ej. chrome-extension://) o API de Supabase
   if (!requestUrl.protocol.startsWith('http')) return;
 
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
-        // Guardar copia en caché si la respuesta es válida (200 OK)
-        if (networkResponse && networkResponse.status === 200) {
+        // Guardar copia en caché si la respuesta es válida (200 OK) y de tipo básico (mismo origen)
+        if (
+          networkResponse && 
+          networkResponse.status === 200 && 
+          networkResponse.type === 'basic'
+        ) {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);
@@ -81,9 +82,9 @@ self.addEventListener('fetch', (event) => {
           return cachedResponse;
         }
 
-        // Si es una navegación SPA/Página HTML y no hay red, servir index.html
+        // Si es una navegación HTML en SPA/Next.js y no hay red, servir la raíz '/'
         if (event.request.mode === 'navigate') {
-          return caches.match('/index.html') || caches.match('./index.html');
+          return caches.match('/');
         }
       })
   );
