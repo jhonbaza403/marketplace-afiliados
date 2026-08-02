@@ -55,7 +55,7 @@ pids
 *.tgz
 .yarn-integrity
 .cache
-.next/cache/
+.next/
 .parcel-cache
 .vite/
 vite.config.js.timestamp-*
@@ -84,7 +84,6 @@ bower_components/
 dist/
 build/
 out/
-.next/
 .nuxt/
 .output/
 .svelte-kit/
@@ -98,11 +97,11 @@ out/
 # Variables de Entorno, Datos Sensibles y Certificados
 # ==========================================
 .env
+.env*
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-.env.*
 !.env.example
 *.pem
 *.key
