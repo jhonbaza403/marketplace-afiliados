@@ -1,57 +1,79 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase admin/server client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// Helper para validar formato de correo
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Inicialización segura del cliente Supabase
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Faltan variables de entorno para Supabase.');
+  }
+
+  return createClient(supabaseUrl, supabaseKey);
+}
 
 export async function POST(request) {
   try {
     const formData = await request.formData();
 
-    const companyName = formData.get('companyName');
-    const rifNumber = formData.get('rifNumber');
+    // Soporta ambos formatos (camelCase y snake_case)
+    const companyName = formData.get('companyName') || formData.get('company_name');
+    const rifNumber = formData.get('rifNumber') || formData.get('rif');
     const phone = formData.get('phone');
     const email = formData.get('email');
-    const userId = formData.get('userId');
-    const rifFile = formData.get('rifFile'); // File object from input
+    const userId = formData.get('userId') || formData.get('user_id');
+    const rifFile = formData.get('rifFile') || formData.get('rif_file') || formData.get('file');
 
-    // Validation
+    // 1. Validación de campos requeridos
     if (!companyName || !rifNumber || !phone || !email) {
       return NextResponse.json(
-        { error: 'Todos los campos obligatorios deben ser completados.' },
+        { error: 'Todos los campos obligatorios (Empresa, RIF, Teléfono, Correo) deben ser completados.' },
         { status: 400 }
       );
     }
 
+    // 2. Validación de formato de email
+    if (!isValidEmail(email)) {
+      return NextResponse.json(
+        { error: 'El formato de correo electrónico no es válido.' },
+        { status: 400 }
+      );
+    }
+
+    const supabase = getSupabaseClient();
     let rifDocumentUrl = null;
 
-    // Handle file upload to Supabase Storage if provided
+    // 3. Carga del archivo a Supabase Storage (Bucket "documents")
     if (rifFile && typeof rifFile === 'object' && rifFile.size > 0) {
-      const fileExt = rifFile.name.split('.').pop();
+      const rawExt = rifFile.name ? rifFile.name.split('.').pop() : 'png';
+      const fileExt = rawExt.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `kyc-documents/${fileName}`;
 
       const fileBuffer = await rifFile.arrayBuffer();
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('documents')
         .upload(filePath, fileBuffer, {
-          contentType: rifFile.type,
+          contentType: rifFile.type || 'application/octet-stream',
           upsert: false,
         });
 
       if (uploadError) {
         console.error('[KYC Upload Error]:', uploadError);
         return NextResponse.json(
-          { error: 'Error al subir el documento de RIF / Cédula.' },
+          { error: 'Error al subir el documento de RIF o identificación.' },
           { status: 500 }
         );
       }
 
-      // Get public URL of the uploaded document
+      // Obtener URL pública
       const { data: publicUrlData } = supabase.storage
         .from('documents')
         .getPublicUrl(filePath);
@@ -59,7 +81,7 @@ export async function POST(request) {
       rifDocumentUrl = publicUrlData.publicUrl;
     }
 
-    // Insert KYC application into Supabase Database
+    // 4. Inserción en la base de datos
     const { data: kycRecord, error: dbError } = await supabase
       .from('kyc_verifications')
       .insert([
@@ -80,7 +102,7 @@ export async function POST(request) {
     if (dbError) {
       console.error('[KYC DB Insert Error]:', dbError);
       return NextResponse.json(
-        { error: 'Error al registrar la solicitud KYC en la base de datos.' },
+        { error: 'Error al guardar el registro KYC en la base de datos.' },
         { status: 500 }
       );
     }
@@ -88,7 +110,7 @@ export async function POST(request) {
     return NextResponse.json(
       {
         success: true,
-        message: 'Solicitud de verificación RIF / KYC enviada con éxito.',
+        message: 'Solicitud de verificación RIF / KYC enviada exitosamente.',
         data: kycRecord,
       },
       { status: 201 }
