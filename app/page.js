@@ -1,507 +1,305 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#2563eb">
+'use client';
 
-  <!-- Manifest PWA & Apple Touch Icon -->
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="logo.png">
+import { useState, useEffect } from 'react';
 
-  <!-- SEO & Redes Sociales -->
-  <title>CrediOfertas Marketplace Multivendedor | Mayor, Detal & Servicios</title>
-  <meta name="description" content="Encuentra ofertas al mayor, detal, servicios profesionales y promociones de Amazon, Shein, AliExpress y Alibaba.">
-  <meta name="robots" content="index, follow">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="CrediOfertas Marketplace Multivendedor">
-  <meta property="og:description" content="Compra al mayor, detal, contrata servicios o publica tus ofertas gratis.">
-  <meta property="og:image" content="logo.png">
+export default function Home() {
+  // Estados para Modales
+  const [activeModal, setActiveModal] = useState(null); // 'auth' | 'kyc' | 'publish' | null
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [isOffline, setIsOffline] = useState(false);
+  const [showPWA, setShowPWA] = useState(true);
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="logo.png">
+  // Módulo de seguridad y estado online/offline
+  useEffect(() => {
+    // Detección offline
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
 
-  <!-- Fuentes & Precarga -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-
-  <!-- Hoja de Estilos Principal -->
-  <link rel="stylesheet" href="style.css">
-
-  <!-- Estilos Integrados -->
-  <style>
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --success: #059669;
-      --bg-light: #f8fafc;
-      --surface-card: #ffffff;
-      --text-main: #0f172a;
-      --text-sub: #64748b;
-      --border-color: #e2e8f0;
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-full: 9999px;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-      --shadow-md: 0 10px 25px -5px rgba(37, 99, 235, 0.1);
-    }
-
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background-color: var(--bg-light);
-      color: var(--text-main);
-      margin: 0;
-      padding: 0;
-    }
-
-    .top-nav {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border-color);
-      padding: 10px 20px;
-    }
-
-    .top-nav-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .brand-logo-small {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 800;
-      font-size: 1.1rem;
-      color: var(--text-main);
-      text-decoration: none;
-    }
-
-    .brand-logo-small img {
-      height: 32px;
-      width: auto;
-    }
-
-    .nav-actions {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 16px;
-      border-radius: var(--radius-full);
-      font-weight: 600;
-      font-size: 0.875rem;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-decoration: none;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #ffffff;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-    }
-
-    .btn-secondary {
-      background: #ffffff;
-      color: var(--text-main);
-      border: 1px solid var(--border-color);
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: #ffffff;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .hero-banner {
-      background: linear-gradient(180deg, #eff6ff 0%, var(--bg-light) 100%);
-      padding: 40px 20px 30px;
-      text-align: center;
-    }
-
-    .hero-title {
-      font-size: 2.25rem;
-      font-weight: 800;
-      letter-spacing: -0.025em;
-      margin: 10px 0;
-    }
-
-    .hero-title span {
-      background: linear-gradient(90deg, var(--primary), #3b82f6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hero-subtitle {
-      max-width: 650px;
-      margin: 0 auto 24px;
-      color: var(--text-sub);
-      font-size: 1rem;
-    }
-
-    .hero-pills {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .pill-btn {
-      background: var(--surface-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: var(--text-main);
-      box-shadow: var(--shadow-sm);
-      transition: all 0.2s ease;
-    }
-
-    .pill-btn:hover {
-      transform: translateY(-3px);
-      border-color: var(--primary);
-      box-shadow: var(--shadow-md);
-    }
-
-    .pill-title { font-weight: 700; font-size: 0.875rem; display: block; }
-    .pill-sub { font-size: 0.75rem; color: var(--text-sub); }
-
-    .controls {
-      max-width: 1100px;
-      margin: 20px auto 30px;
-      padding: 0 20px;
-    }
-
-    .search-bar {
-      width: 100%;
-      padding: 14px 20px;
-      border-radius: var(--radius-full);
-      border: 2px solid var(--border-color);
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.2s ease;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .search-bar:focus {
-      border-color: var(--primary);
-    }
-
-    .filters {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding: 15px 0 5px;
-      scrollbar-width: none;
-    }
-
-    .store-filter {
-      background: var(--surface-card);
-      border: 1px solid var(--border-color);
-      padding: 8px 18px;
-      border-radius: var(--radius-full);
-      font-weight: 600;
-      font-size: 0.875rem;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.2s ease;
-    }
-
-    .store-filter.active, .store-filter:hover {
-      background: var(--primary);
-      color: #ffffff;
-      border-color: var(--primary);
-    }
-  </style>
-
-  <!-- MÓDULO DE SEGURIDAD -->
-  <script>
-    async function verificarSeguridadConexion() {
+    // Módulo de seguridad
+    const verificarSeguridad = () => {
       try {
         const esBot = Boolean(
-          navigator.webdriver || 
-          document.documentElement.getAttribute("webdriver") ||
-          window.callPhantom || window._phantom || window.__nightmare
+          navigator.webdriver ||
+          document.documentElement.getAttribute('webdriver') ||
+          (window as any).callPhantom ||
+          (window as any)._phantom ||
+          (window as any).__nightmare
         );
-
         if (esBot) {
-          bloquearAplicacion("Acceso restringido: Se ha detectado un entorno automatizado.");
-          return;
+          alert('Acceso restringido: Se ha detectado un entorno automatizado.');
         }
       } catch (error) {
-        console.warn("Verificación de seguridad omitida:", error);
+        console.warn('Verificación de seguridad omitida:', error);
       }
-    }
+    };
 
-    function bloquearAplicacion(mensaje) {
-      if (document.getElementById("security-overlay")) return;
-      const overlay = document.createElement("div");
-      overlay.id = "security-overlay";
-      overlay.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0f172a;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;z-index:999999;text-align:center;";
-      overlay.innerHTML = `<div style="font-size:50px;margin-bottom:15px;">🛡️</div><h1 style="color:#ef4444;margin:0 0 10px;">Acceso Restringido</h1><p style="color:#cbd5e1;max-width:450px;">${mensaje}</p><button onclick="window.location.reload()" style="margin-top:15px;padding:10px 20px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;">Reintentar Conexión</button>`;
-      document.body.appendChild(overlay);
-    }
+    verificarSeguridad();
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', verificarSeguridadConexion);
-    } else {
-      verificarSeguridadConexion();
-    }
-  </script>
-</head>
-<body>
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
-  <!-- BANNERS OFFLINE & PWA -->
-  <div id="offline-banner" class="offline-banner hidden" style="background:#ef4444;color:#fff;text-align:center;padding:8px;font-weight:600;">
-    📡 Modo sin conexión (Offline). Mostrando contenido guardado.
-  </div>
+  return (
+    <>
+      {/* BANNER OFFLINE */}
+      {isOffline && (
+        <div style={{ background: '#ef4444', color: '#fff', textAlign: 'center', padding: '8px', fontWeight: '600' }}>
+          📡 Modo sin conexión (Offline). Mostrando contenido guardado.
+        </div>
+      )}
 
-  <div id="pwa-install-banner" class="pwa-banner hidden" style="background:#1e293b;color:#fff;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;">
-    <span>📱 ¡Instala la App de CrediOfertas en tu pantalla de inicio!</span>
-    <div>
-      <button id="install-pwa-btn" class="btn btn-primary" style="padding: 6px 14px;">Instalar</button>
-      <button id="close-pwa-banner-btn" style="background:none;color:#fff;border:none;font-size:20px;cursor:pointer;margin-left:8px;">&times;</button>
-    </div>
-  </div>
+      {/* BANNER PWA */}
+      {showPWA && (
+        <div style={{ background: '#1e293b', color: '#fff', padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>📱 ¡Instala la App de CrediOfertas en tu pantalla de inicio!</span>
+          <div>
+            <button className="btn btn-primary" style={{ padding: '6px 14px' }}>Instalar</button>
+            <button 
+              onClick={() => setShowPWA(false)} 
+              style={{ background: 'none', color: '#fff', border: 'none', fontSize: '20px', cursor: 'pointer', marginLeft: '8px' }}
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+      )}
 
-  <!-- BARRA SUPERIOR STICKY -->
-  <nav class="top-nav">
-    <div class="top-nav-container">
-      <a href="#" class="brand-logo-small">
-        <img src="logo.png" alt="CrediOfertas Logo">
-        <span>CrediOfertas</span>
+      {/* BARRA SUPERIOR STICKY */}
+      <nav className="top-nav">
+        <div className="top-nav-container">
+          <a href="#" className="brand-logo-small">
+            <img src="/logo.png" alt="CrediOfertas Logo" />
+            <span>CrediOfertas</span>
+          </a>
+
+          <div className="nav-actions">
+            <div id="google_translate_element"></div>
+            <button onClick={() => setActiveModal('publish')} className="btn btn-primary">➕ Publicar Oferta</button>
+            <button onClick={() => setActiveModal('auth')} className="btn btn-secondary">🔑 Acceder</button>
+            <button onClick={() => setActiveModal('kyc')} className="btn btn-success">🏢 Registro RIF / KYC</button>
+          </div>
+        </div>
+      </nav>
+
+      {/* HERO BANNER */}
+      <header className="hero-banner">
+        <div className="container">
+          <h1 className="hero-title">CrediOfertas <span>Marketplace</span></h1>
+          <p className="hero-subtitle">
+            Tu plataforma de comercio: compra al <strong>Mayor</strong>, al <strong>Detal</strong>, contrata <strong>Servicios</strong> o explora tendencias.
+          </p>
+
+          <div className="hero-pills">
+            <a href="https://amzn.to/4bJJq22" target="_blank" rel="nofollow noopener sponsored" className="pill-btn">
+              <span style={{ fontSize: '1.25rem' }}>🛒</span>
+              <div>
+                <span className="pill-title">Top Amazon</span>
+                <small className="pill-sub">Lo + vendido</small>
+              </div>
+            </a>
+
+            <a href="https://onelink.shein.com/44/5wyleaujbj2iI" target="_blank" rel="nofollow noopener sponsored" className="pill-btn">
+              <span style={{ fontSize: '1.25rem' }}>👗</span>
+              <div>
+                <span className="pill-title">Tendencias Shein</span>
+                <small className="pill-sub">Moda & Ofertas</small>
+              </div>
+            </a>
+
+            <a href="https://s.click.aliexpress.com/e/_c33p0iwF" target="_blank" rel="nofollow noopener sponsored" className="pill-btn">
+              <span style={{ fontSize: '1.25rem' }}>⚡</span>
+              <div>
+                <span className="pill-title">SuperOfertas AliExpress</span>
+                <small className="pill-sub">Envíos rápidos</small>
+              </div>
+            </a>
+
+            <a href="https://offer.alibaba.com/cps/t9vapivb?bm=cps&src=saf" target="_blank" rel="nofollow noopener sponsored" className="pill-btn">
+              <span style={{ fontSize: '1.25rem' }}>🏭</span>
+              <div>
+                <span className="pill-title">Mayoreo Alibaba</span>
+                <small className="pill-sub">Precios fábrica</small>
+              </div>
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <main className="container">
+        <section className="controls">
+          <input 
+            type="search" 
+            className="search-bar" 
+            placeholder="🔍 Buscar ofertas, servicios, ventas al mayor, Amazon, Shein..." 
+            aria-label="Buscar productos"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          
+          <div className="filters" role="tablist">
+            {[
+              { id: 'all', label: 'Todos' },
+              { id: 'mayorista', label: '📦 Venta al Mayor' },
+              { id: 'detal', label: '🛍️ Venta al Detal' },
+              { id: 'servicio', label: '🛠️ Servicios' },
+              { id: 'amazon', label: 'Amazon' },
+              { id: 'shein', label: 'Shein' },
+              { id: 'aliexpress', label: 'AliExpress' },
+              { id: 'alibaba', label: 'Alibaba' }
+            ].map((item) => (
+              <button 
+                key={item.id}
+                className={`store-filter ${filter === item.id ? 'active' : ''}`}
+                onClick={() => setFilter(item.id)}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* GRID DE PUBLICACIONES */}
+        <section id="products-grid" className="products-grid" aria-live="polite">
+          {/* Aquí mapearás las ofertas cargadas de Supabase */}
+        </section>
+      </main>
+
+      {/* MODAL 1: AUTENTICACIÓN */}
+      {activeModal === 'auth' && (
+        <div className="modal-overlay">
+          <div className="modal-card">
+            <button className="close-btn" onClick={() => setActiveModal(null)}>&times;</button>
+            <h2>🔑 Acceso a CrediOfertas</h2>
+            <p className="modal-sub">Inicia sesión o regístrate para publicar y gestionar tus ofertas.</p>
+
+            <form onSubmit={(e) => e.preventDefault()}>
+              <div className="form-group">
+                <label htmlFor="auth-email">Correo Electrónico</label>
+                <input type="email" id="auth-email" required placeholder="tu@correo.com" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="auth-password">Contraseña</label>
+                <input type="password" id="auth-password" required placeholder="••••••••" />
+              </div>
+              <button type="submit" className="submit-btn" style={{ marginTop: '15px' }}>Ingresar</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: REGISTRO EMPRESA / KYC */}
+      {activeModal === 'kyc' && (
+        <div className="modal-overlay">
+          <div className="modal-card">
+            <button className="close-btn" onClick={() => setActiveModal(null)}>&times;</button>
+            <h2>🏢 Registro de Empresa & Verificación KYC</h2>
+            <p className="modal-sub">Ingresa los datos fiscales y sube los documentos para verificar tu perfil comercial.</p>
+
+            <form onSubmit={(e) => e.preventDefault()}>
+              <div className="form-group">
+                <label htmlFor="company_name">Nombre Comercial</label>
+                <input type="text" id="company_name" required placeholder="Inversiones Global C.A." />
+              </div>
+              <div className="form-group">
+                <label htmlFor="rif">RIF Fiscal / Documento ID</label>
+                <input type="text" id="rif" required placeholder="J-12345678-0" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="phone">Teléfono / WhatsApp</label>
+                <input type="tel" id="phone" required placeholder="+58 412 000 0000" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="document_file">Documento RIF / Cédula (Imagen)</label>
+                <input type="file" id="document_file" accept="image/*" required />
+              </div>
+              <div className="form-group">
+                <label htmlFor="selfie_front">Foto Frontal (Selfie Rostro)</label>
+                <input type="file" id="selfie_front" accept="image/*" required />
+              </div>
+              <div className="form-group">
+                <label htmlFor="selfie_right">Foto Perfil Derecho</label>
+                <input type="file" id="selfie_right" accept="image/*" required />
+              </div>
+              <div className="form-group">
+                <label htmlFor="selfie_left">Foto Perfil Izquierdo</label>
+                <input type="file" id="selfie_left" accept="image/*" required />
+              </div>
+              <button type="submit" className="submit-btn">✅ Enviar para Verificación</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: PUBLICACIÓN */}
+      {activeModal === 'publish' && (
+        <div className="modal-overlay">
+          <div className="modal-card">
+            <button className="close-btn" onClick={() => setActiveModal(null)}>&times;</button>
+            <h2>📢 Publicar Oferta / Servicio</h2>
+            <p className="modal-sub">Anuncia productos al mayor, detal o servicios profesionales con video de 90 segundos.</p>
+
+            <form onSubmit={(e) => e.preventDefault()}>
+              <div className="form-group">
+                <label htmlFor="pub-type">Tipo de Oferta</label>
+                <select id="pub-type" required className="form-select">
+                  <option value="detal">🛍️ Venta al Detal</option>
+                  <option value="mayorista">📦 Venta al Mayor</option>
+                  <option value="servicio">🛠️ Servicio Profesional</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="pub-title">Título</label>
+                <input type="text" id="pub-title" required placeholder="Ej: Lote de Franelas de Algodón" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="pub-price">Precio ($ USD)</label>
+                <input type="number" step="0.01" id="pub-price" required placeholder="15.00" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="pub-affiliate">Enlace de Contacto / WhatsApp / Web</label>
+                <input type="text" id="pub-affiliate" required placeholder="+584120000000 o https://tienda.com" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="pub-image">Imagen Promocional</label>
+                <input type="file" id="pub-image" accept="image/*" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="pub-video">Video Corto (hasta 90 segundos)</label>
+                <input type="file" id="pub-video" accept="video/mp4,video/webm" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="pub-description">Descripción</label>
+                <textarea id="pub-description" rows={3} required placeholder="Detalles de la oferta..."></textarea>
+              </div>
+              <button type="submit" className="submit-btn">🚀 Publicar Ahora</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* SOPORTE WHATSAPP */}
+      <a 
+        href="https://wa.me/18722371015" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="whatsapp-float"
+        style={{ position: 'fixed', bottom: '20px', right: '20px', background: '#25d366', color: '#fff', padding: '12px 20px', borderRadius: '50px', fontWeight: 'bold', textDecoration: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 999 }}
+      >
+        💬 Soporte WhatsApp
       </a>
 
-      <div class="nav-actions">
-        <div id="google_translate_element"></div>
-        <button id="open-publish-btn" data-modal="publish-modal" class="btn btn-primary">➕ Publicar Oferta</button>
-        <button id="open-auth-btn" data-modal="auth-modal" class="btn btn-secondary">🔑 Acceder</button>
-        <button id="open-kyc-btn" data-modal="kyc-modal" class="btn btn-success">🏢 Registro RIF / KYC</button>
-      </div>
-    </div>
-  </nav>
-
-  <!-- HERO BANNER -->
-  <header class="hero-banner">
-    <div class="container">
-      <h1 class="hero-title">CrediOfertas <span>Marketplace</span></h1>
-      <p class="hero-subtitle">
-        Tu plataforma de comercio: compra al <strong>Mayor</strong>, al <strong>Detal</strong>, contrata <strong>Servicios</strong> o explora tendencias.
-      </p>
-
-      <div class="hero-pills">
-        <a href="https://amzn.to/4bJJq22" target="_blank" rel="nofollow noopener sponsored" class="pill-btn">
-          <span style="font-size: 1.25rem;">🛒</span>
-          <div>
-            <span class="pill-title">Top Amazon</span>
-            <small class="pill-sub">Lo + vendido</small>
-          </div>
-        </a>
-
-        <a href="https://onelink.shein.com/44/5wyleaujbj2iI" target="_blank" rel="nofollow noopener sponsored" class="pill-btn">
-          <span style="font-size: 1.25rem;">👗</span>
-          <div>
-            <span class="pill-title">Tendencias Shein</span>
-            <small class="pill-sub">Moda & Ofertas</small>
-          </div>
-        </a>
-
-        <a href="https://s.click.aliexpress.com/e/_c33p0iwF" target="_blank" rel="nofollow noopener sponsored" class="pill-btn">
-          <span style="font-size: 1.25rem;">⚡</span>
-          <div>
-            <span class="pill-title">SuperOfertas AliExpress</span>
-            <small class="pill-sub">Envíos rápidos</small>
-          </div>
-        </a>
-
-        <a href="https://offer.alibaba.com/cps/t9vapivb?bm=cps&src=saf" target="_blank" rel="nofollow noopener sponsored" class="pill-btn">
-          <span style="font-size: 1.25rem;">🏭</span>
-          <div>
-            <span class="pill-title">Mayoreo Alibaba</span>
-            <small class="pill-sub">Precios fábrica</small>
-          </div>
-        </a>
-      </div>
-    </div>
-  </header>
-
-  <main class="container">
-    <section class="controls">
-      <input type="search" id="search-bar" class="search-bar" placeholder="🔍 Buscar ofertas, servicios, ventas al mayor, Amazon, Shein..." aria-label="Buscar productos">
-      
-      <div class="filters" role="tablist">
-        <button class="store-filter active" data-filter="all">Todos</button>
-        <button class="store-filter" data-filter="mayorista">📦 Venta al Mayor</button>
-        <button class="store-filter" data-filter="detal">🛍️ Venta al Detal</button>
-        <button class="store-filter" data-filter="servicio">🛠️ Servicios</button>
-        <button class="store-filter" data-filter="amazon">Amazon</button>
-        <button class="store-filter" data-filter="shein">Shein</button>
-        <button class="store-filter" data-filter="aliexpress">AliExpress</button>
-        <button class="store-filter" data-filter="alibaba">Alibaba</button>
-      </div>
-    </section>
-
-    <!-- GRID DE PUBLICACIONES -->
-    <section id="products-grid" class="products-grid" aria-live="polite"></section>
-  </main>
-
-  <!-- MODAL 1: AUTENTICACIÓN -->
-  <div id="auth-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
-    <div class="modal-card">
-      <button class="close-btn">&times;</button>
-      <h2>🔑 Acceso a CrediOfertas</h2>
-      <p class="modal-sub">Inicia sesión o regístrate para publicar y gestionar tus ofertas.</p>
-
-      <form id="login-form" data-mode="login">
-        <div class="form-group">
-          <label for="auth-email">Correo Electrónico</label>
-          <input type="email" id="auth-email" name="email" required placeholder="tu@correo.com">
+      {/* FOOTER */}
+      <footer style={{ marginTop: '50px', padding: '25px 20px', background: '#ffffff', borderTop: '1px solid var(--border-color)', textAlign: 'center', color: 'var(--text-sub)', fontSize: '0.875rem' }}>
+        <div className="container">
+          <p><strong>Aviso de Plataforma:</strong> Este marketplace permite la publicación directa de comerciantes, empresas e independientes, así como productos de afiliados externos.</p>
+          <p>&copy; 2026 CrediOfertas Marketplace Multivendedor. Todos los derechos reservados.</p>
         </div>
-        <div class="form-group">
-          <label for="auth-password">Contraseña</label>
-          <input type="password" id="auth-password" name="password" required placeholder="••••••••">
-        </div>
-        <button type="submit" class="submit-btn" style="margin-top: 15px;">Ingresar</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL 2: REGISTRO EMPRESA / KYC COMPLETO -->
-  <div id="kyc-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
-    <div class="modal-card">
-      <button class="close-btn">&times;</button>
-      <h2>🏢 Registro de Empresa & Verificación KYC</h2>
-      <p class="modal-sub">Ingresa los datos fiscales y sube los documentos para verificar tu perfil comercial.</p>
-
-      <form id="kyc-form" enctype="multipart/form-data">
-        <div class="form-group">
-          <label for="company_name">Nombre Comercial</label>
-          <input type="text" id="company_name" name="company_name" required placeholder="Inversiones Global C.A.">
-        </div>
-        <div class="form-group">
-          <label for="rif">RIF Fiscal / Documento ID</label>
-          <input type="text" id="rif" name="rif" required placeholder="J-12345678-0">
-        </div>
-        <div class="form-group">
-          <label for="phone">Teléfono / WhatsApp</label>
-          <input type="tel" id="phone" name="phone" required placeholder="+58 412 000 0000">
-        </div>
-        <div class="form-group">
-          <label for="document_file">Documento RIF / Cédula (Imagen)</label>
-          <input type="file" id="document_file" name="document" accept="image/*" required>
-        </div>
-        <div class="form-group">
-          <label for="selfie_front">Foto Frontal (Selfie Rostro)</label>
-          <input type="file" id="selfie_front" name="selfieFront" accept="image/*" required>
-        </div>
-        <div class="form-group">
-          <label for="selfie_right">Foto Perfil Derecho</label>
-          <input type="file" id="selfie_right" name="selfieRight" accept="image/*" required>
-        </div>
-        <div class="form-group">
-          <label for="selfie_left">Foto Perfil Izquierdo</label>
-          <input type="file" id="selfie_left" name="selfieLeft" accept="image/*" required>
-        </div>
-        <button type="submit" class="submit-btn">✅ Enviar para Verificación</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL 3: PUBLICACIÓN CON VIDEO DE 90 SEGUNDOS -->
-  <div id="publish-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
-    <div class="modal-card">
-      <button id="close-publish-modal-btn" class="close-btn">&times;</button>
-      <h2>📢 Publicar Oferta / Servicio</h2>
-      <p class="modal-sub">Anuncia productos al mayor, detal o servicios profesionales con video de 90 segundos.</p>
-
-      <form id="publish-form" enctype="multipart/form-data">
-        <div class="form-group">
-          <label for="pub-type">Tipo de Oferta</label>
-          <select id="pub-type" name="type" required class="form-select">
-            <option value="detal">🛍️ Venta al Detal</option>
-            <option value="mayorista">📦 Venta al Mayor</option>
-            <option value="servicio">🛠️ Servicio Profesional</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="pub-title">Título</label>
-          <input type="text" id="pub-title" name="title" required placeholder="Ej: Lote de Franelas de Algodón">
-        </div>
-        <div class="form-group">
-          <label for="pub-price">Precio ($ USD)</label>
-          <input type="number" step="0.01" id="pub-price" name="price" required placeholder="15.00">
-        </div>
-        <div class="form-group">
-          <label for="pub-affiliate">Enlace de Contacto / WhatsApp / Web</label>
-          <input type="text" id="pub-affiliate" name="affiliate_link" required placeholder="+584120000000 o https://tienda.com">
-        </div>
-        <div class="form-group">
-          <label for="pub-image">Imagen Promocional</label>
-          <input type="file" id="pub-image" name="image_file" accept="image/*">
-        </div>
-        <div class="form-group">
-          <label for="pub-video">Video Corto (hasta 90 segundos)</label>
-          <input type="file" id="pub-video" name="video_file" accept="video/mp4,video/webm">
-        </div>
-        <div class="form-group">
-          <label for="pub-description">Descripción</label>
-          <textarea id="pub-description" name="description" rows="3" required placeholder="Detalles de la oferta..."></textarea>
-        </div>
-        <button type="submit" class="submit-btn publish-submit-btn">🚀 Publicar Ahora</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- SOPORTE WHATSAPP -->
-  <a href="https://wa.me/18722371015" target="_blank" rel="noopener noreferrer" class="whatsapp-float" aria-label="Soporte WhatsApp" style="position:fixed;bottom:20px;right:20px;background:#25d366;color:#fff;padding:12px 20px;border-radius:50px;font-weight:bold;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:999;">
-    💬 Soporte WhatsApp
-  </a>
-
-  <!-- FOOTER -->
-  <footer style="margin-top: 50px; padding: 25px 20px; background: #ffffff; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-sub); font-size: 0.875rem;">
-    <div class="container">
-      <p><strong>Aviso de Plataforma:</strong> Este marketplace permite la publicación directa de comerciantes, empresas e independientes, así como productos de afiliados externos.</p>
-      <p>&copy; 2026 CrediOfertas Marketplace Multivendedor. Todos los derechos reservados.</p>
-    </div>
-  </footer>
-
-  <!-- TRADUCCIÓN GOOGLE -->
-  <script type="text/javascript">
-    function googleTranslateElementInit() {
-      new google.translate.TranslateElement({ pageLanguage: 'es', layout: google.translate.TranslateElement.InlineLayout.SIMPLE }, 'google_translate_element');
-    }
-  </script>
-  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async defer></script>
-
-  <!-- SUPABASE & SCRIPT PRINCIPAL -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/app.js" defer></script>
-  <script defer src="/_vercel/insights/script.js"></script>
-</body>
-</html>
+      </footer>
+    </>
+  );
+}
