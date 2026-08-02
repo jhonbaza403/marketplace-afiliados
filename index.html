@@ -30,7 +30,7 @@
   <!-- Hoja de Estilos Principal -->
   <link rel="stylesheet" href="style.css">
 
-  <!-- Estilos Integrados de Modernización -->
+  <!-- Estilos Integrados -->
   <style>
     :root {
       --primary: #2563eb;
@@ -56,7 +56,6 @@
       padding: 0;
     }
 
-    /* BARRA NAVEGACIÓN STICKY MODERN GLASSMORPHISM */
     .top-nav {
       position: sticky;
       top: 0;
@@ -99,7 +98,6 @@
       flex-wrap: wrap;
     }
 
-    /* BOTONES MODERNOS */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -136,7 +134,6 @@
       box-shadow: var(--shadow-md);
     }
 
-    /* HERO SECTION */
     .hero-banner {
       background: linear-gradient(180deg, #eff6ff 0%, var(--bg-light) 100%);
       padding: 40px 20px 30px;
@@ -163,7 +160,6 @@
       font-size: 1rem;
     }
 
-    /* ACCESOS DIRECTOS (TIENDAS) */
     .hero-pills {
       display: flex;
       justify-content: center;
@@ -196,7 +192,6 @@
     .pill-title { font-weight: 700; font-size: 0.875rem; display: block; }
     .pill-sub { font-size: 0.75rem; color: var(--text-sub); }
 
-    /* CONTROLES / BUSCADOR / FILTROS */
     .controls {
       max-width: 1100px;
       margin: 20px auto 30px;
@@ -245,11 +240,6 @@
     }
   </style>
 
-  <!-- Analytics & Vercel Web Insights -->
-  <script>
-    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-  </script>
-
   <!-- MÓDULO DE SEGURIDAD -->
   <script>
     async function verificarSeguridadConexion() {
@@ -263,15 +253,6 @@
         if (esBot) {
           bloquearAplicacion("Acceso restringido: Se ha detectado un entorno automatizado.");
           return;
-        }
-
-        const respuesta = await fetch('https://ipapi.co/json/').catch(() => null);
-        if (respuesta && respuesta.ok) {
-          const datosIP = await respuesta.json();
-          if (datosIP?.security?.is_vpn || datosIP?.security?.is_proxy) {
-            bloquearAplicacion("Uso de VPN o Proxy detectado. Desactiva la redirección de red para continuar.");
-            return;
-          }
         }
       } catch (error) {
         console.warn("Verificación de seguridad omitida:", error);
@@ -309,15 +290,7 @@
     </div>
   </div>
 
-  <noscript>
-    <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0f172a;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999999;text-align:center;padding:20px;">
-      <div style="font-size:50px;">⚠️</div>
-      <h1 style="color:#ef4444;">JavaScript Requerido</h1>
-      <p style="color:#cbd5e1;">Habilita JavaScript en tu navegador para continuar.</p>
-    </div>
-  </noscript>
-
-  <!-- BARRA SUPERIOR ESTRATÉGICA STICKY -->
+  <!-- BARRA SUPERIOR STICKY -->
   <nav class="top-nav">
     <div class="top-nav-container">
       <a href="#" class="brand-logo-small">
@@ -327,9 +300,9 @@
 
       <div class="nav-actions">
         <div id="google_translate_element"></div>
-        <button id="open-publish-btn" data-modal="publish-modal" class="btn btn-primary">➕ Publicar Gratis</button>
+        <button id="open-publish-btn" data-modal="publish-modal" class="btn btn-primary">➕ Publicar Oferta</button>
         <button id="open-auth-btn" data-modal="auth-modal" class="btn btn-secondary">🔑 Acceder</button>
-        <button id="open-kyc-btn" data-modal="kyc-modal" class="btn btn-success">🏢 Registro RIF</button>
+        <button id="open-kyc-btn" data-modal="kyc-modal" class="btn btn-success">🏢 Registro RIF / KYC</button>
       </div>
     </div>
   </nav>
@@ -339,10 +312,9 @@
     <div class="container">
       <h1 class="hero-title">CrediOfertas <span>Marketplace</span></h1>
       <p class="hero-subtitle">
-        Tu plataforma de comercio: compra al <strong>Mayor</strong>, al <strong>Detal</strong>, contrata <strong>Servicios</strong> o explora los productos en tendencia.
+        Tu plataforma de comercio: compra al <strong>Mayor</strong>, al <strong>Detal</strong>, contrata <strong>Servicios</strong> o explora tendencias.
       </p>
 
-      <!-- ACCESOS AFILIADOS MONETIZADOS -->
       <div class="hero-pills">
         <a href="https://amzn.to/4bJJq22" target="_blank" rel="nofollow noopener sponsored" class="pill-btn">
           <span style="font-size: 1.25rem;">🛒</span>
@@ -380,7 +352,6 @@
   </header>
 
   <main class="container">
-    <!-- CONTROLES Y BUSCADOR -->
     <section class="controls">
       <input type="search" id="search-bar" class="search-bar" placeholder="🔍 Buscar ofertas, servicios, ventas al mayor, Amazon, Shein..." aria-label="Buscar productos">
       
@@ -421,37 +392,53 @@
     </div>
   </div>
 
-  <!-- MODAL 2: REGISTRO EMPRESA / RIF -->
+  <!-- MODAL 2: REGISTRO EMPRESA / KYC COMPLETO -->
   <div id="kyc-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal-card">
       <button class="close-btn">&times;</button>
-      <h2>🏢 Registro de Empresa / RIF</h2>
-      <p class="modal-sub">Ingresa los datos fiscales de tu empresa para verificar tu perfil comercial.</p>
+      <h2>🏢 Registro de Empresa & Verificación KYC</h2>
+      <p class="modal-sub">Ingresa los datos fiscales y sube los documentos para verificar tu perfil comercial.</p>
 
-      <form id="kyc-form">
+      <form id="kyc-form" enctype="multipart/form-data">
         <div class="form-group">
           <label for="company_name">Nombre Comercial</label>
           <input type="text" id="company_name" name="company_name" required placeholder="Inversiones Global C.A.">
         </div>
         <div class="form-group">
-          <label for="rif">RIF Fiscal</label>
+          <label for="rif">RIF Fiscal / Documento ID</label>
           <input type="text" id="rif" name="rif" required placeholder="J-12345678-0">
         </div>
         <div class="form-group">
           <label for="phone">Teléfono / WhatsApp</label>
           <input type="tel" id="phone" name="phone" required placeholder="+58 412 000 0000">
         </div>
-        <button type="submit" class="submit-btn">✅ Guardar Empresa</button>
+        <div class="form-group">
+          <label for="document_file">Documento RIF / Cédula (Imagen)</label>
+          <input type="file" id="document_file" name="document" accept="image/*" required>
+        </div>
+        <div class="form-group">
+          <label for="selfie_front">Foto Frontal (Selfie Rostro)</label>
+          <input type="file" id="selfie_front" name="selfieFront" accept="image/*" required>
+        </div>
+        <div class="form-group">
+          <label for="selfie_right">Foto Perfil Derecho</label>
+          <input type="file" id="selfie_right" name="selfieRight" accept="image/*" required>
+        </div>
+        <div class="form-group">
+          <label for="selfie_left">Foto Perfil Izquierdo</label>
+          <input type="file" id="selfie_left" name="selfieLeft" accept="image/*" required>
+        </div>
+        <button type="submit" class="submit-btn">✅ Enviar para Verificación</button>
       </form>
     </div>
   </div>
 
-  <!-- MODAL 3: PUBLICACIÓN DE OFERTAS -->
+  <!-- MODAL 3: PUBLICACIÓN CON VIDEO DE 90 SEGUNDOS -->
   <div id="publish-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal-card">
       <button id="close-publish-modal-btn" class="close-btn">&times;</button>
-      <h2>📢 Publicar Oferta / Servicio Gratis</h2>
-      <p class="modal-sub">Anuncia productos al mayor, detal o promociona tus servicios profesionales.</p>
+      <h2>📢 Publicar Oferta / Servicio</h2>
+      <p class="modal-sub">Anuncia productos al mayor, detal o servicios profesionales con video de 90 segundos.</p>
 
       <form id="publish-form" enctype="multipart/form-data">
         <div class="form-group">
@@ -471,6 +458,18 @@
           <input type="number" step="0.01" id="pub-price" name="price" required placeholder="15.00">
         </div>
         <div class="form-group">
+          <label for="pub-affiliate">Enlace de Contacto / WhatsApp / Web</label>
+          <input type="text" id="pub-affiliate" name="affiliate_link" required placeholder="+584120000000 o https://tienda.com">
+        </div>
+        <div class="form-group">
+          <label for="pub-image">Imagen Promocional</label>
+          <input type="file" id="pub-image" name="image_file" accept="image/*">
+        </div>
+        <div class="form-group">
+          <label for="pub-video">Video Corto (hasta 90 segundos)</label>
+          <input type="file" id="pub-video" name="video_file" accept="video/mp4,video/webm">
+        </div>
+        <div class="form-group">
           <label for="pub-description">Descripción</label>
           <textarea id="pub-description" name="description" rows="3" required placeholder="Detalles de la oferta..."></textarea>
         </div>
@@ -479,7 +478,7 @@
     </div>
   </div>
 
-  <!-- SOPORTE FLOTANTE DE WHATSAPP -->
+  <!-- SOPORTE WHATSAPP -->
   <a href="https://wa.me/18722371015" target="_blank" rel="noopener noreferrer" class="whatsapp-float" aria-label="Soporte WhatsApp" style="position:fixed;bottom:20px;right:20px;background:#25d366;color:#fff;padding:12px 20px;border-radius:50px;font-weight:bold;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:999;">
     💬 Soporte WhatsApp
   </a>
