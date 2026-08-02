@@ -1,33 +1,37 @@
+'use client';
+
+import { createClient } from '@supabase/supabase-js';
+
 // ==========================================
 // CONFIGURACIÓN E INICIALIZACIÓN DE SUPABASE
 // ==========================================
-const SUPABASE_URL = 'https://TU_PROYECTO_SUPABASE.supabase.co'; // <--- Pega aquí la URL de tu proyecto Supabase
-const SUPABASE_ANON_KEY = 'sb_publishable_yPCMORrQyiQ1esGLUdSsJA_YfyjPhAo';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://TU_PROYECTO_SUPABASE.supabase.co';
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_yPCMORrQyiQ1esGLUdSsJA_YfyjPhAo';
 
-let supabaseClient = null;
-if (typeof supabase !== 'undefined' && SUPABASE_URL !== 'https://TU_PROYECTO_SUPABASE.supabase.co') {
-  supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  window.supabaseClient = supabaseClient;
-}
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Estado global de productos
-window.allProducts = [];
+// Correo receptor de ingresos por suscripciones y comisiones
+export const PAYPAL_RECEIVER_EMAIL = 'bazwjhon@gmail.com';
 
 // ==========================================
-// 1. FUNCIÓN AUXILIAR: VALIDAR Y NORMALIZAR URLS
+// HELPER: NORMALIZACIÓN Y VALIDACIÓN DE URLS
 // ==========================================
-function normalizarUrlContacto(urlOriginal) {
+export function normalizarUrlContacto(urlOriginal, titulo = '') {
   if (!urlOriginal) return '#';
   
   let url = urlOriginal.trim();
 
-  // Si es un número de teléfono de WhatsApp sin formato URL
+  // Si es solo un número de teléfono (formato WhatsApp)
   if (/^\+?\d{8,15}$/.test(url)) {
     const numLimpio = url.replace(/\+/g, '');
-    return `https://wa.me/${numLimpio}?text=Hola!%20Me%20interesa%20tu%20publicación%20en%20CrediOfertas`;
+    const mensaje = encodeURIComponent(`¡Hola! Me interesa tu publicación "${titulo}" en CrediOfertas.`);
+    return `https://wa.me/${numLimpio}?text=${mensaje}`;
   }
 
-  // Asegurar protocolo https:// si falta
+  if (url.startsWith('wa.me/')) {
+    return `https://${url}`;
+  }
+
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
     return `https://${url}`;
   }
@@ -35,370 +39,621 @@ function normalizarUrlContacto(urlOriginal) {
   return url;
 }
 
-// ==========================================
-// 2. RENDERIZADO DE TARJETAS EN EL GRID
-// ==========================================
-function renderProducts(productsList) {
-  const grid = document.getElementById('products-grid');
-  if (!grid) return;
+// Helper global para compartir en redes sociales
+export function compartirRedSocial(red, titulo, url) {
+  if (typeof window === 'undefined') return;
+  
+  const linkFinal = url || window.location.href;
+  const mensaje = encodeURIComponent(`🔥 ¡Mira esta oferta en CrediOfertas! ${titulo}\n👉 ${linkFinal}`);
 
-  grid.innerHTML = '';
+  let shareUrl = '';
 
-  if (!productsList || productsList.length === 0) {
-    grid.innerHTML = '<p class="no-results" style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #cbd5e1;">No se encontraron ofertas o servicios disponibles.</p>';
-    return;
-  }
-
-  productsList.forEach(item => {
-    const card = document.createElement('article');
-    card.className = 'product-card';
-
-    // Capturar cualquier variación del nombre de la propiedad del enlace
-    const rawLink = item.affiliate_link || item.affiliateUrl || item.url || item.link || '';
-    const actionUrl = normalizarUrlContacto(rawLink);
-
-    // Identificar tipo de tienda/oferta
-    const storeLower = (item.store || '').toLowerCase();
-    const categoryLower = (item.category || '').toLowerCase();
-    const typeLower = (item.type || '').toLowerCase();
-    
-    const esAfiliadoExterno = ['amazon', 'shein', 'aliexpress', 'alibaba'].includes(storeLower) || 
-                               ['amazon', 'shein', 'aliexpress', 'alibaba'].includes(categoryLower);
-
-    // Definir texto y estilo del botón dinámicamente
-    let btnText = '💬 Contactar por WhatsApp';
-    let btnClass = 'whatsapp-btn';
-
-    if (esAfiliadoExterno) {
-      const nombreTienda = item.store || item.category || 'Tienda';
-      btnText = `🛒 Ver Oferta en ${nombreTienda}`;
-      btnClass = 'affiliate-btn';
-    } else if (categoryLower.includes('servicio') || typeLower === 'servicio') {
-      btnText = '🛠️ Contratar Servicio';
-      btnClass = 'service-btn';
-    } else if (categoryLower.includes('mayor') || typeLower === 'mayorista') {
-      btnText = '📦 Cotizar al Mayor';
-      btnClass = 'mayor-btn';
-    }
-
-    // Normalizar Imagen y Video
-    const imageUrl = item.image_url || item.image || 'logo.png';
-    const videoUrl = item.video_url || item.videoUrl || '';
-
-    card.innerHTML = `
-      <div class="card-media">
-        ${videoUrl 
-          ? `<video src="${videoUrl}" controls poster="${imageUrl}" preload="metadata"></video>` 
-          : `<img src="${imageUrl}" alt="${item.title}" loading="lazy" onerror="this.src='logo.png'">`
-        }
-        <span class="badge ${typeLower || categoryLower}">${item.category || item.store || 'Oferta'}</span>
-      </div>
-      <div class="card-body">
-        <h3>${item.title}</h3>
-        <p class="price">$${parseFloat(item.price || 0).toFixed(2)} <small>USD</small></p>
-        <p class="description">${item.description || 'Sin descripción disponible.'}</p>
-        
-        <a href="${actionUrl}" 
-           target="_blank" 
-           rel="noopener noreferrer" 
-           class="btn-action ${btnClass}">
-           ${btnText}
-        </a>
-      </div>
-    `;
-
-    grid.appendChild(card);
-  });
-}
-
-// ==========================================
-// 3. CARGA DE PRODUCTOS (SUPABASE / LOCAL)
-// ==========================================
-async function cargarProductos() {
-  if (supabaseClient) {
-    try {
-      const { data, error } = await supabaseClient
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (!error && data && data.length > 0) {
-        window.allProducts = data;
-        renderProducts(window.allProducts);
+  switch (red) {
+    case 'whatsapp':
+      shareUrl = `https://api.whatsapp.com/send?text=${mensaje}`;
+      break;
+    case 'facebook':
+      shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(linkFinal)}`;
+      break;
+    case 'x':
+      shareUrl = `https://twitter.com/intent/tweet?text=${mensaje}`;
+      break;
+    case 'native':
+      if (navigator.share) {
+        navigator.share({
+          title: titulo,
+          text: `🔥 ¡Mira esta oferta! ${titulo}`,
+          url: linkFinal
+        }).catch(() => {});
+        return;
+      } else {
+        navigator.clipboard.writeText(linkFinal);
+        alert('¡Enlace copiado al portapapeles!');
         return;
       }
-    } catch (err) {
-      console.warn('Error al cargar datos desde Supabase:', err);
-    }
   }
 
-  // Datos por defecto en caso de no conectar a Supabase
-  window.allProducts = [
-    {
-      id: 1,
-      title: 'Lote de Calzado Deportivo al Mayor',
-      category: 'Calzado',
-      store: 'mayorista',
-      type: 'mayorista',
-      price: 12.50,
-      description: 'Venta al mayor desde 12 pares. Excelente calidad y envío inmediato.',
-      image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500',
-      affiliate_link: '+584120000000',
-      created_at: new Date().toISOString()
-    },
-    {
-      id: 2,
-      title: 'Servicio Técnico Especializado de Laptops',
-      category: 'Servicios',
-      store: 'servicio',
-      type: 'servicio',
-      price: 25.00,
-      description: 'Mantenimiento preventivo, diagnóstico y reparación de hardware/software.',
-      image_url: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500',
-      affiliate_link: '+584120000000',
-      created_at: new Date().toISOString()
-    }
-  ];
-  renderProducts(window.allProducts);
-}
-
-// ==========================================
-// 4. SUBIDA DE ARCHIVOS A SUPABASE STORAGE
-// ==========================================
-async function subirArchivoStorage(file, folder) {
-  if (!supabaseClient || !file) return null;
-  
-  const ext = file.name.split('.').pop();
-  const filePath = `${folder}/${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`;
-
-  const { data, error } = await supabaseClient.storage
-    .from('media')
-    .upload(filePath, file, { cacheControl: '3600', upsert: false });
-
-  if (error) {
-    console.error('Error al subir archivo a Storage:', error);
-    return null;
+  if (shareUrl) {
+    window.open(shareUrl, '_blank', 'width=600,height=450');
   }
-
-  const { data: publicUrlData } = supabaseClient.storage
-    .from('media')
-    .getPublicUrl(filePath);
-
-  return publicUrlData.publicUrl;
 }
 
-// ==========================================
-// 5. CAPTURA DEL FORMULARIO DE PUBLICACIÓN
-// ==========================================
-const publishForm = document.getElementById('publish-form');
+// Inicializador de eventos para el DOM en cliente
+export function initRegisterKyc() {
+  if (typeof window === 'undefined') return;
 
-if (publishForm) {
-  publishForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Elementos DOM Principales
+    const productsContainer = document.getElementById('products-grid');
+    const searchInput = document.getElementById('search-input') || document.getElementById('search-bar');
+    const storeButtons = document.querySelectorAll('.store-filter');
 
-    const submitBtn = publishForm.querySelector('.publish-submit-btn');
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = '⏳ Subiendo y guardando...';
+    // Modales
+    const authModal = document.getElementById('auth-modal');
+    const publishModal = document.getElementById('publish-modal');
+    const openAuthBtn = document.getElementById('open-auth-btn');
+    const openPublishBtn = document.getElementById('open-publish-btn');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const closePublishModalBtn = document.getElementById('close-publish-modal-btn');
+
+    // Formularios
+    const kycForm = document.getElementById('kyc-form');
+    const publishForm = document.getElementById('publish-form');
+    const loginForm = document.getElementById('login-form');
+
+    let allProducts = [];
+    let currentUser = null;
+
+    // ==========================================
+    // PWA 1. REGISTRO DE SERVICE WORKER
+    // ==========================================
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => {
+            console.log('✅ Service Worker registrado con éxito. Escopo:', reg.scope);
+          })
+          .catch((err) => {
+            console.warn('⚠️ Error al registrar el Service Worker:', err);
+          });
+      });
     }
 
-    const formData = new FormData(publishForm);
-    const imageFile = document.getElementById('pub-image-file')?.files[0];
-    const videoFile = document.getElementById('pub-video-file')?.files[0];
+    // ==========================================
+    // PWA 2. CONTROL DE EVENTO E INSTALACIÓN (BANNER PWA)
+    // ==========================================
+    let deferredPrompt = null;
+    const pwaInstallBanner = document.getElementById('pwa-install-banner');
+    const installPwaBtn = document.getElementById('install-pwa-btn');
+    const closePwaBannerBtn = document.getElementById('close-pwa-banner-btn');
 
-    let finalImageUrl = formData.get('image_url') || 'logo.png';
-    let finalVideoUrl = formData.get('video_url') || '';
-
-    // Subida de imagen y video si se seleccionaron archivos locales
-    if (imageFile) {
-      const urlSubida = await subirArchivoStorage(imageFile, 'imagenes');
-      if (urlSubida) finalImageUrl = urlSubida;
-    }
-
-    if (videoFile) {
-      const urlSubida = await subirArchivoStorage(videoFile, 'videos');
-      if (urlSubida) finalVideoUrl = urlSubida;
-    }
-
-    const nuevoProducto = {
-      title: formData.get('title'),
-      category: formData.get('category'),
-      type: formData.get('type') || 'detal',
-      store: formData.get('type') || formData.get('category'),
-      price: parseFloat(formData.get('price')) || 0,
-      description: formData.get('description'),
-      image_url: finalImageUrl,
-      video_url: finalVideoUrl,
-      affiliate_link: formData.get('affiliate_link'),
-      created_at: new Date().toISOString()
-    };
-
-    // A) Insertar en Supabase si está disponible
-    try {
-      if (supabaseClient) {
-        const { data, error } = await supabaseClient.from('products').insert([nuevoProducto]).select();
-        if (error) throw error;
-        if (data && data[0]) nuevoProducto.id = data[0].id;
-      } else {
-        nuevoProducto.id = Date.now();
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (pwaInstallBanner) {
+        pwaInstallBanner.classList.remove('hidden');
       }
-    } catch (err) {
-      console.warn('Error al guardar en Supabase, agregando localmente:', err);
-      nuevoProducto.id = Date.now();
+    });
+
+    if (installPwaBtn) {
+      installPwaBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`Respuesta de instalación PWA: ${outcome}`);
+        deferredPrompt = null;
+        if (pwaInstallBanner) pwaInstallBanner.classList.add('hidden');
+      });
     }
 
-    // B) Actualizar Arreglo en Memoria y Volver a Renderizar
-    if (window.allProducts) {
-      window.allProducts.unshift(nuevoProducto);
-      renderProducts(window.allProducts);
+    if (closePwaBannerBtn) {
+      closePwaBannerBtn.addEventListener('click', () => {
+        if (pwaInstallBanner) pwaInstallBanner.classList.add('hidden');
+      });
     }
 
-    // C) Restablecer Formulario y Cerrar Modal
-    document.getElementById('publish-modal')?.classList.add('hidden');
-    publishForm.reset();
-    
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = '🚀 Publicar Ahora Gratis';
-    }
+    window.addEventListener('appinstalled', () => {
+      console.log('🎉 ¡CrediOfertas PWA se instaló correctamente!');
+      if (pwaInstallBanner) pwaInstallBanner.classList.add('hidden');
+    });
 
-    alert('🚀 ¡Publicación creada e integrada con éxito!');
-  });
-}
+    // ==========================================
+    // PWA 3. DETECCIÓN DE CONEXIÓN (OFFLINE/ONLINE)
+    // ==========================================
+    const offlineBanner = document.getElementById('offline-banner');
 
-// ==========================================
-// 6. INICIO DE SESIÓN Y REGISTRO (SUPABASE AUTH)
-// ==========================================
-const loginForm = document.getElementById('login-form');
-
-if (loginForm) {
-  loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-password').value;
-    const isSignUp = loginForm.dataset.mode === 'signup';
-
-    if (!supabaseClient) {
-      alert('⚠️ Supabase no está configurado. Revisa las llaves SUPABASE_URL y SUPABASE_ANON_KEY.');
-      return;
-    }
-
-    try {
-      let result;
-      if (isSignUp) {
-        result = await supabaseClient.auth.signUp({ email, password });
+    function updateOnlineStatus() {
+      if (!navigator.onLine) {
+        if (offlineBanner) {
+          offlineBanner.textContent = '📡 Estás en modo sin conexión (Offline). Mostrando datos guardados en caché.';
+          offlineBanner.classList.add('visible');
+        }
       } else {
-        result = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (offlineBanner) {
+          offlineBanner.classList.remove('visible');
+        }
       }
-
-      if (result.error) throw result.error;
-
-      alert(isSignUp ? '📩 Registro exitoso. Revisa tu correo para confirmar la cuenta.' : '✅ Sesión iniciada correctamente.');
-      document.getElementById('auth-modal')?.classList.add('hidden');
-      loginForm.reset();
-    } catch (err) {
-      alert(`❌ Error de autenticación: ${err.message}`);
     }
-  });
-}
 
-// ==========================================
-// 7. REGISTRO Y VERIFICACIÓN DE EMPRESA (RIF)
-// ==========================================
-const kycForm = document.getElementById('kyc-form');
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
 
-if (kycForm) {
-  kycForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(kycForm);
-    
-    const kycData = {
-      company_name: formData.get('company_name'),
-      rif: formData.get('rif'),
-      email: formData.get('email'),
-      phone: formData.get('phone'),
-      created_at: new Date().toISOString()
-    };
-
-    if (supabaseClient) {
+    // ==========================================
+    // 1. AUTENTICACIÓN Y CONTROL DE SESIÓN
+    // ==========================================
+    async function checkUserSession() {
+      if (!supabase) return;
       try {
-        const { error } = await supabaseClient.from('companies').insert([kycData]);
-        if (error) throw error;
-      } catch (err) {
-        console.warn('Error al registrar empresa en Supabase:', err);
+        const { data: { session } } = await supabase.auth.getSession();
+        currentUser = session ? session.user : null;
+        updateAuthUI();
+      } catch (e) {
+        console.warn('⚠️ No se pudo obtener la sesión:', e.message);
       }
     }
 
-    alert('🏢 Registro de Empresa / RIF enviado correctamente para verificación.');
-    document.getElementById('kyc-modal')?.classList.add('hidden');
-    kycForm.reset();
+    function updateAuthUI() {
+      if (openAuthBtn) {
+        if (currentUser) {
+          openAuthBtn.textContent = '👤 Mi Cuenta';
+          openAuthBtn.classList.add('logged-in');
+        } else {
+          openAuthBtn.textContent = '🔑 Iniciar Sesión / Registro';
+          openAuthBtn.classList.remove('logged-in');
+        }
+      }
+    }
+
+    if (supabase) {
+      supabase.auth.onAuthStateChange((_event, session) => {
+        currentUser = session ? session.user : null;
+        updateAuthUI();
+      });
+
+      await checkUserSession();
+    }
+
+    if (loginForm && supabase) {
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = loginForm.email.value;
+        const password = loginForm.password.value;
+        const isSignUp = loginForm.dataset.mode === 'signup';
+
+        if (isSignUp) {
+          const { error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { full_name: loginForm.full_name?.value || '' } }
+          });
+          if (error) alert('⚠️ Error al registrarse: ' + error.message);
+          else alert('🎉 Registro exitoso. ¡Bienvenido a CrediOfertas!');
+        } else {
+          const { error } = await supabase.auth.signInWithPassword({ email, password });
+          if (error) alert('⚠️ Error al iniciar sesión: ' + error.message);
+          else alert('✅ Sesión iniciada correctamente');
+        }
+        cerrarModal(authModal);
+      });
+    }
+
+    // ==========================================
+    // 2. MANEJO Y CONTROL DE MODALES
+    // ==========================================
+    const abrirModal = (modal) => modal?.classList.remove('hidden');
+    const cerrarModal = (modal) => modal?.classList.add('hidden');
+
+    if (openAuthBtn) openAuthBtn.addEventListener('click', () => abrirModal(authModal));
+    if (closeModalBtn) closeModalBtn.addEventListener('click', () => cerrarModal(authModal));
+
+    if (openPublishBtn) {
+      openPublishBtn.addEventListener('click', () => {
+        if (!currentUser && supabase) {
+          alert('Debes iniciar sesión para publicar un producto o servicio.');
+          abrirModal(authModal);
+          return;
+        }
+        abrirModal(publishModal);
+      });
+    }
+    if (closePublishModalBtn) closePublishModalBtn.addEventListener('click', () => cerrarModal(publishModal));
+
+    document.querySelectorAll('[data-modal]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-modal');
+        const targetModal = document.getElementById(targetId);
+        if (targetModal) abrirModal(targetModal);
+      });
+    });
+
+    document.querySelectorAll('.close-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        cerrarModal(authModal);
+        cerrarModal(publishModal);
+      });
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === authModal) cerrarModal(authModal);
+      if (e.target === publishModal) cerrarModal(publishModal);
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        cerrarModal(authModal);
+        cerrarModal(publishModal);
+      }
+    });
+
+    // ==========================================
+    // 3. CARGAR PUBLICACIONES (SUPABASE + LOCAL)
+    // ==========================================
+    async function loadProductsFromSupabase() {
+      let supabaseProducts = [];
+      let localProducts = [];
+
+      if (supabase) {
+        try {
+          const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('is_active', true)
+            .order('created_at', { ascending: false });
+
+          if (error) throw error;
+          supabaseProducts = data || [];
+        } catch (error) {
+          console.warn('Conexión remota con Supabase omitida o con error:', error.message);
+        }
+      }
+
+      try {
+        const res = await fetch('./products.json');
+        if (res.ok) {
+          localProducts = await res.json();
+        }
+      } catch (e) {
+        console.warn('Archivo local products.json no encontrado.');
+      }
+
+      allProducts = [...supabaseProducts, ...localProducts];
+
+      if (allProducts.length === 0 && productsContainer) {
+        productsContainer.innerHTML =
+          '<p class="error" style="grid-column: 1/-1; text-align: center; color: #64748b; font-weight: bold; padding: 2rem;">No hay publicaciones disponibles en este momento.</p>';
+        return;
+      }
+
+      renderProducts(allProducts);
+    }
+
+    // ==========================================
+    // 4. HELPER: MOSTRAR VIDEO O IMAGEN
+    // ==========================================
+    function renderMediaElement(videoUrl, imageUrl, safeTitle) {
+      if (videoUrl && videoUrl.trim() !== '') {
+        const videoTrimmed = videoUrl.trim();
+        
+        if (videoTrimmed.includes('youtube.com') || videoTrimmed.includes('youtu.be')) {
+          let embedUrl = videoTrimmed;
+          if (videoTrimmed.includes('watch?v=')) {
+            embedUrl = videoTrimmed.replace('watch?v=', 'embed/');
+          } else if (videoTrimmed.includes('youtu.be/')) {
+            embedUrl = videoTrimmed.replace('youtu.be/', 'www.youtube.com/embed/');
+          }
+          return `
+            <div class="video-container">
+              <iframe src="${embedUrl}" allowfullscreen loading="lazy" title="${safeTitle}"></iframe>
+            </div>
+          `;
+        }
+
+        return `
+          <video controls playsinline preload="metadata" poster="${imageUrl}" style="width: 100%; max-height: 230px; object-fit: cover; border-radius: 8px 8px 0 0;">
+            <source src="${videoTrimmed}" type="video/mp4">
+            Tu navegador no soporta reproducción de video.
+          </video>
+        `;
+      }
+
+      return `
+        <img src="${imageUrl}" alt="${safeTitle}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80'" style="width: 100%; height: 200px; object-fit: cover;">
+      `;
+    }
+
+    // ==========================================
+    // 5. RENDERIZAR TARJETAS EN EL DOM
+    // ==========================================
+    function renderProducts(products) {
+      if (!productsContainer) return;
+      productsContainer.innerHTML = '';
+
+      if (products.length === 0) {
+        productsContainer.innerHTML =
+          '<p style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #64748b;">No se encontraron publicaciones disponibles para este filtro.</p>';
+        return;
+      }
+
+      products.forEach((product) => {
+        const card = document.createElement('article');
+        card.className = 'product-card';
+        
+        const productType = (product.type || 'detal').toLowerCase();
+        const storeLower = (product.store || '').toLowerCase();
+        const categoryLower = (product.category || '').toLowerCase();
+        const storeClass = (product.type || product.category || 'generico').toLowerCase().replace(/\s+/g, '');
+
+        const discountBadge = product.discount
+          ? `<span class="discount-badge">${product.discount}</span>`
+          : '';
+
+        let planBadge = '';
+        if (product.plan === 'global') {
+          planBadge = `<span class="plan-badge global">🌍 Global</span>`;
+        } else if (product.plan === 'nacional') {
+          planBadge = `<span class="plan-badge nacional">🇻🇪 Nacional</span>`;
+        } else if (product.region) {
+          planBadge = `<span class="plan-badge local">📍 ${product.region}</span>`;
+        }
+
+        const formattedPrice =
+          typeof product.price === 'number'
+            ? product.price.toFixed(2)
+            : parseFloat(product.price || 0).toFixed(2);
+
+        const rawUrl = product.affiliateUrl || product.affiliate_link || product.url || product.link || '';
+        const safeTitle = (product.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        const targetUrl = normalizarUrlContacto(rawUrl, product.title);
+
+        const esAfiliado = ['amazon', 'shein', 'aliexpress', 'alibaba'].includes(storeLower) || 
+                           ['amazon', 'shein', 'aliexpress', 'alibaba'].includes(categoryLower);
+
+        let btnText = '🛒 Comprar al Detal';
+        let btnClass = 'whatsapp-btn';
+
+        if (esAfiliado) {
+          btnText = `🛒 Ver oferta en ${product.store || product.category || 'Tienda'}`;
+          btnClass = 'affiliate-btn';
+        } else if (productType === 'servicio' || categoryLower.includes('servicio')) {
+          btnText = '🛠️ Contratar Servicio';
+          btnClass = 'service-btn';
+        } else if (productType === 'mayorista' || categoryLower.includes('mayor')) {
+          btnText = '📦 Contactar Mayorista';
+          btnClass = 'mayor-btn';
+        }
+
+        const imageUrl = product.image_url || product.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80';
+        const videoUrl = product.video_url || product.video || '';
+
+        const mediaHtml = renderMediaElement(videoUrl, imageUrl, safeTitle);
+
+        card.innerHTML = `
+          <div class="card-image">
+            ${mediaHtml}
+            <span class="store-badge ${storeClass}">${product.type ? product.type.toUpperCase() : (product.category || 'DETAL')}</span>
+            ${discountBadge}
+          </div>
+          <div class="card-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span class="category">${product.category || 'General'} ${product.rif ? `| RIF: ${product.rif}` : ''}</span>
+              ${planBadge}
+            </div>
+            
+            <h3 class="title">${product.title}</h3>
+            
+            <p class="description">
+              ${product.description || ''}
+            </p>
+
+            <div class="price-rating">
+              <span class="price">$${formattedPrice} ${product.currency || 'USD'}</span>
+              <span class="rating">⭐ ${product.rating || '5.0'}</span>
+            </div>
+
+            <div class="card-actions-viral">
+              <a href="${targetUrl}" target="_blank" rel="nofollow noopener sponsored" class="btn-action ${btnClass}">
+                ${btnText}
+              </a>
+              
+              <button 
+                type="button"
+                class="share-btn"
+                onclick="window.compartirRedSocial && window.compartirRedSocial('whatsapp', '${safeTitle}', '${targetUrl}')" 
+                title="Compartir en WhatsApp"
+              >💬</button>
+
+              <button 
+                type="button"
+                class="share-btn"
+                style="background-color: #64748b;"
+                onclick="window.compartirRedSocial && window.compartirRedSocial('native', '${safeTitle}', '${targetUrl}')" 
+                title="Copiar enlace o Compartir"
+              >📲</button>
+            </div>
+          </div>
+        `;
+        productsContainer.appendChild(card);
+      });
+    }
+
+    // ==========================================
+    // 6. REGISTRO DE EMPRESA (FORMULARIO KYC/RIF)
+    // ==========================================
+    if (kycForm && supabase) {
+      kycForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const submitBtn = kycForm.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
+
+        const formData = new FormData(kycForm);
+        const companyData = {
+          user_id: currentUser ? currentUser.id : null,
+          company_name: formData.get('company_name'),
+          rif: formData.get('rif'),
+          email: formData.get('email'),
+          phone: formData.get('phone')
+        };
+
+        const { error } = await supabase.from('companies').insert([companyData]);
+
+        if (error) {
+          alert('⚠️ Error al registrar la empresa: ' + error.message);
+        } else {
+          alert('🎉 ¡Empresa registrada con éxito en CrediOfertas!');
+          cerrarModal(authModal);
+          kycForm.reset();
+        }
+
+        if (submitBtn) submitBtn.disabled = false;
+      });
+    }
+
+    // ==========================================
+    // 7. PUBLICAR OFERTA CON SUBIDA DE ARCHIVOS (STORAGE 'media')
+    // ==========================================
+    if (publishForm && supabase) {
+      publishForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!currentUser) {
+          alert('Debes iniciar sesión para publicar.');
+          return;
+        }
+
+        const submitBtn = publishForm.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
+
+        const formData = new FormData(publishForm);
+        let imageUrl = formData.get('image_url') || '';
+        let videoUrl = formData.get('video_url') || '';
+
+        const imageFile = formData.get('image_file');
+        const videoFile = formData.get('video_file');
+
+        try {
+          if (imageFile && imageFile.size > 0) {
+            const filePath = `images/${Date.now()}_${imageFile.name}`;
+            const { data, error } = await supabase.storage.from('media').upload(filePath, imageFile);
+            if (!error && data) {
+              const { data: publicUrlData } = supabase.storage.from('media').getPublicUrl(filePath);
+              imageUrl = publicUrlData.publicUrl;
+            }
+          }
+
+          if (videoFile && videoFile.size > 0) {
+            const filePath = `videos/${Date.now()}_${videoFile.name}`;
+            const { data, error } = await supabase.storage.from('media').upload(filePath, videoFile);
+            if (!error && data) {
+              const { data: publicUrlData } = supabase.storage.from('media').getPublicUrl(filePath);
+              videoUrl = publicUrlData.publicUrl;
+            }
+          }
+        } catch (err) {
+          console.warn('⚠️ Ocurrió una advertencia en la carga de archivos a Storage:', err.message);
+        }
+
+        const newProduct = {
+          user_id: currentUser.id,
+          title: formData.get('title'),
+          category: formData.get('category'),
+          type: formData.get('type') || 'detal',
+          price: parseFloat(formData.get('price') || 0),
+          description: formData.get('description'),
+          image_url: imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80',
+          video_url: videoUrl || null,
+          affiliate_link: formData.get('affiliate_link'),
+          accept_policy: true
+        };
+
+        const { error } = await supabase.from('products').insert([newProduct]);
+
+        if (error) {
+          alert('⚠️ Error al publicar: ' + error.message);
+        } else {
+          alert('🚀 ¡Publicación creada exitosamente!');
+          cerrarModal(publishModal);
+          publishForm.reset();
+          loadProductsFromSupabase();
+        }
+
+        if (submitBtn) submitBtn.disabled = false;
+      });
+    }
+
+    // ==========================================
+    // 8. FILTRADO Y BÚSQUEDA EN TIEMPO REAL
+    // ==========================================
+    function filterProducts() {
+      const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+      const activeStoreBtn = document.querySelector('.store-filter.active');
+      
+      const rawFilter = activeStoreBtn 
+        ? (activeStoreBtn.dataset.filter || activeStoreBtn.dataset.store || 'all')
+        : 'all';
+
+      const selectedFilter = rawFilter.toLowerCase().trim();
+
+      const filtered = allProducts.filter((product) => {
+        const title = (product.title || '').toLowerCase();
+        const category = (product.category || '').toLowerCase();
+        const store = (product.store || '').toLowerCase();
+        const type = (product.type || '').toLowerCase();
+        const description = (product.description || '').toLowerCase();
+
+        const matchesSearch =
+          !searchTerm ||
+          title.includes(searchTerm) ||
+          category.includes(searchTerm) ||
+          store.includes(searchTerm) ||
+          description.includes(searchTerm);
+
+        let matchesStore = false;
+        if (selectedFilter === 'all') {
+          matchesStore = true;
+        } else {
+          matchesStore =
+            category.includes(selectedFilter) ||
+            store.includes(selectedFilter) ||
+            type.includes(selectedFilter) ||
+            description.includes(selectedFilter);
+        }
+
+        return matchesSearch && matchesStore;
+      });
+
+      renderProducts(filtered);
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', filterProducts);
+    }
+
+    storeButtons.forEach((button) => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        storeButtons.forEach((btn) => btn.classList.remove('active'));
+        button.classList.add('active');
+        filterProducts();
+      });
+    });
+
+    // ==========================================
+    // 9. ACTUALIZACIONES EN TIEMPO REAL (REALTIME)
+    // ==========================================
+    if (supabase) {
+      supabase
+        .channel('public:products')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'products' }, (payload) => {
+          console.log('⚡ Nueva oferta detectada en tiempo real:', payload.new);
+          allProducts.unshift(payload.new);
+          renderProducts(allProducts);
+        })
+        .subscribe();
+    }
+
+    // Inicializar carga de publicaciones
+    loadProductsFromSupabase();
   });
 }
-
-// ==========================================
-// 8. BÚSQUEDA Y FILTRADO
-// ==========================================
-function filtrarProductos() {
-  const searchTerm = (document.getElementById('search-bar')?.value || '').toLowerCase().trim();
-  const activeFilterBtn = document.querySelector('.store-filter.active');
-  const storeFilter = activeFilterBtn ? activeFilterBtn.dataset.filter : 'all';
-
-  const filtrados = window.allProducts.filter(item => {
-    const titleMatch = (item.title || '').toLowerCase().includes(searchTerm);
-    const descMatch = (item.description || '').toLowerCase().includes(searchTerm);
-    const categoryMatch = (item.category || '').toLowerCase().includes(searchTerm);
-    const matchesSearch = titleMatch || descMatch || categoryMatch;
-
-    if (!matchesSearch) return false;
-    if (storeFilter === 'all') return true;
-
-    const itemStore = (item.store || '').toLowerCase();
-    const itemCategory = (item.category || '').toLowerCase();
-    const itemType = (item.type || '').toLowerCase();
-
-    return itemStore === storeFilter || itemCategory === storeFilter || itemType === storeFilter;
-  });
-
-  renderProducts(filtrados);
-}
-
-// Evento Búsqueda
-document.getElementById('search-bar')?.addEventListener('input', filtrarProductos);
-
-// Eventos Botones de Filtro
-document.querySelectorAll('.store-filter').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.store-filter').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    filtrados();
-  });
-});
-
-// ==========================================
-// 9. CONTROL DE MODALES
-// ==========================================
-document.querySelectorAll('[data-modal]').forEach(trigger => {
-  trigger.addEventListener('click', () => {
-    const modalId = trigger.getAttribute('data-modal');
-    document.getElementById(modalId)?.classList.remove('hidden');
-  });
-});
-
-document.querySelectorAll('.modal-overlay .close-btn').forEach(closeBtn => {
-  closeBtn.addEventListener('click', () => {
-    closeBtn.closest('.modal-overlay')?.classList.add('hidden');
-  });
-});
-
-window.addEventListener('click', (e) => {
-  if (e.target.classList.contains('modal-overlay')) {
-    e.target.classList.add('hidden');
-  }
-});
-
-// ==========================================
-// 10. INICIALIZACIÓN
-// ==========================================
-document.addEventListener('DOMContentLoaded', () => {
-  cargarProductos();
-});
