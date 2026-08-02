@@ -7,16 +7,13 @@
     "price": 29.99,
     "currency": "USD",
     "rating": 4.8,
-    "discount": "-30%",
+    "discount": 30,
     "store": "Amazon",
     "plan": "global",
     "region": "Internacional",
-    "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80",
-    "image_url": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80",
-    "video_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    "affiliateUrl": "https://amazon.com",
-    "affiliate_link": "https://amazon.com"
+    "imageUrl": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop&q=80",
+    "videoUrl": "https://www.youtube.com/embed/2-i_nK_aGv8",
+    "affiliateUrl": "https://amazon.com"
   },
   {
     "id": 2,
@@ -26,16 +23,13 @@
     "price": 18.50,
     "currency": "USD",
     "rating": 4.5,
-    "discount": "-15%",
+    "discount": 15,
     "store": "Shein",
     "plan": "global",
     "region": "Internacional",
-    "image": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=500&q=80",
-    "image_url": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=500&q=80",
-    "video_url": "",
-    "videoUrl": "",
-    "affiliateUrl": "https://shein.com",
-    "affiliate_link": "https://shein.com"
+    "imageUrl": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=500&auto=format&fit=crop&q=80",
+    "videoUrl": null,
+    "affiliateUrl": "https://shein.com"
   },
   {
     "id": 3,
@@ -45,16 +39,13 @@
     "price": 12.99,
     "currency": "USD",
     "rating": 4.3,
-    "discount": "-50%",
+    "discount": 50,
     "store": "AliExpress",
     "plan": "global",
     "region": "Internacional",
-    "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80",
-    "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80",
-    "video_url": "https://assets.mixkit.co/videos/preview/mixkit-smartwatch-close-up-42805-large.mp4",
+    "imageUrl": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=80",
     "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-smartwatch-close-up-42805-large.mp4",
-    "affiliateUrl": "https://aliexpress.com",
-    "affiliate_link": "https://aliexpress.com"
+    "affiliateUrl": "https://aliexpress.com"
   },
   {
     "id": 4,
@@ -64,16 +55,13 @@
     "price": 45.00,
     "currency": "USD",
     "rating": 4.9,
-    "discount": "-20%",
+    "discount": 20,
     "store": "Alibaba",
     "plan": "global",
     "region": "Internacional",
-    "image": "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=500&q=80",
-    "image_url": "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=500&q=80",
-    "video_url": "",
-    "videoUrl": "",
-    "affiliateUrl": "https://alibaba.com",
-    "affiliate_link": "https://alibaba.com"
+    "imageUrl": "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=500&auto=format&fit=crop&q=80",
+    "videoUrl": null,
+    "affiliateUrl": "https://alibaba.com"
   },
   {
     "id": 5,
@@ -83,16 +71,13 @@
     "price": 35.00,
     "currency": "USD",
     "rating": 4.7,
-    "discount": "-10%",
+    "discount": 10,
     "store": "Detal",
     "plan": "nacional",
     "region": "Caracas",
-    "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80",
-    "image_url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80",
-    "video_url": "",
-    "videoUrl": "",
-    "affiliateUrl": "https://wa.me/1234567890",
-    "affiliate_link": "https://wa.me/1234567890"
+    "imageUrl": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop&q=80",
+    "videoUrl": null,
+    "affiliateUrl": "https://wa.me/1234567890"
   },
   {
     "id": 6,
@@ -102,15 +87,12 @@
     "price": 25.00,
     "currency": "USD",
     "rating": 5.0,
-    "discount": "",
+    "discount": 0,
     "store": "Servicios",
     "plan": "local",
     "region": "Valencia",
-    "image": "https://images.unsplash.com/photo-1588702547919-26089e690ecc?w=500&q=80",
-    "image_url": "https://images.unsplash.com/photo-1588702547919-26089e690ecc?w=500&q=80",
-    "video_url": "",
-    "videoUrl": "",
-    "affiliateUrl": "https://wa.me/1234567890",
-    "affiliate_link": "https://wa.me/1234567890"
+    "imageUrl": "https://images.unsplash.com/photo-1588702547919-26089e690ecc?w=500&auto=format&fit=crop&q=80",
+    "videoUrl": null,
+    "affiliateUrl": "https://wa.me/1234567890"
   }
 ]
