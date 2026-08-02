@@ -3,8 +3,8 @@
   "id": "/?utm_source=pwa",
   "name": "CrediOfertas Marketplace Multivendedor",
   "short_name": "CrediOfertas",
-  "start_url": "./index.html?utm_source=pwa",
-  "scope": "./",
+  "start_url": "/?utm_source=pwa",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0f172a",
@@ -21,10 +21,16 @@
   ],
   "icons": [
     {
-      "src": "./logo.png",
+      "src": "/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "shortcuts": [
@@ -32,10 +38,10 @@
       "name": "Publicar Oferta / Servicio",
       "short_name": "Publicar",
       "description": "Publica productos al mayor, detal o anuncia tus servicios",
-      "url": "./index.html?action=publish",
+      "url": "/?action=publish",
       "icons": [
         { 
-          "src": "./logo.png", 
+          "src": "/logo.png", 
           "sizes": "512x512",
           "type": "image/png"
         }
@@ -45,10 +51,10 @@
       "name": "Servicios & Profesionales",
       "short_name": "Servicios",
       "description": "Explora contrataciones de servicios profesionales",
-      "url": "./index.html?store=Servicios",
+      "url": "/?store=Servicios",
       "icons": [
         { 
-          "src": "./logo.png", 
+          "src": "/logo.png", 
           "sizes": "512x512",
           "type": "image/png"
         }
@@ -58,10 +64,10 @@
       "name": "Registro de Empresa / RIF",
       "short_name": "Empresas",
       "description": "Verifica tu cuenta comercial o RIF",
-      "url": "./index.html?action=kyc",
+      "url": "/?action=kyc",
       "icons": [
         { 
-          "src": "./logo.png", 
+          "src": "/logo.png", 
           "sizes": "512x512",
           "type": "image/png"
         }
