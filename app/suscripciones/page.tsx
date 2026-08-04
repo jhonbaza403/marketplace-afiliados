@@ -13,6 +13,7 @@ export default function SubscriptionsPage() {
       ],
       cta: 'Plan Actual',
       highlighted: false,
+      paypalUrl: null,
     },
     {
       name: 'Plan Premium',
@@ -26,8 +27,10 @@ export default function SubscriptionsPage() {
         'Prioridad en el buscador',
         'Soporte prioritario'
       ],
-      cta: 'Elegir Premium',
+      cta: 'Elegir Premium ($19/mes)',
       highlighted: true,
+      // Enlace de pago directo a PayPal (se puede usar un enlace "me" de PayPal o botón de compra)
+      paypalUrl: 'https://www.paypal.com/ncp/payment?hosted_button_id=TU_BUTTON_ID_PREMIUM', 
     },
     {
       name: 'Plan Empresa',
@@ -41,8 +44,9 @@ export default function SubscriptionsPage() {
         'Acceso a herramientas de analítica avanzada',
         'Gerente de cuenta dedicado'
       ],
-      cta: 'Elegir Empresa',
+      cta: 'Elegir Empresa ($49/mes)',
       highlighted: false,
+      paypalUrl: 'https://www.paypal.com/ncp/payment?hosted_button_id=TU_BUTTON_ID_EMPRESA',
     },
   ]
 
@@ -57,7 +61,7 @@ export default function SubscriptionsPage() {
             💎 Planes y Suscripciones Credi Marketplace
           </h1>
           <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
-            Elige el plan que mejor se adapte a tu crecimiento comercial y reduce tus comisiones por transacción.
+            Elige el plan que mejor se adapte a tu crecimiento comercial y reduce tus comisiones por transacción. Los pagos se procesan de forma segura a través de PayPal (<span className="font-semibold text-indigo-600">bazwjhon@gmail.com</span>).
           </p>
         </header>
 
@@ -95,13 +99,27 @@ export default function SubscriptionsPage() {
                 </ul>
               </div>
 
-              <button className={`w-full py-3 rounded-xl font-semibold text-sm transition-colors ${
-                plan.highlighted 
-                  ? 'bg-indigo-600 hover:bg-indigo-700 text-white' 
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
-              }`}>
-                {plan.cta}
-              </button>
+              {plan.paypalUrl ? (
+                <a
+                  href={plan.paypalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`w-full py-3 rounded-xl font-semibold text-sm text-center transition-colors block ${
+                    plan.highlighted 
+                      ? 'bg-indigo-600 hover:bg-indigo-700 text-white' 
+                      : 'bg-gray-900 hover:bg-gray-800 text-white'
+                  }`}
+                >
+                  {plan.cta} 💳
+                </a>
+              ) : (
+                <button 
+                  disabled
+                  className="w-full py-3 rounded-xl font-semibold text-sm bg-gray-100 text-gray-400 cursor-not-allowed"
+                >
+                  {plan.cta}
+                </button>
+              )}
             </div>
           ))}
         </div>
