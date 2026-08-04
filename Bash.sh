@@ -1,1 +1,1 @@
-npm i @vercel/speed-insights
+git clone https://github.com/tu-usuario/credi-marketplace.git
