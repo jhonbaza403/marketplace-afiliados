@@ -1,1 +1,1 @@
-npx create-next-app@latest tienda-ofertas-marketplace
+cd tienda-ofertas-marketplace
