@@ -6,7 +6,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 async function getServices() {
   const { data, error } = await supabase
-    .from('products') // O una tabla específica 'services' si prefieres separarla
+    .from('products')
     .select('*')
     .eq('type', 'servicio')
     .order('created_at', { ascending: false })
@@ -63,18 +63,33 @@ export default async function ServicesPage() {
                   <p className="text-gray-600 text-sm mt-2 line-clamp-3">{service.description}</p>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
+                <div className="mt-6 pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
                   <span className="text-xs text-gray-500">Atención Directa</span>
-                  {service.seller_whatsapp && (
-                    <a 
-                      href={`https://wa.me/${service.seller_whatsapp}?text=Hola,%20estoy%20interesado%20en%20contratar%20tu%20servicio:%20${encodeURIComponent(service.title)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
-                    >
-                      Contactar Experto
-                    </a>
-                  )}
+                  
+                  <div className="flex items-center gap-2">
+                    {/* Botón de enlace de afiliado o redes sociales opcional */}
+                    {service.affiliate_link && (
+                      <a 
+                        href={service.affiliate_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-2 rounded-lg transition-colors"
+                      >
+                        🌐 Enlace / Red Social
+                      </a>
+                    )}
+
+                    {service.seller_whatsapp && (
+                      <a 
+                        href={`https://wa.me/${service.seller_whatsapp}?text=Hola,%20estoy%20interesado%20en%20contratar%20tu%20servicio:%20${encodeURIComponent(service.title)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+                      >
+                        Contactar Experto
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
