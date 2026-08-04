@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'formdata-event'
+import { useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -20,10 +20,11 @@ export default function PublicarPage() {
     const title = formData.get('title') as string
     const category = formData.get('category') as string
     const type = formData.get('type') as string
-    const price = parseFloat(formData.get('price') as string)
+    const price = parseFloat(formData.get('price') as string) || 0
     const description = formData.get('description') as string
     const image_url = formData.get('image_url') as string
     const seller_whatsapp = formData.get('seller_whatsapp') as string
+    const affiliate_link = formData.get('affiliate_link') as string
 
     const { error } = await supabase.from('products').insert([
       {
@@ -34,6 +35,7 @@ export default function PublicarPage() {
         description,
         image_url,
         seller_whatsapp,
+        affiliate_link,
       },
     ])
 
@@ -42,7 +44,7 @@ export default function PublicarPage() {
     if (error) {
       setMensaje(`Error al publicar: ${error.message}`)
     } else {
-      setMensaje('¡Producto publicado con éxito en el Marketplace!')
+      setMensaje('¡Producto o enlace de afiliado publicado con éxito en el Marketplace!')
       e.currentTarget.reset()
     }
   }
@@ -50,8 +52,8 @@ export default function PublicarPage() {
   return (
     <main className="min-h-screen bg-gray-50 p-6 md:p-12">
       <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
-        <h1 className="text-2xl font-extrabold text-gray-900 mb-2">📢 Publicar Nueva Oferta</h1>
-        <p className="text-gray-600 text-sm mb-6">Completa los datos para agregar tu producto al catálogo global.</p>
+        <h1 className="text-2xl font-extrabold text-gray-900 mb-2">📢 Publicar Nueva Oferta o Afiliación</h1>
+        <p className="text-gray-600 text-sm mb-6">Comparte tus productos, servicios o enlaces de redes sociales y marketing.</p>
 
         {mensaje && (
           <div className={`p-4 mb-6 rounded-lg text-sm ${mensaje.includes('éxito') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
@@ -62,13 +64,13 @@ export default function PublicarPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Título del Producto u Oferta</label>
-            <input name="title" required type="text" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ej. Zapatillas Deportivas Importadas" />
+            <input name="title" required type="text" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ej. Zapatillas o Curso de Afiliados" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
-              <input name="category" required type="text" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ej. Calzado, Tecnología" />
+              <input name="category" required type="text" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ej. Calzado, Tecnología, Redes" />
             </div>
 
             <div>
@@ -77,7 +79,7 @@ export default function PublicarPage() {
                 <option value="detal">Detal</option>
                 <option value="mayor">Al Mayor</option>
                 <option value="servicio">Servicio</option>
-                <option value="afiliado">Afiliado</option>
+                <option value="afiliado">Afiliado / Enlace Externo</option>
               </select>
             </div>
           </div>
@@ -85,13 +87,19 @@ export default function PublicarPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Precio ($)</label>
-              <input name="price" required type="number" step="0.01" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="0.00" />
+              <input name="price" type="number" step="0.01" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="0.00" />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp de Contacto</label>
-              <input name="seller_whatsapp" required type="text" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ej. 584121234567" />
+              <input name="seller_whatsapp" type="text" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ej. 584121234567" />
             </div>
+          </div>
+
+          {/* Enlace de Afiliado para redes sociales / Amazon / Telegram */}
+          <div>
+            <label className="block text-sm font-medium text-emerald-700 mb-1">🔗 Enlace de Afiliado / Red Social (Facebook, Telegram, X, etc.)</label>
+            <input name="affiliate_link" type="url" className="w-full px-4 py-2 border border-emerald-300 bg-emerald-50/30 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="https://t.me/tu_canal o https://tu-enlace.com" />
           </div>
 
           <div>
@@ -101,15 +109,15 @@ export default function PublicarPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-            <textarea name="description" rows={3} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Detalles de la oferta..." />
+            <textarea name="description" rows={3} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Detalles de la oferta o campaña..." />
           </div>
 
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50"
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 shadow-sm"
           >
-            {loading ? 'Publicando...' : 'Publicar Oferta'}
+            {loading ? 'Publicando...' : 'Publicar Oferta 🚀'}
           </button>
         </form>
       </div>
