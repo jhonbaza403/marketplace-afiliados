@@ -1,1 +1,1 @@
-npm install @supabase/supabase-js @supabase/ssr
+npx create-next-app@latest tienda-ofertas-marketplace
