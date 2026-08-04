@@ -20,6 +20,7 @@ export default async function AdminPublishPage() {
     const image_url = formData.get('image_url') as string
     const seller_whatsapp = formData.get('seller_whatsapp') as string
     const affiliate_link = formData.get('affiliate_link') as string
+    const social_network = formData.get('social_network') as string
 
     const supabaseServer = await createClient()
     const { data: userData } = await supabaseServer.auth.getUser()
@@ -34,6 +35,7 @@ export default async function AdminPublishPage() {
         image_url,
         seller_whatsapp,
         affiliate_link,
+        // Puedes concatenar o guardar la red social dentro de la descripción o en una columna específica si la creas en Supabase
         user_id: userData.user?.id || null,
       },
     ])
@@ -98,7 +100,7 @@ export default async function AdminPublishPage() {
                 <option value="detal">Detal</option>
                 <option value="mayor">Al Mayor</option>
                 <option value="servicio">Servicio</option>
-                <option value="afiliado">Afiliado</option>
+                <option value="afiliado">Afiliado / Enlace externo</option>
                 <option value="empleo">Empleo</option>
               </select>
             </div>
@@ -120,7 +122,7 @@ export default async function AdminPublishPage() {
 
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-zinc-700 mb-1">
-                WhatsApp
+                WhatsApp de Contacto
               </label>
               <input
                 name="seller_whatsapp"
@@ -129,6 +131,32 @@ export default async function AdminPublishPage() {
                 className="w-full px-4 py-3 rounded-xl border border-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
+          </div>
+
+          {/* Campo esencial para marketing de afiliados estilo Amazon */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
+              🔗 Enlace de Afiliado / Producto (Amazon, Hotmart, etc.)
+            </label>
+            <input
+              name="affiliate_link"
+              type="url"
+              placeholder="https://tu-enlace-de-afiliado.com/..."
+              className="w-full px-4 py-3 rounded-xl border border-emerald-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-emerald-50/30"
+            />
+          </div>
+
+          {/* Redes sociales para difusión */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-zinc-700 mb-1">
+              📱 Red Social o Canal de Promoción (Telegram, Instagram, X, Facebook)
+            </label>
+            <input
+              name="social_network"
+              type="text"
+              placeholder="Ej. https://t.me/tu_canal o @tu_perfil"
+              className="w-full px-4 py-3 rounded-xl border border-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
           </div>
 
           <div>
@@ -150,7 +178,7 @@ export default async function AdminPublishPage() {
             <textarea
               name="description"
               rows={3}
-              placeholder="Detalles..."
+              placeholder="Detalles de la oferta..."
               className="w-full px-4 py-3 rounded-xl border border-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
