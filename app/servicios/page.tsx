@@ -1,100 +1,130 @@
+'use client'
+
+import { useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-async function getServices() {
-  const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .eq('type', 'servicio')
-    .order('created_at', { ascending: false })
+export default function PublicarPage() {
+  const [loading, setLoading] = useState(false)
+  const [mensaje, setMensaje] = useState('')
 
-  if (error) {
-    console.error('Error al cargar servicios:', error.message)
-    return []
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    setMensaje('')
+
+    const formData = new FormData(e.currentTarget)
+    const title = formData.get('title') as string
+    const category = formData.get('category') as string
+    const type = formData.get('type') as string
+    const price = parseFloat(formData.get('price') as string) || 0
+    const description = formData.get('description') as string
+    const image_url = formData.get('image_url') as string
+    const seller_whatsapp = formData.get('seller_whatsapp') as string
+    const affiliate_link = formData.get('affiliate_link') as string
+
+    // Obtenemos el usuario autenticado actual para asociar la publicación a su cuenta
+    const { data: { user } } = await supabase.auth.getUser()
+
+    const { error } = await supabase.from('products').insert([
+      {
+        title,
+        category,
+        type,
+        price,
+        description,
+        image_url,
+        seller_whatsapp,
+        affiliate_link,
+        user_id: user?.id || null, // Asocia el producto al usuario si ha iniciado sesión
+      },
+    ])
+
+    setLoading(false)
+
+    if (error) {
+      setMensaje(`Error al publicar: ${error.message}`)
+    } else {
+      setMensaje('¡Producto o enlace de afiliado publicado con éxito en el Marketplace!')
+      e.currentTarget.reset()
+    }
   }
-
-  return data || []
-}
-
-export default async function ServicesPage() {
-  const services = await getServices()
 
   return (
     <main className="min-h-screen bg-gray-50 p-6 md:p-12">
-      <div className="max-w-7xl mx-auto">
-        <header className="mb-8 text-center">
-          <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
-            Directorio Profesional
-          </span>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight mt-2">
-            🛠️ Servicios Calificados & Expertos
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Conecta con profesionales especializados para tus proyectos y requerimientos.
-          </p>
-        </header>
+      <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+        <h1 className="text-2xl font-extrabold text-gray-900 mb-2">📢 Publicar Nueva Oferta o Afiliación</h1>
+        <p className="text-gray-600 text-sm mb-6">Comparte tus productos, servicios o enlaces de redes sociales y marketing.</p>
 
-        {services.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-xl shadow-sm border border-gray-100">
-            <p className="text-gray-500 text-lg">No hay servicios profesionales publicados todavía.</p>
-            <p className="text-sm text-gray-400 mt-1">Publica un servicio seleccionando el tipo "Servicio" desde el panel.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((service: any) => (
-              <div 
-                key={service.id} 
-                className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-between hover:shadow-md transition-shadow"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-1 rounded">
-                      {service.category || 'Servicio Profesional'}
-                    </span>
-                    <span className="text-lg font-bold text-gray-900">
-                      ${Number(service.price).toFixed(2)}
-                    </span>
-                  </div>
-
-                  <h2 className="text-xl font-bold text-gray-800">{service.title}</h2>
-                  <p className="text-gray-600 text-sm mt-2 line-clamp-3">{service.description}</p>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
-                  <span className="text-xs text-gray-500">Atención Directa</span>
-                  
-                  <div className="flex items-center gap-2">
-                    {/* Botón de enlace de afiliado o redes sociales opcional */}
-                    {service.affiliate_link && (
-                      <a 
-                        href={service.affiliate_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-2 rounded-lg transition-colors"
-                      >
-                        🌐 Enlace / Red Social
-                      </a>
-                    )}
-
-                    {service.seller_whatsapp && (
-                      <a 
-                        href={`https://wa.me/${service.seller_whatsapp}?text=Hola,%20estoy%20interesado%20en%20contratar%20tu%20servicio:%20${encodeURIComponent(service.title)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
-                      >
-                        Contactar Experto
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
+        {mensaje && (
+          <div className={`p-4 mb-6 rounded-lg text-sm ${mensaje.includes('éxito') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+            {mensaje}
           </div>
         )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Título del Producto u Oferta</label>
+            <input name="title" required type="text" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ej. Zapatillas o Curso de Afiliados" />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+              <input name="category" required type="text" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ej. Calzado, Tecnología, Redes" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Venta</label>
+              <select name="type" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
+                <option value="detal">Detal</option>
+                <option value="mayor">Al Mayor</option>
+                <option value="servicio">Servicio</option>
+                <option value="afiliado">Afiliado / Enlace Externo</option>
+                <option value="empleo">Empleo</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Precio ($)</label>
+              <input name="price" type="number" step="0.01" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="0.00" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp de Contacto</label>
+              <input name="seller_whatsapp" type="text" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ej. 584121234567" />
+            </div>
+          </div>
+
+          {/* Enlace de Afiliado para redes sociales / Amazon / Telegram */}
+          <div>
+            <label className="block text-sm font-medium text-emerald-700 mb-1">🔗 Enlace de Afiliado / Red Social (Facebook, Telegram, X, etc.)</label>
+            <input name="affiliate_link" type="url" className="w-full px-4 py-2 border border-emerald-300 bg-emerald-50/30 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="https://t.me/tu_canal o https://tu-enlace.com" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">URL de la Imagen</label>
+            <input name="image_url" type="url" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="https://..." />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+            <textarea name="description" rows={3} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Detalles de la oferta o campaña..." />
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 shadow-sm"
+          >
+            {loading ? 'Publicando...' : 'Publicar Oferta 🚀'}
+          </button>
+        </form>
       </div>
     </main>
   )
