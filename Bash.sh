@@ -1,2 +1,3 @@
-npm install prisma --save-dev
-npm install @prisma/client
+git add .
+git commit -m "Corregir rutas de importacion y tsconfig"
+git push origin main
