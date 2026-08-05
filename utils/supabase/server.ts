@@ -1,27 +1,38 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createClient } from '@/utils/supabase/server'
 
-export async function createClient() {
-  const cookieStore = await cookies()
+/**
+ * Servicio general para interactuar con las tablas del Marketplace
+ * utilizando el cliente de Supabase para el servidor.
+ */
+export async function obtenerPerfilUsuario(userId: string) {
+  const supabase = await createClient()
+  
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single()
 
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
-          } catch {
-            // El método setAll fue llamado desde un Server Component.
-          }
-        },
-      },
-    }
-  )
+  if (error) {
+    console.error('Error al obtener el perfil:', error.message)
+    return null
+  }
+
+  return data
+}
+
+export async function listarServiciosProfesionales() {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('servicios')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('Error al listar los servicios:', error.message)
+    return []
+  }
+
+  return data
 }
