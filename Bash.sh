@@ -29,10 +29,13 @@ rm -f package-lock.json yarn.lock pnpm-lock.yaml bun.lockb
 echo "=== 3. Reinstalando dependencias limpias (npm) ==="
 npm install
 
-echo "=== 4. Preparando cambios para Git y sincronizando con GitHub (Rama Main) ==="
+echo "=== 4. Ejecutando verificación de compilación (npm run build) ==="
+npm run build
+
+echo "=== 5. Preparando cambios para Git y sincronizando con GitHub (Rama Main) ==="
 git checkout main 2>/dev/null || git checkout -B main
-git add package.json Bash.sh
-git commit -m "Fix: Corrección de dependencias y actualización general para la rama main"
+git add .
+git commit -m "Fix: Integración de npm run build y sincronización completa para producción"
 git push origin main
 
 echo "=== ¡Proceso completado con éxito! Todo sincronizado en main y Vercel iniciará el despliegue automático. ==="
