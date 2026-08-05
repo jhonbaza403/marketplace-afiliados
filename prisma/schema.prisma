@@ -1,0 +1,73 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  role          String    @default("COMPRADOR") // COMPRADOR, VENDEDOR, PROFESIONAL, EMPRESA, ADMIN
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  stores        Store[]
+  products      Product[]
+  services      Service[]
+  videos        Video[]
+  messages      Message[]
+}
+
+model Store {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  userId      String
+  user        User      @refererences([id])
+  products    Product[]
+  createdAt   DateTime  @default(now())
+}
+
+model Product {
+  id          String    @id @default(uuid())
+  title       String
+  description String?
+  price       Float
+  stock       Int       @default(0)
+  storeId     String
+  store       Store     @relation(fields: [storeId], references: [id])
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  createdAt   DateTime  @default(now())
+}
+
+model Service {
+  id          String    @id @default(uuid())
+  title       String
+  category    String
+  price       Float
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  createdAt   DateTime  @default(now())
+}
+
+model Video {
+  id          String    @id @default(uuid())
+  title       String
+  videoUrl    String
+  duration    Int       // Máximo 90 segundos
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  createdAt   DateTime  @default(now())
+}
+
+model Message {
+  id          String    @id @default(uuid())
+  content     String
+  senderId    String
+  sender      User      @relation(fields: [senderId], references: [id])
+  createdAt   DateTime  @default(now())
+}
