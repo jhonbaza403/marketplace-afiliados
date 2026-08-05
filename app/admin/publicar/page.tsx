@@ -16,11 +16,16 @@ export default async function AdminPublishPage() {
     const category = formData.get('category') as string
     const type = formData.get('type') as string
     const price = parseFloat(formData.get('price') as string) || 0
-    const description = formData.get('description') as string
+    let description = formData.get('description') as string
     const image_url = formData.get('image_url') as string
     const seller_whatsapp = formData.get('seller_whatsapp') as string
     const affiliate_link = formData.get('affiliate_link') as string
     const social_network = formData.get('social_network') as string
+
+    // Si la red social no tiene columna dedicada en Supabase, la añadimos a la descripción automáticamente
+    if (social_network) {
+      description = `${description}\n\nCanal / Red Social: ${social_network}`
+    }
 
     const supabaseServer = await createClient()
     const { data: userData } = await supabaseServer.auth.getUser()
@@ -35,7 +40,6 @@ export default async function AdminPublishPage() {
         image_url,
         seller_whatsapp,
         affiliate_link,
-        // Puedes concatenar o guardar la red social dentro de la descripción o en una columna específica si la creas en Supabase
         user_id: userData.user?.id || null,
       },
     ])
@@ -133,7 +137,6 @@ export default async function AdminPublishPage() {
             </div>
           </div>
 
-          {/* Campo esencial para marketing de afiliados estilo Amazon */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
               🔗 Enlace de Afiliado / Producto (Amazon, Hotmart, etc.)
@@ -146,7 +149,6 @@ export default async function AdminPublishPage() {
             />
           </div>
 
-          {/* Redes sociales para difusión */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-zinc-700 mb-1">
               📱 Red Social o Canal de Promoción (Telegram, Instagram, X, Facebook)
