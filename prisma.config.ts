@@ -1,12 +1,11 @@
-import "dotenv/config"
-import { defineConfig, env } from "prisma/config"
-
-export default defineConfig({
-  schema: "prisma/schema.prisma",
-  migrations: {
-    path: "prisma/migrations",
-  },
-  datasource: {
-    url: env("DATABASE_URL"),
-  },
-})
+{
+  "region": "us-east-1",
+  "app": {
+    "name": "tienda-ofertas-marketplace",
+    "framework": "nextjs",
+    "httpPort": 3000,
+    "build": {
+      "command": "next build"
+    }
+  }
+}
